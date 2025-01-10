@@ -8,10 +8,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.PacketDistributor;
 
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -61,7 +59,7 @@ public class PurchaseItemPacket {
             }
 
             // 扣除买家货币并将物品发放给买家
-            savedData.withdraw(buyer.getUUID(), price);
+            savedData.minBalance(buyer.getUUID(), price);
             ItemStack purchasedItem = item.getItemStack().copy();
             if (!buyer.getInventory().add(purchasedItem)) {
                 buyer.drop(purchasedItem, false); // 如果背包满了，直接丢在地上

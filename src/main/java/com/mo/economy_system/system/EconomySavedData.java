@@ -22,12 +22,12 @@ public class EconomySavedData extends SavedData {
     }
 
     // 存款
-    public void deposit(UUID playerUUID, int amount) {
+    public void addBalance(UUID playerUUID, int amount) {
         setBalance(playerUUID, getBalance(playerUUID) + amount);
     }
 
     // 取款
-    public boolean withdraw(UUID playerUUID, int amount) {
+    public boolean minBalance(UUID playerUUID, int amount) {
         int balance = getBalance(playerUUID);
         if (balance >= amount) {
             setBalance(playerUUID, balance - amount);
@@ -43,12 +43,12 @@ public class EconomySavedData extends SavedData {
 
     // 增加余额
     public void increaseBalance(UUID playerUUID, int amount) {
-        deposit(playerUUID, amount);
+        addBalance(playerUUID, amount);
     }
 
     // 减少余额
     public void decreaseBalance(UUID playerUUID, int amount) {
-        if (!withdraw(playerUUID, amount)) {
+        if (!minBalance(playerUUID, amount)) {
             throw new IllegalStateException("Insufficient balance for player: " + playerUUID);
         }
     }

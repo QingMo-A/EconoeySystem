@@ -2,6 +2,8 @@ package com.mo.economy_system.item;
 
 import com.mo.economy_system.EconomySystem;
 import com.mo.economy_system.item.items.GuitarItem;
+import com.mo.economy_system.item.items.RecallPotion;
+import com.mo.economy_system.item.items.WormholePotion;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
@@ -25,11 +27,26 @@ public class ModItems {
                     .fireResistant() // 可选，防火
             ));
 
+    // 注册虫洞药水
+    public static final RegistryObject<Item> WORMHOLE_POTION = ITEMS.register("wormhole_potion",
+            () -> new WormholePotion(new Item.Properties()
+                    .stacksTo(1) // 堆叠数量为1
+                    .fireResistant())); // 可选，防火
+
+    // 注册回忆药水
+    public static final RegistryObject<Item> RECALL_POTION = ITEMS.register("recall_potion",
+            () -> new RecallPotion(new Item.Properties()
+                    .stacksTo(1) // 堆叠数量为1
+                    .fireResistant())); // 可选，防火
+
     // 注册物品到默认创造模式标签（如工具或装饰标签）
     @SubscribeEvent
     public static void addToCreativeTabs(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) { // 将吉他添加到工具标签中
             event.accept(GUITAR.get());
+        } else if (event.getTabKey() == CreativeModeTabs.FOOD_AND_DRINKS) {
+            event.accept(WORMHOLE_POTION.get());
+            event.accept(RECALL_POTION.get());
         }
     }
 

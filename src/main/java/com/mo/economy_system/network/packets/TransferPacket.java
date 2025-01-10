@@ -12,6 +12,11 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 public class TransferPacket {
+
+    private static final String TRANSFER_SUCCESSFULLY_MESSAGE_KEY = "message.transfer.transfer_successfully";
+    private static final String RECEIVE_SUCCESSFULLY_MESSAGE_KEY = "message.transfer.receive_successfully";
+    private static final String TRANSFER_FAILED_MESSAGE_KEY = "message.transfer.transfer_failed";
+
     private final UUID targetUUID;
     private final int amount;
 
@@ -39,12 +44,12 @@ public class TransferPacket {
                     EconomySavedData data = EconomySavedData.getInstance(serverLevel);
                     Player target = serverLevel.getPlayerByUUID(msg.targetUUID); // 根据 UUID 获取目标玩家
 
-                    if (target != null && data.withdraw(sender.getUUID(), msg.amount)) {
-                        data.deposit(target.getUUID(), msg.amount);
-                        sender.sendSystemMessage(Component.literal("Transferred " + msg.amount + " coins to " + target.getName().getString()));
-                        target.sendSystemMessage(Component.literal("Received " + msg.amount + " coins from " + sender.getName().getString()));
+                    if (target != null && data.minBalance(sender.getUUID(), msg.amount) && target.getUUID() != sender.getUUID()) {
+                        data.addBalance(target.getUUID(), msg.amount);
+                        sender.sendSystemMessage(Component.translatable(TRANSFER_SUCCESSFULLY_MESSAGE_KEY, msg.amount, target.getName().getString()));
+                        target.sendSystemMessage(Component.translatable(RECEIVE_SUCCESSFULLY_MESSAGE_KEY, sender.getName().getString(), msg.amount));
                     } else {
-                        sender.sendSystemMessage(Component.literal("Transfer failed!"));
+                        sender.sendSystemMessage(Component.translatable(TRANSFER_FAILED_MESSAGE_KEY));
                     }
                 }
             }

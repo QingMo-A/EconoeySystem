@@ -8,6 +8,11 @@
   "button.home.shop": "系统商店",
   "button.home.market": "玩家市场",
 
+  "message.mob_reward": "你从 %s 的尸体上找到了 %s 枚梦鱼币",
+  "message.transfer.transfer_successfully": "已将 %s 枚梦鱼币发给 %s",
+  "message.transfer.receive_successfully": "你收到来自 %s 的 %s 枚梦鱼币",
+  "message.transfer.transfer_failed": "§4转账失败, §b可能是因为 §e目标不存在 余额不足 §b或是 §e目标为自己",
+
   "screen.shop.title": "商店",
   "screen.shop.item.price": "%s 枚梦鱼币 / 个",
   "screen.shop.item.id": "物品ID: %s",
@@ -53,5 +58,7 @@
   "message.list.list_unmatched_item": "你手中的物品与上架的物品不匹配",
   "text.list.hint": "输入价格(整数且大于0)",
 
-  "item.economy_system.guitar": "吉他"
+  "item.economy_system.guitar": "吉他",
+  "item.economy_system.wormhole_potion": "虫洞药水",
+  "item.economy_system.recall_potion": "回忆药水"
 }

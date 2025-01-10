@@ -54,7 +54,7 @@ public class BuyItemPacket {
                 // 检查玩家是否有足够的余额
                 if (economyData.getBalance(player.getUUID()) >= totalPrice) {
                     // 扣除玩家余额
-                    economyData.withdraw(player.getUUID(), totalPrice);
+                    economyData.minBalance(player.getUUID(), totalPrice);
 
                     // 创建物品并添加到玩家背包
                     ItemStack purchasedItem = getItemStack(msg.itemID);

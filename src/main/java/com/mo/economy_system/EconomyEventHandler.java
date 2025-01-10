@@ -7,9 +7,7 @@ import com.mo.economy_system.market.MarketSavedData;
 import com.mo.economy_system.reward.RewardManager;
 import com.mo.economy_system.shop.ShopManager;
 import com.mo.economy_system.system.EconomySavedData;
-import com.mo.economy_system.system.MobKillRewardHandler;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
@@ -21,7 +19,6 @@ import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
 import java.util.Random;
@@ -32,9 +29,9 @@ public class EconomyEventHandler {
     private static ShopManager shopManager;
 
     private static final Random RANDOM = new Random();
-    private static final MobKillRewardHandler m = new MobKillRewardHandler();
 
     private static final String SHOP_REFRESH_MESSAGE_KEY = "message.shop.shop_refresh";
+    private static final String MOB_REWARD_MESSAGE_KEY = "message.mob_reward";
 
     @SubscribeEvent
     public static void onServerStarting(ServerStartingEvent event) {
@@ -106,8 +103,8 @@ public class EconomyEventHandler {
         if (rewardEntry != null && RANDOM.nextDouble() < rewardEntry.dropChance) {
             int reward = RANDOM.nextInt(rewardEntry.dropMax - rewardEntry.dropMin + 1) + rewardEntry.dropMin;
             EconomySavedData economy = EconomySavedData.getInstance(player.serverLevel());
-            economy.deposit(player.getUUID(), reward);
-            player.sendSystemMessage(Component.literal("You earned " + reward + " coins!"));
+            economy.addBalance(player.getUUID(), reward);
+            player.sendSystemMessage(Component.translatable(MOB_REWARD_MESSAGE_KEY, event.getEntity().getName().getString(), reward));
         }
     }
 

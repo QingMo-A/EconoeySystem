@@ -39,9 +39,9 @@ public class ModifyBalancePacket {
                         data.setBalance(player.getUUID(), msg.amount);
                     } else {
                         if (msg.amount > 0) {
-                            data.deposit(player.getUUID(), msg.amount);
+                            data.addBalance(player.getUUID(), msg.amount);
                         } else {
-                            data.withdraw(player.getUUID(), -msg.amount);
+                            data.minBalance(player.getUUID(), -msg.amount);
                         }
                     }
                     player.sendSystemMessage(Component.literal("Balance updated successfully!"));
