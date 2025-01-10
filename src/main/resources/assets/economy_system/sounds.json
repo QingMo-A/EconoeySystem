@@ -1,0 +1,65 @@
+{
+  "note_c": {
+    "sounds": [
+      {
+        "name": "economy_system:note_c",
+        "volume": 1.0,
+        "pitch": 1.0
+      }
+    ]
+  },
+  "note_dm": {
+    "sounds": [
+      {
+        "name": "economy_system:note_dm",
+        "volume": 1.0,
+        "pitch": 1.0
+      }
+    ]
+  },
+  "note_em": {
+    "sounds": [
+      {
+        "name": "economy_system:note_em",
+        "volume": 1.0,
+        "pitch": 1.0
+      }
+    ]
+  },
+  "note_f": {
+    "sounds": [
+      {
+        "name": "economy_system:note_f",
+        "volume": 1.0,
+        "pitch": 1.0
+      }
+    ]
+  },
+  "note_g": {
+    "sounds": [
+      {
+        "name": "economy_system:note_g",
+        "volume": 1.0,
+        "pitch": 1.0
+      }
+    ]
+  },
+  "note_am": {
+    "sounds": [
+      {
+        "name": "economy_system:note_am",
+        "volume": 1.0,
+        "pitch": 1.0
+      }
+    ]
+  },
+  "note_bm": {
+    "sounds": [
+      {
+        "name": "economy_system:note_bm",
+        "volume": 1.0,
+        "pitch": 1.0
+      }
+    ]
+  }
+}
