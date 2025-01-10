@@ -60,5 +60,19 @@
 
   "item.economy_system.guitar": "吉他",
   "item.economy_system.wormhole_potion": "虫洞药水",
-  "item.economy_system.recall_potion": "回忆药水"
+  "item.economy_system.recall_potion": "回忆药水",
+
+  "message.tpa.self_error": "你不能向自己发送传送请求。",
+  "message.tpa.no_potion": "你需要一个虫洞药水才能发送传送请求。",
+  "message.tpa.request_sent": "已向 %s 发送了传送请求。",
+  "message.tpa.accept": "点击同意",
+  "message.tpa.deny": "点击拒绝",
+  "message.tpa.no_request": "你没有待处理的传送请求。",
+  "message.tpa.sender_offline": "发送传送请求的玩家已离线。",
+  "message.tpa.sender_no_potion": "%s 已经没有虫洞药水。",
+  "message.tpa.teleported": "你已被传送到 %s。",
+  "message.tpa.accepted": "你接受了来自 %s 的传送请求。",
+  "message.tpa.denied": "你拒绝了传送请求。",
+  "message.tpa.timeout_sender": "你向 %s 发送的传送请求已超时。",
+  "message.tpa.timeout_target": "%s 的传送请求已超时。"
 }

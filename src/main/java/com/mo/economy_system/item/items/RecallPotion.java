@@ -16,6 +16,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
+import net.minecraft.resources.ResourceKey;
 
 public class RecallPotion extends Item {
     public RecallPotion(Properties properties) {
@@ -46,27 +47,44 @@ public class RecallPotion extends Item {
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
         if (!level.isClientSide && entity instanceof ServerPlayer player) {
-            ServerLevel serverLevel = (ServerLevel) level; // 强制转换为 ServerLevel
+            ServerLevel currentLevel = (ServerLevel) level; // 当前所在维度的 ServerLevel
 
-            // 获取玩家的出生点
+            // 获取玩家的出生点和出生维度
             BlockPos respawnPosition = player.getRespawnPosition();
+            ResourceKey<Level> respawnDimensionKey = player.getRespawnDimension();
 
-            // 检查出生点是否设置以及是否在同一维度
-            if (respawnPosition == null || player.getRespawnDimension() != level.dimension()) {
-                respawnPosition = level.getSharedSpawnPos(); // 如果未设置出生点，使用世界默认出生点
+            // 如果出生点未设置，使用默认世界出生点
+            if (respawnPosition == null) {
+                respawnPosition = level.getSharedSpawnPos(); // 默认出生点
+                respawnDimensionKey = Level.OVERWORLD; // 默认维度为主世界
+            }
+
+            // 获取目标维度的 ServerLevel
+            ServerLevel respawnLevel = currentLevel.getServer().getLevel(respawnDimensionKey);
+
+            // 检查目标维度是否存在
+            if (respawnLevel == null) {
+                player.sendSystemMessage(Component.literal("Error: Unable to locate your respawn dimension!"));
+                return stack;
             }
 
             // 传送前粒子效果
-            serverLevel.sendParticles(ParticleTypes.PORTAL, player.getX(), player.getY(), player.getZ(), 50, 1, 1, 1, 0.1);
+            currentLevel.sendParticles(ParticleTypes.PORTAL, player.getX(), player.getY(), player.getZ(), 50, 1, 1, 1, 0.1);
 
-            // 传送玩家
+            // 如果需要切换维度
+            if (!currentLevel.dimension().equals(respawnDimensionKey)) {
+                // 切换维度
+                player.changeDimension(respawnLevel);
+            }
+
+            // 在目标维度传送到出生点
             player.teleportTo(respawnPosition.getX() + 0.5, respawnPosition.getY(), respawnPosition.getZ() + 0.5);
 
             // 传送后粒子效果
-            serverLevel.sendParticles(ParticleTypes.PORTAL, respawnPosition.getX(), respawnPosition.getY(), respawnPosition.getZ(), 50, 1, 1, 1, 0.1);
+            respawnLevel.sendParticles(ParticleTypes.PORTAL, respawnPosition.getX(), respawnPosition.getY(), respawnPosition.getZ(), 50, 1, 1, 1, 0.1);
 
             // 播放音效
-            level.playSound(null, respawnPosition, SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1.0F, 1.0F);
+            respawnLevel.playSound(null, respawnPosition, SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1.0F, 1.0F);
 
             // 消耗物品
             stack.shrink(1);

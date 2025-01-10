@@ -1,6 +1,7 @@
 package com.mo.economy_system;
 
 import com.mo.economy_system.commands.EconomyCommands;
+import com.mo.economy_system.commands.TpaCommand;
 import com.mo.economy_system.market.MarketItem;
 import com.mo.economy_system.market.MarketManager;
 import com.mo.economy_system.market.MarketSavedData;
@@ -37,6 +38,7 @@ public class EconomyEventHandler {
     public static void onServerStarting(ServerStartingEvent event) {
         // 在服务器启动时加载数据
         EconomyCommands.register(event.getServer().getCommands().getDispatcher());
+        TpaCommand.register(event.getServer().getCommands().getDispatcher());
         EconomySavedData.getInstance(event.getServer().overworld());
         // 初始化 ShopManager
         shopManager = new ShopManager();

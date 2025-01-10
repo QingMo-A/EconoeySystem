@@ -5,6 +5,7 @@ import com.mo.economy_system.network.EconomyNetwork;
 import com.mo.economy_system.network.packets.MarketRequestPacket;
 import com.mo.economy_system.network.packets.PurchaseItemPacket;
 import com.mo.economy_system.network.packets.RemoveItemPacket;
+import com.mo.economy_system.utils.MessageKeys;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -19,21 +20,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class MarketScreen extends Screen {
-
-    private static final String TITLE_KEY = "screen.market.title";
-    private static final String SELLER_NAME_KEY = "screen.market.item.seller_name";
-    private static final String SELLER_UUID_KEY = "screen.market.item.seller_uuid";
-    private static final String TRADE_ID_KEY = "screen.market.item.trade_id";
-    private static final String ITEM_ID_KEY = "screen.market.item.id";
-    private static final String ITEM_NAME_AND_COUNT_KEY = "screen.market.item.name_and_count";
-    private static final String ITEM_PRICE_KEY = "screen.market.item.price";
-    private static final String NO_ITEMS_TEXT_KEY = "text.market.no_items";
-    private static final String LIST_BUTTON_KEY = "button.market.list";
-    private static final String BUY_BUTTON_KEY = "button.market.buy";
-    private static final String REMOVE_BUTTON_KEY = "button.market.remove";
-    private static final String HINT_TEXT_KEY = "text.market.hint";
-    private static final String PAGE_LABEL_KEY = "screen.market.page_label";
-
     private List<MarketItem> items = new ArrayList<>(); // 市场商品列表
     private List<MarketItem> filteredItems = new ArrayList<>(); // 根据搜索过滤后的商品列表
     private int currentPage = 0; // 当前页码
@@ -50,7 +36,7 @@ public class MarketScreen extends Screen {
 
     // 构造方法
     public MarketScreen() {
-        super(Component.translatable(TITLE_KEY));
+        super(Component.translatable(MessageKeys.TITLE_KEY));
     }
 
     // 初始化
@@ -73,7 +59,7 @@ public class MarketScreen extends Screen {
         this.searchBox.setResponder(text -> isUserTyping = true); // 标记用户正在输入
         this.searchBox.setFocused(false); // 默认不聚焦
         this.searchBox.setMaxLength(50); // 限制输入长度
-        this.searchBox.setHint(Component.translatable(HINT_TEXT_KEY)); // 提示文本
+        this.searchBox.setHint(Component.translatable(MessageKeys.HINT_TEXT_KEY)); // 提示文本
 
         // 添加翻页按钮
         addPageButtons();
@@ -114,9 +100,9 @@ public class MarketScreen extends Screen {
         if (filteredItems.isEmpty()) {
             // 如果没有商品，添加无商品提示的渲染任务
             renderCache.add((guiGraphics) -> {
-                int textWidth = this.font.width(Component.translatable(NO_ITEMS_TEXT_KEY));
+                int textWidth = this.font.width(Component.translatable(MessageKeys.NO_ITEMS_TEXT_KEY));
                 int xPosition = (this.width - textWidth) / 2;
-                guiGraphics.drawString(this.font, Component.translatable(NO_ITEMS_TEXT_KEY), xPosition, this.height / 2 - 10, 0xFFFFFF, false);
+                guiGraphics.drawString(this.font, Component.translatable(MessageKeys.NO_ITEMS_TEXT_KEY), xPosition, this.height / 2 - 10, 0xFFFFFF, false);
             });
             return;
         }
@@ -144,13 +130,13 @@ public class MarketScreen extends Screen {
 
             // 添加物品名称渲染任务
             renderCache.add((guiGraphics) -> guiGraphics.drawString(this.font,
-                    Component.translatable(ITEM_NAME_AND_COUNT_KEY,
+                    Component.translatable(MessageKeys.ITEM_NAME_AND_COUNT_KEY,
                             itemStack.getHoverName().getString(),
                             itemStack.getCount()), startX + 20, currentY + 5, 0xFFFFFF, false));
 
             // 添加价格渲染任务
             renderCache.add((guiGraphics) -> guiGraphics.drawString(this.font,
-                    Component.translatable(ITEM_PRICE_KEY, item.getPrice()), startX, currentY + 18, 0xAAAAAA, false));
+                    Component.translatable(MessageKeys.ITEM_PRICE_KEY, item.getPrice()), startX, currentY + 18, 0xAAAAAA, false));
 
             // 添加购买或下架按钮（确保在初始化时添加按钮）
             addPurchaseOrRemoveButton(item, this.width - startX, currentY, playerUUID);
@@ -173,10 +159,10 @@ public class MarketScreen extends Screen {
 
             if (isMouseOver(mouseX, mouseY, startX, y, 16, 16)) {
                 List<Component> tooltip = new ArrayList<>();
-                tooltip.add(Component.translatable(SELLER_NAME_KEY, item.getSellerName()));
-                tooltip.add(Component.translatable(SELLER_UUID_KEY, item.getSellerID()));
-                tooltip.add(Component.translatable(TRADE_ID_KEY, item.getTradeID()));
-                tooltip.add(Component.translatable(ITEM_ID_KEY, item.getItemID()));
+                tooltip.add(Component.translatable(MessageKeys.SELLER_NAME_KEY, item.getSellerName()));
+                tooltip.add(Component.translatable(MessageKeys.SELLER_UUID_KEY, item.getSellerID()));
+                tooltip.add(Component.translatable(MessageKeys.TRADE_ID_KEY, item.getTradeID()));
+                tooltip.add(Component.translatable(MessageKeys.ITEM_ID_KEY, item.getItemID()));
 
                 guiGraphics.renderTooltip(this.font, tooltip, Optional.empty(), mouseX, mouseY);
             }
@@ -196,8 +182,8 @@ public class MarketScreen extends Screen {
     private boolean isItemButton(Button button) {
         // 判断按钮是否为 "Buy" 或 "Remove" 按钮
         Component buttonMessage = button.getMessage();
-        return buttonMessage.equals(Component.translatable(BUY_BUTTON_KEY)) ||
-                buttonMessage.equals(Component.translatable(REMOVE_BUTTON_KEY));
+        return buttonMessage.equals(Component.translatable(MessageKeys.BUY_BUTTON_KEY)) ||
+                buttonMessage.equals(Component.translatable(MessageKeys.REMOVE_BUTTON_KEY));
     }
 
     // 添加购买按钮
@@ -265,7 +251,7 @@ public class MarketScreen extends Screen {
         int buttonHeight = 20;
 
         this.addRenderableWidget(
-                Button.builder(Component.translatable(LIST_BUTTON_KEY), button -> {
+                Button.builder(Component.translatable(MessageKeys.LIST_BUTTON_KEY), button -> {
                             // 打开上架界面
                             this.minecraft.setScreen(new ListItemScreen(minecraft.player));
                         })
@@ -279,7 +265,7 @@ public class MarketScreen extends Screen {
     private void addPurchaseOrRemoveButton(MarketItem item, int buttonX, int buttonY, UUID playerUUID) {
         Button button;
         if (item.getSellerID().equals(playerUUID)) {
-            button = Button.builder(Component.translatable(REMOVE_BUTTON_KEY), btn -> {
+            button = Button.builder(Component.translatable(MessageKeys.REMOVE_BUTTON_KEY), btn -> {
                         // 发送下架请求到服务器
                         EconomyNetwork.INSTANCE.sendToServer(new RemoveItemPacket(item.getTradeID()));
                         refreshItemButtons(); // 局部更新商品按钮
@@ -290,7 +276,7 @@ public class MarketScreen extends Screen {
                     .size(60, 20)
                     .build();
         } else {
-            button = Button.builder(Component.translatable(BUY_BUTTON_KEY), btn -> {
+            button = Button.builder(Component.translatable(MessageKeys.BUY_BUTTON_KEY), btn -> {
                         // 发送购买请求到服务器
                         EconomyNetwork.INSTANCE.sendToServer(new PurchaseItemPacket(item.getTradeID()));
                         refreshItemButtons(); // 局部更新商品按钮
