@@ -1,10 +1,12 @@
 package com.mo.economy_system;
 
 import com.mo.economy_system.commands.EconomyCommands;
+import com.mo.economy_system.commands.RedPacketCommand;
 import com.mo.economy_system.commands.TpaCommand;
 import com.mo.economy_system.market.MarketItem;
 import com.mo.economy_system.market.MarketManager;
 import com.mo.economy_system.market.MarketSavedData;
+import com.mo.economy_system.red_packet.RedPacketManager;
 import com.mo.economy_system.reward.RewardManager;
 import com.mo.economy_system.shop.ShopManager;
 import com.mo.economy_system.system.EconomySavedData;
@@ -39,6 +41,8 @@ public class EconomyEventHandler {
         // 在服务器启动时加载数据
         EconomyCommands.register(event.getServer().getCommands().getDispatcher());
         TpaCommand.register(event.getServer().getCommands().getDispatcher());
+        RedPacketCommand.register(event.getServer().getCommands().getDispatcher());
+
         EconomySavedData.getInstance(event.getServer().overworld());
         // 初始化 ShopManager
         shopManager = new ShopManager();
@@ -65,7 +69,7 @@ public class EconomyEventHandler {
         long dayTime = overworld.getDayTime() % 24000; // 获取当前世界的时间（一天的 tick 范围 0-23999）
 
         // 如果是中午（6000 tick）
-        if (dayTime == 6000) {
+        if (dayTime == 6000 || dayTime == 18000) {
             if (shopManager != null) {
                 shopManager.adjustPrices(); // 调整价格
 
@@ -74,6 +78,11 @@ public class EconomyEventHandler {
                     player.sendSystemMessage(Component.translatable(SHOP_REFRESH_MESSAGE_KEY));
                 }
             }
+        }
+
+        // 定时检查红包（每 100 tick 检查一次）
+        if (dayTime % 100 == 0) {
+            RedPacketManager.checkAndExpireRedPackets();
         }
     }
 

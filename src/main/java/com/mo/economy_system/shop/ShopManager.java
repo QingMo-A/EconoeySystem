@@ -54,6 +54,8 @@ public class ShopManager {
     }
 
     private void saveDefaultConfig() {
+        items.add(new ShopItem("economy_system:recall_potion", 5, "回忆药水"));
+        items.add(new ShopItem("economy_system:wormhole_potion", 10, "虫洞药水"));
         items.add(new ShopItem("minecraft:dirt", 10, "泥土"));
         items.add(new ShopItem("minecraft:grass_block", 15, "草方块"));
         items.add(new ShopItem("minecraft:sand", 10, "沙子"));
