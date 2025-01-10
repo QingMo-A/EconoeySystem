@@ -16,6 +16,7 @@ public class HomeScreen extends Screen {
     private static final String BALANCE_TEXT_KEY = "text.home.balance";
     private static final String SHOP_BUTTON_KEY = "button.home.shop";
     private static final String MARKET_BUTTON_KEY = "button.home.market";
+    private static final String ABOUT_BUTTON_KEY = "button.home.about";
 
     private int balance = -1; // 用于存储玩家余额，默认值为 -1 表示未获取
 
@@ -48,6 +49,17 @@ public class HomeScreen extends Screen {
                             this.minecraft.setScreen(new MarketScreen());
                         })
                         .pos(this.width / 2 - 50, this.height / 2)  // 设置按钮位置
+                        .size(100, 20)  // 设置按钮大小
+                        .build()
+        );
+
+        // 添加按钮以打开 MarketScreen
+        this.addRenderableWidget(
+                Button.builder(Component.translatable(ABOUT_BUTTON_KEY), button -> {
+                            // 打开 MarketScreen（初始化为空列表）
+                            this.minecraft.setScreen(new AboutScreen());
+                        })
+                        .pos(this.width / 2 - 50, this.height / 2 + 30)  // 设置按钮位置
                         .size(100, 20)  // 设置按钮大小
                         .build()
         );

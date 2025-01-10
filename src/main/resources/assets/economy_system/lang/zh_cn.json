@@ -7,6 +7,7 @@
   "text.home.balance": "余额: %s",
   "button.home.shop": "系统商店",
   "button.home.market": "玩家市场",
+  "button.home.about": "关于本模组",
 
   "message.mob_reward": "你从 %s 的尸体上找到了 %s 枚梦鱼币",
   "message.transfer.transfer_successfully": "已将 %s 枚梦鱼币发给 %s",
