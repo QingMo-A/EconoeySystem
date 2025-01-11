@@ -52,6 +52,7 @@ public class EconomyEventHandler {
         shopManager = new ShopManager();
         MarketSavedData marketData = MarketSavedData.getInstance(overworld);
         MarketManager.setMarketItems(marketData.getMarketItems()); // 将数据加载到 MarketManager
+        TerritoryManager.reset();
         // 初始化领地数据
         TerritoryManager.initialize(overworld);
     }

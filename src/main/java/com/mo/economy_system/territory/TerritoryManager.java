@@ -66,6 +66,12 @@ public class TerritoryManager {
         return null;
     }
 
+    // 获取所有领地
+    public static List<Territory> getAllTerritories() {
+        return new ArrayList<>(territoryByID.values());
+    }
+
+
     /**
      * 忽略 Y 轴的范围判断，根据 X 和 Z 判断领地
      */
@@ -133,4 +139,11 @@ public class TerritoryManager {
         }
     }
 
+    // 重置领地管理器
+    public static void reset() {
+        savedData = null;
+        initialized = false;
+        territoryByID.clear();
+        territoriesByOwner.clear();
+    }
 }

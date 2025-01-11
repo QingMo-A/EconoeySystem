@@ -1,5 +1,7 @@
 package com.mo.economy_system.item.items;
 
+import com.mo.economy_system.territory.Territory;
+import com.mo.economy_system.territory.TerritoryManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -47,8 +49,16 @@ public class ClaimWandItem extends Item {
             secondPositions.put(playerUUID, clickedPos);
             player.sendSystemMessage(Component.literal("§a第二个点已确定 坐标: " + clickedPos.getX() + " " + clickedPos.getY() + " " + clickedPos.getZ()));
 
-            // 计算范围和价格
+            // 检查新圈地是否包含已有领地
             BlockPos firstPos = firstPositions.get(playerUUID);
+            if (isOverlappingExistingTerritory(playerUUID, firstPos, clickedPos)) {
+                player.sendSystemMessage(Component.literal("§c圈地失败！新领地与现有领地重叠，请重新选择点位。"));
+                firstPositions.remove(playerUUID);
+                secondPositions.remove(playerUUID);
+                return InteractionResult.FAIL;
+            }
+
+            // 计算范围和价格
             int volume = calculateVolume(firstPos, clickedPos);
             int price = volume * 20;
 
@@ -72,6 +82,7 @@ public class ClaimWandItem extends Item {
 
         return InteractionResult.SUCCESS;
     }
+
 
     private int calculateVolume(BlockPos pos1, BlockPos pos2) {
         int xSize = Math.abs(pos2.getX() - pos1.getX()) + 1;
@@ -165,4 +176,34 @@ public class ClaimWandItem extends Item {
             executorService.shutdownNow();
         }
     }
+
+    private boolean isOverlappingExistingTerritory(UUID playerUUID, BlockPos pos1, BlockPos pos2) {
+        // 计算新领地的范围
+        int minX = Math.min(pos1.getX(), pos2.getX());
+        int maxX = Math.max(pos1.getX(), pos2.getX());
+        int minZ = Math.min(pos1.getZ(), pos2.getZ());
+        int maxZ = Math.max(pos1.getZ(), pos2.getZ());
+
+        // 遍历所有现有领地
+        for (Territory territory : TerritoryManager.getAllTerritories()) {
+            // 如果玩家是领地所有者，不检测此领地
+            /*if (territory.isOwner(playerUUID)) {
+                continue;
+            }*/
+
+            // 获取现有领地的 X-Z 范围
+            int existingMinX = Math.min(territory.getPos1().getX(), territory.getPos2().getX());
+            int existingMaxX = Math.max(territory.getPos1().getX(), territory.getPos2().getX());
+            int existingMinZ = Math.min(territory.getPos1().getZ(), territory.getPos2().getZ());
+            int existingMaxZ = Math.max(territory.getPos1().getZ(), territory.getPos2().getZ());
+
+            // 检测范围是否重叠
+            if (maxX >= existingMinX && minX <= existingMaxX && maxZ >= existingMinZ && minZ <= existingMaxZ) {
+                return true; // 存在重叠
+            }
+        }
+
+        return false; // 没有重叠
+    }
+
 }
