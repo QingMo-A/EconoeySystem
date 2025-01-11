@@ -1,5 +1,6 @@
 package com.mo.economy_system;
 
+import com.mo.economy_system.commands.ClaimCommand;
 import com.mo.economy_system.commands.EconomyCommands;
 import com.mo.economy_system.commands.RedPacketCommand;
 import com.mo.economy_system.commands.TpaCommand;
@@ -10,6 +11,7 @@ import com.mo.economy_system.red_packet.RedPacketManager;
 import com.mo.economy_system.reward.RewardManager;
 import com.mo.economy_system.shop.ShopManager;
 import com.mo.economy_system.system.EconomySavedData;
+import com.mo.economy_system.territory.TerritoryManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -42,12 +44,17 @@ public class EconomyEventHandler {
         EconomyCommands.register(event.getServer().getCommands().getDispatcher());
         TpaCommand.register(event.getServer().getCommands().getDispatcher());
         RedPacketCommand.register(event.getServer().getCommands().getDispatcher());
+        ClaimCommand.register(event.getServer().getCommands().getDispatcher());
 
-        EconomySavedData.getInstance(event.getServer().overworld());
+        ServerLevel overworld = event.getServer().overworld();
+
+        EconomySavedData.getInstance(overworld);
         // 初始化 ShopManager
         shopManager = new ShopManager();
-        MarketSavedData marketData = MarketSavedData.getInstance(event.getServer().overworld());
+        MarketSavedData marketData = MarketSavedData.getInstance(overworld);
         MarketManager.setMarketItems(marketData.getMarketItems()); // 将数据加载到 MarketManager
+        // 初始化领地数据
+        TerritoryManager.initialize(overworld);
     }
 
     @SubscribeEvent

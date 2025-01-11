@@ -7,6 +7,7 @@
   "text.home.balance": "余额: %s",
   "button.home.shop": "系统商店",
   "button.home.market": "玩家市场",
+  "button.home.territory": "我的领地",
   "button.home.about": "关于本模组",
 
   "message.mob_reward": "你从 %s 的尸体上找到了 %s 枚梦鱼币",
@@ -59,9 +60,15 @@
   "message.list.list_unmatched_item": "你手中的物品与上架的物品不匹配",
   "text.list.hint": "输入价格(整数且大于0)",
 
+  "screen.territory.territory_name": "领地名称: %s",
+  "screen.territory.territory_uuid": "领地UUID: %s",
+  "screen.territory.territory_owner_name": "领地所有者名称: %s",
+  "screen.territory.territory_owner_name_uuid": "领地所有者UUID: %s",
+
   "item.economy_system.guitar": "吉他",
   "item.economy_system.wormhole_potion": "虫洞药水",
   "item.economy_system.recall_potion": "回忆药水",
+  "item.economy_system.claim_wand": "圈地杖",
 
   "message.tpa.self_error": "你不能向自己发送传送请求。",
   "message.tpa.no_potion": "你需要一个虫洞药水才能发送传送请求。",

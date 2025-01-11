@@ -1,6 +1,7 @@
 package com.mo.economy_system.item;
 
 import com.mo.economy_system.EconomySystem;
+import com.mo.economy_system.item.items.ClaimWandItem;
 import com.mo.economy_system.item.items.GuitarItem;
 import com.mo.economy_system.item.items.RecallPotion;
 import com.mo.economy_system.item.items.WormholePotion;
@@ -39,11 +40,18 @@ public class ModItems {
                     .stacksTo(1) // 堆叠数量为1
                     .fireResistant())); // 可选，防火
 
+    // 注册圈地杖
+    public static final RegistryObject<Item> CLAIM_WAND = ITEMS.register("claim_wand",
+            () -> new ClaimWandItem(new Item.Properties()
+                    .stacksTo(1) // 限制每堆只能有一个
+            ));
+
     // 注册物品到默认创造模式标签（如工具或装饰标签）
     @SubscribeEvent
     public static void addToCreativeTabs(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) { // 将吉他添加到工具标签中
             event.accept(GUITAR.get());
+            event.accept(CLAIM_WAND.get());
         } else if (event.getTabKey() == CreativeModeTabs.FOOD_AND_DRINKS) {
             event.accept(WORMHOLE_POTION.get());
             event.accept(RECALL_POTION.get());

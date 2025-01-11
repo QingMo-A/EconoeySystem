@@ -31,5 +31,7 @@ public class EconomyNetwork {
         INSTANCE.registerMessage(packetId++, MarketResponsePacket.class, MarketResponsePacket::encode, MarketResponsePacket::decode, MarketResponsePacket::handle);
         INSTANCE.registerMessage(packetId++, PurchaseItemPacket.class, PurchaseItemPacket::encode, PurchaseItemPacket::decode, PurchaseItemPacket::handle);
         INSTANCE.registerMessage(packetId++, RemoveItemPacket.class, RemoveItemPacket::encode, RemoveItemPacket::decode, RemoveItemPacket::handle);
+        INSTANCE.registerMessage(packetId++, TerritoryRequestPacket.class, TerritoryRequestPacket::encode, TerritoryRequestPacket::decode, TerritoryRequestPacket::handle);
+        INSTANCE.registerMessage(packetId++, TerritoryResponsePacket.class, TerritoryResponsePacket::encode, TerritoryResponsePacket::decode, TerritoryResponsePacket::handle);
     }
 }

@@ -4,6 +4,7 @@ import com.mo.economy_system.network.EconomyNetwork;
 import com.mo.economy_system.network.packets.BalanceRequestPacket;
 import com.mo.economy_system.network.packets.MarketRequestPacket;
 import com.mo.economy_system.network.packets.ShopRequestPacket;
+import com.mo.economy_system.network.packets.TerritoryRequestPacket;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.components.Button;
@@ -16,6 +17,7 @@ public class HomeScreen extends Screen {
     private static final String BALANCE_TEXT_KEY = "text.home.balance";
     private static final String SHOP_BUTTON_KEY = "button.home.shop";
     private static final String MARKET_BUTTON_KEY = "button.home.market";
+    private static final String TERRITORY_BUTTON_KEY = "button.home.territory";
     private static final String ABOUT_BUTTON_KEY = "button.home.about";
 
     private int balance = -1; // 用于存储玩家余额，默认值为 -1 表示未获取
@@ -53,13 +55,24 @@ public class HomeScreen extends Screen {
                         .build()
         );
 
-        // 添加按钮以打开 MarketScreen
+        // 添加按钮
         this.addRenderableWidget(
-                Button.builder(Component.translatable(ABOUT_BUTTON_KEY), button -> {
-                            // 打开 MarketScreen（初始化为空列表）
-                            this.minecraft.setScreen(new AboutScreen());
+                Button.builder(Component.translatable(TERRITORY_BUTTON_KEY), button -> {
+                            // 请求服务器数据
+                            EconomyNetwork.INSTANCE.sendToServer(new TerritoryRequestPacket());
+                            this.minecraft.setScreen(new TerritoryScreen());
                         })
                         .pos(this.width / 2 - 50, this.height / 2 + 30)  // 设置按钮位置
+                        .size(100, 20)  // 设置按钮大小
+                        .build()
+        );
+
+        // 添加按钮以打开
+        this.addRenderableWidget(
+                Button.builder(Component.translatable(ABOUT_BUTTON_KEY), button -> {
+                            this.minecraft.setScreen(new AboutScreen());
+                        })
+                        .pos(this.width / 2 - 50, this.height / 2 + 60)  // 设置按钮位置
                         .size(100, 20)  // 设置按钮大小
                         .build()
         );
