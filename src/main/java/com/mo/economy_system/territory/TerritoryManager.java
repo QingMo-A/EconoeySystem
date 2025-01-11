@@ -26,6 +26,7 @@ public class TerritoryManager {
     public static void addTerritory(Territory territory) {
         if (!territoryByID.containsKey(territory.getTerritoryID())) { // 防止重复添加
             territoryByID.put(territory.getTerritoryID(), territory);
+            System.out.println(territory.getTerritoryID());
             territoriesByOwner.computeIfAbsent(territory.getOwnerUUID(), k -> new ArrayList<>()).add(territory);
             if (savedData != null) {
                 savedData.addTerritory(territory);
@@ -86,8 +87,21 @@ public class TerritoryManager {
 
     // 根据领地 ID 获取领地
     public static Territory getTerritoryByID(UUID territoryID) {
-        return territoryByID.get(territoryID);
+        System.out.println("Current territoryByID size: " + territoryByID.size());
+        System.out.println("Current territoryByID entries:");
+        for (Map.Entry<UUID, Territory> entry : territoryByID.entrySet()) {
+            System.out.println("ID: " + entry.getKey() + ", Territory: " + entry.getValue());
+        }
+
+        Territory result = territoryByID.get(territoryID);
+        if (result == null) {
+            System.out.println("No territory found for ID: " + territoryID);
+        } else {
+            System.out.println("Found territory: " + result.getName() + " for ID: " + territoryID);
+        }
+        return result;
     }
+
 
     // 获取玩家拥有的领地
     public static List<Territory> getTerritoriesByOwner(UUID ownerUUID) {

@@ -46,7 +46,7 @@ public class ClaimCommand {
 
                             // 扣除金额并创建领地
                             String name = StringArgumentType.getString(context, "name");
-                            Territory territory = new Territory(name, playerUUID, player.getName().getString(), firstPos.getX(), firstPos.getY(), firstPos.getZ(), secondPos.getX(), secondPos.getY(), secondPos.getZ());
+                            Territory territory = new Territory(name, playerUUID, player.getName().getString(), firstPos.getX(), firstPos.getY(), firstPos.getZ(), secondPos.getX(), secondPos.getY(), secondPos.getZ(), firstPos, player.level().dimension());
                             territory.setBackpoint(firstPos);
                             TerritoryManager.addTerritory(territory);
                             data.minBalance(playerUUID, price);

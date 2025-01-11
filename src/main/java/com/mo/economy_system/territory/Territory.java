@@ -1,10 +1,14 @@
 package com.mo.economy_system.territory;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -20,9 +24,16 @@ public class Territory {
     private final int x1, y1, z1, x2, y2, z2; // 领地范围
     private final Set<UUID> authorizedPlayers; // 有权限的玩家 UUID 列表
     private BlockPos backpoint; // 回城点
+    private final ResourceKey<Level> dimension; // 所在维度
 
-    public Territory(String name, UUID ownerUUID, String ownerName, int x1, int y1, int z1, int x2, int y2, int z2) {
-        this.territoryID = UUID.randomUUID();
+    // 用于新建领地的构造方法（生成新 UUID）
+    public Territory(String name, UUID ownerUUID, String ownerName, int x1, int y1, int z1, int x2, int y2, int z2, BlockPos backpoint, ResourceKey<Level> dimension) {
+        this(UUID.randomUUID(), name, ownerUUID, ownerName, x1, y1, z1, x2, y2, z2, backpoint, dimension);
+    }
+
+    // 用于加载领地的构造方法（使用已存在的 UUID）
+    public Territory(UUID territoryID, String name, UUID ownerUUID, String ownerName, int x1, int y1, int z1, int x2, int y2, int z2, BlockPos backpoint, ResourceKey<Level> dimension) {
+        this.territoryID = territoryID;
         this.name = name;
         this.ownerUUID = ownerUUID;
         this.ownerName = ownerName;
@@ -33,7 +44,8 @@ public class Territory {
         this.y2 = y2;
         this.z2 = z2;
         this.authorizedPlayers = new HashSet<>();
-        this.backpoint = null; // 默认无回城点
+        this.backpoint = backpoint;
+        this.dimension = dimension;
     }
 
     public UUID getTerritoryID() {
@@ -52,7 +64,11 @@ public class Territory {
         return name;
     }
 
-    // 添加 getPos1() 和 getPos2() 方法
+    public ResourceKey<Level> getDimension() {
+        return dimension;
+    }
+
+    // 获取领地起点和终点坐标
     public BlockPos getPos1() {
         return new BlockPos(x1, y1, z1);
     }
@@ -67,9 +83,6 @@ public class Territory {
                 z >= Math.min(z1, z2) && z <= Math.max(z1, z2);
     }
 
-    /**
-     * 忽略 Y 轴的范围判断
-     */
     public boolean isWithinBoundsIgnoreY(int x, int z) {
         return x >= Math.min(x1, x2) && x <= Math.max(x1, x2) &&
                 z >= Math.min(z1, z2) && z <= Math.max(z1, z2);
@@ -87,22 +100,10 @@ public class Territory {
         authorizedPlayers.remove(playerUUID);
     }
 
-    /**
-     * 判断玩家是否为领地所有者
-     *
-     * @param playerUUID 玩家 UUID
-     * @return 如果玩家是所有者返回 true，否则返回 false
-     */
     public boolean isOwner(UUID playerUUID) {
         return ownerUUID.equals(playerUUID);
     }
 
-    /**
-     * 判断玩家是否有权限（不包括所有者）
-     *
-     * @param playerUUID 玩家 UUID
-     * @return 如果玩家有权限（但不是所有者）返回 true，否则返回 false
-     */
     public boolean hasPermission(UUID playerUUID) {
         return !isOwner(playerUUID) && authorizedPlayers.contains(playerUUID);
     }
@@ -128,6 +129,9 @@ public class Territory {
         tag.putInt("Y2", y2);
         tag.putInt("Z2", z2);
 
+        // 保存维度信息
+        tag.putString("Dimension", dimension.location().toString());
+
         // 保存有权限的玩家
         ListTag authorizedPlayersTag = new ListTag();
         for (UUID playerUUID : authorizedPlayers) {
@@ -150,7 +154,7 @@ public class Territory {
     }
 
     public static Territory fromNBT(CompoundTag tag) {
-        UUID territoryID = tag.getUUID("TerritoryID");
+        UUID territoryID = tag.getUUID("TerritoryID"); // 从 NBT 加载 UUID
         UUID ownerUUID = tag.getUUID("OwnerUUID");
         String ownerName = tag.getString("OwnerName");
         String name = tag.getString("Name");
@@ -161,7 +165,9 @@ public class Territory {
         int y2 = tag.getInt("Y2");
         int z2 = tag.getInt("Z2");
 
-        Territory territory = new Territory(name, ownerUUID, ownerName, x1, y1, z1, x2, y2, z2);
+        ResourceKey<Level> dimension = ResourceKey.create(Registries.DIMENSION, new ResourceLocation(tag.getString("Dimension")));
+
+        Territory territory = new Territory(territoryID, name, ownerUUID, ownerName, x1, y1, z1, x2, y2, z2, null, dimension);
 
         // 加载有权限的玩家
         ListTag authorizedPlayersTag = tag.getList("AuthorizedPlayers", Tag.TAG_COMPOUND);
@@ -182,16 +188,17 @@ public class Territory {
         return territory;
     }
 
+
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true; // 同一引用，必定相等
-        if (obj == null || getClass() != obj.getClass()) return false; // 类不同，不相等
-        Territory that = (Territory) obj; // 类型转换
-        return Objects.equals(territoryID, that.territoryID); // 使用领地 ID 判断是否相等
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Territory that = (Territory) obj;
+        return Objects.equals(territoryID, that.territoryID);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(territoryID); // 根据领地 ID 生成哈希值
+        return Objects.hash(territoryID);
     }
 }

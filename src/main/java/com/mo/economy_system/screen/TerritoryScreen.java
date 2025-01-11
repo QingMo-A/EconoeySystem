@@ -1,12 +1,18 @@
 package com.mo.economy_system.screen;
 
+import com.mo.economy_system.network.EconomyNetwork;
+import com.mo.economy_system.network.packets.TeleportRequestPacket;
+import com.mo.economy_system.network.packets.TerritoryRequestPacket;
 import com.mo.economy_system.territory.Territory;
 import com.mo.economy_system.utils.MessageKeys;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 
 import java.util.*;
 
@@ -123,7 +129,7 @@ public class TerritoryScreen extends Screen {
             if (ownedTerritories.contains(territory)) {
                 this.addRenderableWidget(
                         Button.builder(Component.literal("传送"), button -> {
-                                    // 打开管理界面逻辑
+                                    EconomyNetwork.INSTANCE.sendToServer(new TeleportRequestPacket(territory.getTerritoryID()));
                                 }).pos(this.width - startX - 60 - 80, currentY)
                                 .size(60, 20)
                                 .build()

@@ -24,7 +24,6 @@ public class TerritoryRequestPacket {
             var player = context.getSender();
             if (player != null) {
                 var ownedTerritories = TerritoryManager.getTerritoriesByOwner(player.getUUID());
-                System.out.println(ownedTerritories.size());
                 var authorizedTerritories = TerritoryManager.getAuthorizedTerritories(player.getUUID());
 
                 // 返回领地数据
