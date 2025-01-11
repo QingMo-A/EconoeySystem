@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.world.level.block.Block;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -63,6 +64,14 @@ public class Territory {
     public boolean isWithinBounds(int x, int y, int z) {
         return x >= Math.min(x1, x2) && x <= Math.max(x1, x2) &&
                 y >= Math.min(y1, y2) && y <= Math.max(y1, y2) &&
+                z >= Math.min(z1, z2) && z <= Math.max(z1, z2);
+    }
+
+    /**
+     * 忽略 Y 轴的范围判断
+     */
+    public boolean isWithinBoundsIgnoreY(int x, int z) {
+        return x >= Math.min(x1, x2) && x <= Math.max(x1, x2) &&
                 z >= Math.min(z1, z2) && z <= Math.max(z1, z2);
     }
 

@@ -1,9 +1,7 @@
-package com.mo.economy_system;
+package com.mo.economy_system.events;
 
-import com.mo.economy_system.commands.ClaimCommand;
-import com.mo.economy_system.commands.EconomyCommands;
-import com.mo.economy_system.commands.RedPacketCommand;
-import com.mo.economy_system.commands.TpaCommand;
+import com.mo.economy_system.EconomySystem;
+import com.mo.economy_system.commands.*;
 import com.mo.economy_system.market.MarketItem;
 import com.mo.economy_system.market.MarketManager;
 import com.mo.economy_system.market.MarketSavedData;
@@ -45,6 +43,7 @@ public class EconomyEventHandler {
         TpaCommand.register(event.getServer().getCommands().getDispatcher());
         RedPacketCommand.register(event.getServer().getCommands().getDispatcher());
         ClaimCommand.register(event.getServer().getCommands().getDispatcher());
+        TerritoryCommands.register(event.getServer().getCommands().getDispatcher());
 
         ServerLevel overworld = event.getServer().overworld();
 

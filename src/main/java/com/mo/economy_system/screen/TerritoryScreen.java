@@ -112,25 +112,36 @@ public class TerritoryScreen extends Screen {
                 guiGraphics.drawString(this.font, "领地名称: " + territory.getName(), startX+ 20, currentY + 5, 0xFFFFFF);
             });
             renderCache.add((guiGraphics) -> {
-                guiGraphics.drawString(this.font, "范围: " + territory.getPos1() + " -> " + territory.getPos2(), startX, currentY + 18, 0xAAAAAA);
+                guiGraphics.drawString(this.font, "范围: " +
+                        territory.getPos1().getX() + " " + territory.getPos1().getY() + " " + territory.getPos1().getZ()
+                                + " -> " +
+                        territory.getPos2().getX() + " " + territory.getPos2().getY() + " " + territory.getPos2().getZ() ,
+                        startX, currentY + 18, 0xAAAAAA);
             });
 
             // 如果是拥有的领地，显示“管理领地”按钮
             if (ownedTerritories.contains(territory)) {
                 this.addRenderableWidget(
-                        Button.builder(Component.literal("管理领地"), button -> {
+                        Button.builder(Component.literal("传送"), button -> {
                                     // 打开管理界面逻辑
-                                }).pos(this.width - startX - 100, currentY)
-                                .size(100, 20)
+                                }).pos(this.width - startX - 60 - 80, currentY)
+                                .size(60, 20)
+                                .build()
+                );
+                this.addRenderableWidget(
+                        Button.builder(Component.literal("管理"), button -> {
+                                    // 打开管理界面逻辑
+                                }).pos(this.width - startX - 60, currentY)
+                                .size(60, 20)
                                 .build()
                 );
             } else {
                 // 如果是有权限的领地，显示“关于领地”按钮
                 this.addRenderableWidget(
-                        Button.builder(Component.literal("关于领地"), button -> {
+                        Button.builder(Component.literal("传送"), button -> {
                                     // 打开详情界面逻辑
-                                }).pos(this.width - startX - 100, currentY)
-                                .size(100, 20)
+                                }).pos(this.width - startX - 60, currentY)
+                                .size(60, 20)
                                 .build()
                 );
             }
@@ -157,6 +168,11 @@ public class TerritoryScreen extends Screen {
                 tooltip.add(Component.translatable(MessageKeys.TERRITORY_TERRITORY_UUID_KEY, territory.getTerritoryID()));
                 tooltip.add(Component.translatable(MessageKeys.TERRITORY_TERRITORY_OWNER_NAME_KEY, territory.getOwnerName()));
                 tooltip.add(Component.translatable(MessageKeys.TERRITORY_TERRITORY_OWNER_UUID_KEY, territory.getOwnerUUID()));
+                if (territory.getBackpoint() != null) {
+                    tooltip.add(Component.translatable(MessageKeys.TERRITORY_TERRITORY_BACK_POINT_KEY, territory.getBackpoint().getX(), territory.getBackpoint().getY(), territory.getBackpoint().getZ()));
+                } else {
+                    tooltip.add(Component.translatable(MessageKeys.TERRITORY_TERRITORY_BACK_POINT_KEY, "null", "null", "null"));
+                }
 
                 guiGraphics.renderTooltip(this.font, tooltip, Optional.empty(), mouseX, mouseY);
             }

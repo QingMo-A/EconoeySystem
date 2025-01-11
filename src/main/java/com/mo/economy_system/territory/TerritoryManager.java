@@ -54,6 +54,30 @@ public class TerritoryManager {
         return null;
     }
 
+    public static Territory getTerritoryAtIgnoringY(int x, int z) {
+        for (Territory territory : territoryByID.values()) {
+            if (x >= Math.min(territory.getPos1().getX(), territory.getPos2().getX()) &&
+                    x <= Math.max(territory.getPos1().getX(), territory.getPos2().getX()) &&
+                    z >= Math.min(territory.getPos1().getZ(), territory.getPos2().getZ()) &&
+                    z <= Math.max(territory.getPos1().getZ(), territory.getPos2().getZ())) {
+                return territory;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 忽略 Y 轴的范围判断，根据 X 和 Z 判断领地
+     */
+    public static Territory getTerritoryAtIgnoreY(int x, int z) {
+        for (Territory territory : territoryByID.values()) {
+            if (territory.isWithinBoundsIgnoreY(x, z)) {
+                return territory;
+            }
+        }
+        return null;
+    }
+
     // 根据领地 ID 获取领地
     public static Territory getTerritoryByID(UUID territoryID) {
         return territoryByID.get(territoryID);
@@ -102,4 +126,11 @@ public class TerritoryManager {
         Territory territory = getTerritoryByID(territoryID);
         return territory != null && territory.hasPermission(playerUUID);
     }
+
+    public static void markDirty() {
+        if (savedData != null) {
+            savedData.setDirty();
+        }
+    }
+
 }
