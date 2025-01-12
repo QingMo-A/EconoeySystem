@@ -127,10 +127,11 @@ public class TerritoryManagementScreen extends Screen {
             final int currentY = y; // 使用最终变量供 Lambda 表达式使用
 
             // 添加图标渲染任务
-            // renderCache.add((guiGraphics) -> guiGraphics.renderItem(SkullUtils.createPlayerHead(playerUUID, PlayerUtils.getPlayerNameByUUID(playerUUID.)), startX, currentY));
+            renderCache.add((guiGraphics) -> guiGraphics.renderItem(SkullUtils.createPlayerHead(playerUUID, playerInfo.getName()), startX, currentY));
 
             // 添加物品名称渲染任务
             renderCache.add((guiGraphics) -> guiGraphics.drawString(this.font, playerInfo.getName(), startX + 20, currentY + 5, 0xFFFFFF, false));
+            renderCache.add((guiGraphics) -> guiGraphics.drawString(this.font, String.valueOf(playerInfo.getUuid()), startX, currentY + 18, 0xAAAAAA, false));
 
             addKickButton(playerInfo.getUuid(), (this.width / 2) - startX, currentY);
 

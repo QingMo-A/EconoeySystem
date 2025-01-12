@@ -1,6 +1,7 @@
 package com.mo.economy_system.network.packets;
 
 import com.mo.economy_system.territory.InviteManager;
+import com.mo.economy_system.territory.PlayerInfo;
 import com.mo.economy_system.territory.Territory;
 import com.mo.economy_system.territory.TerritoryManager;
 import net.minecraft.network.FriendlyByteBuf;
@@ -49,13 +50,25 @@ public class InvitePlayerPacket {
                 return;
             }
 
-            // 添加邀请到管理器
-            InviteManager.sendInvite(inviter.getUUID(), target.getUUID(), msg.territoryID);
+            if (!(target.getUUID().equals(territory.getOwnerUUID()))){
+                System.out.println(target.getUUID() + "\n" + territory.getOwnerUUID());
+                for (PlayerInfo playerInfo : territory.getAuthorizedPlayers()) {
+                    if (playerInfo.getUuid().equals(target.getUUID())) {
+                        inviter.sendSystemMessage(Component.literal("§c玩家 " + msg.playerName + " 已经是你的领地成员了！"));
+                        return;
+                    }
+                }
+                // 添加邀请到管理器
+                InviteManager.sendInvite(inviter.getUUID(), target.getUUID(), msg.territoryID);
 
-            // 发送邀请消息
-            inviter.sendSystemMessage(Component.literal("§a已向玩家 " + msg.playerName + " 发送邀请！"));
-            target.sendSystemMessage(Component.literal("§e玩家 " + inviter.getName().getString() + " 邀请你加入领地: " + territory.getName()));
-            target.sendSystemMessage(Component.literal("§a输入 /accept_invite 接受 或 /decline_invite 拒绝"));
+                // 发送邀请消息
+                inviter.sendSystemMessage(Component.literal("§a已向玩家 " + msg.playerName + " 发送邀请！"));
+                target.sendSystemMessage(Component.literal("§e玩家 " + inviter.getName().getString() + " 邀请你加入领地: " + territory.getName()));
+                target.sendSystemMessage(Component.literal("§a输入 /accept_invite 接受 或 /decline_invite 拒绝"));
+            } else {
+                inviter.sendSystemMessage(Component.literal("§c你不能向自己发出邀请!"));
+            }
+
         });
         context.setPacketHandled(true);
     }
