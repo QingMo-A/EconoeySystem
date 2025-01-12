@@ -36,5 +36,6 @@ public class EconomyNetwork {
         INSTANCE.registerMessage(packetId++, TeleportRequestPacket.class, TeleportRequestPacket::encode, TeleportRequestPacket::decode, TeleportRequestPacket::handle);
         INSTANCE.registerMessage(packetId++, InvitePlayerPacket.class, InvitePlayerPacket::encode, InvitePlayerPacket::decode, InvitePlayerPacket::handle);
         INSTANCE.registerMessage(packetId++, RemoveTerritoryPacket.class, RemoveTerritoryPacket::encode, RemoveTerritoryPacket::decode, RemoveTerritoryPacket::handle);
+        INSTANCE.registerMessage(packetId++, RemovePlayerFromTerritoryPacket.class, RemovePlayerFromTerritoryPacket::encode, RemovePlayerFromTerritoryPacket::decode, RemovePlayerFromTerritoryPacket::handle);
     }
 }

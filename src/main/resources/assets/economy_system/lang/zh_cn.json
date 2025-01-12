@@ -65,6 +65,7 @@
   "screen.territory.territory_owner_name": "领地所有者名称: %s",
   "screen.territory.territory_owner_name_uuid": "领地所有者UUID: %s",
   "screen.territory.territory_back_point": "领地传送点: %s %s %s",
+  "screen.territory.territory_no_authorized_player": "你的领地中还没有成员哦",
 
   "item.economy_system.guitar": "吉他",
   "item.economy_system.wormhole_potion": "虫洞药水",

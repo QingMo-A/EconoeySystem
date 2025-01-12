@@ -33,5 +33,6 @@ public class MessageKeys {
     public static final String TERRITORY_TERRITORY_OWNER_NAME_KEY = "screen.territory.territory_owner_name";
     public static final String TERRITORY_TERRITORY_OWNER_UUID_KEY = "screen.territory.territory_owner_name_uuid";
     public static final String TERRITORY_TERRITORY_BACK_POINT_KEY = "screen.territory.territory_back_point";
+    public static final String TERRITORY_TERRITORY_NO_AUTHORIZED_PLAYER_KEY = "screen.territory.territory_no_authorized_player";
 }
 

@@ -109,15 +109,19 @@ public class TerritoryManager {
     }
 
     // 添加授权玩家
-    public static void addAuthorizedPlayer(UUID territoryID, UUID playerUUID) {
+    public static void addAuthorizedPlayer(UUID territoryID, UUID playerUUID, String playerName) {
         Territory territory = getTerritoryByID(territoryID);
         if (territory != null) {
-            territory.addAuthorizedPlayer(playerUUID);
+            // 添加玩家到领地，并保存玩家名称
+            territory.addAuthorizedPlayer(playerUUID, playerName);
+
+            // 标记数据已更改（如果有保存机制）
             if (savedData != null) {
                 savedData.setDirty();
             }
         }
     }
+
 
     // 获取玩家有权限的领地（排除自己拥有的领地）
     public static List<Territory> getAuthorizedTerritories(UUID playerUUID) {

@@ -3,6 +3,7 @@ package com.mo.economy_system.commands;
 import com.mo.economy_system.territory.InviteManager;
 import com.mo.economy_system.territory.Territory;
 import com.mo.economy_system.territory.TerritoryManager;
+import com.mo.economy_system.utils.PlayerUtils;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -103,7 +104,7 @@ public class TerritoryCommands {
             return 0;
         }
 
-        territory.addAuthorizedPlayer(player.getUUID());
+        territory.addAuthorizedPlayer(player.getUUID(), PlayerUtils.getPlayerNameByUUID(source.getServer(), player.getUUID()));
         TerritoryManager.markDirty();
         InviteManager.removeInvite(player.getUUID());
 

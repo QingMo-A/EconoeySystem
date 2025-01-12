@@ -22,7 +22,7 @@ public class Territory {
     private final String ownerName; // 领主名字
     private final String name;      // 领地名称
     private final int x1, y1, z1, x2, y2, z2; // 领地范围
-    private final Set<UUID> authorizedPlayers; // 有权限的玩家 UUID 列表
+    private final Set<PlayerInfo> authorizedPlayers; // 保存有权限玩家的列表
     private BlockPos backpoint; // 回城点
     private final ResourceKey<Level> dimension; // 所在维度
 
@@ -88,24 +88,24 @@ public class Territory {
                 z >= Math.min(z1, z2) && z <= Math.max(z1, z2);
     }
 
-    public Set<UUID> getAuthorizedPlayers() {
+    public Set<PlayerInfo> getAuthorizedPlayers() {
         return authorizedPlayers;
     }
 
-    public void addAuthorizedPlayer(UUID playerUUID) {
-        authorizedPlayers.add(playerUUID);
+    public void addAuthorizedPlayer(UUID playerUUID, String playerName) {
+        authorizedPlayers.add(new PlayerInfo(playerUUID, playerName));
     }
 
     public void removeAuthorizedPlayer(UUID playerUUID) {
-        authorizedPlayers.remove(playerUUID);
+        authorizedPlayers.removeIf(playerInfo -> playerInfo.getUuid().equals(playerUUID));
+    }
+
+    public boolean hasPermission(UUID playerUUID) {
+        return authorizedPlayers.stream().anyMatch(playerInfo -> playerInfo.getUuid().equals(playerUUID));
     }
 
     public boolean isOwner(UUID playerUUID) {
         return ownerUUID.equals(playerUUID);
-    }
-
-    public boolean hasPermission(UUID playerUUID) {
-        return !isOwner(playerUUID) && authorizedPlayers.contains(playerUUID);
     }
 
     public BlockPos getBackpoint() {
@@ -132,11 +132,12 @@ public class Territory {
         // 保存维度信息
         tag.putString("Dimension", dimension.location().toString());
 
-        // 保存有权限的玩家
+        // 保存有权限玩家
         ListTag authorizedPlayersTag = new ListTag();
-        for (UUID playerUUID : authorizedPlayers) {
+        for (PlayerInfo playerInfo : authorizedPlayers) {
             CompoundTag playerTag = new CompoundTag();
-            playerTag.putUUID("PlayerUUID", playerUUID);
+            playerTag.putUUID("PlayerUUID", playerInfo.getUuid());
+            playerTag.putString("PlayerName", playerInfo.getName());
             authorizedPlayersTag.add(playerTag);
         }
         tag.put("AuthorizedPlayers", authorizedPlayersTag);
@@ -169,11 +170,13 @@ public class Territory {
 
         Territory territory = new Territory(territoryID, name, ownerUUID, ownerName, x1, y1, z1, x2, y2, z2, null, dimension);
 
-        // 加载有权限的玩家
+        // 加载有权限玩家
         ListTag authorizedPlayersTag = tag.getList("AuthorizedPlayers", Tag.TAG_COMPOUND);
         for (Tag playerTag : authorizedPlayersTag) {
-            UUID playerUUID = ((CompoundTag) playerTag).getUUID("PlayerUUID");
-            territory.addAuthorizedPlayer(playerUUID);
+            CompoundTag playerCompound = (CompoundTag) playerTag;
+            UUID playerUUID = playerCompound.getUUID("PlayerUUID");
+            String playerName = playerCompound.getString("PlayerName");
+            territory.addAuthorizedPlayer(playerUUID, playerName);
         }
 
         // 加载回城点
