@@ -3,8 +3,10 @@ package com.mo.economy_system.screen;
 import com.mo.economy_system.network.EconomyNetwork;
 import com.mo.economy_system.network.packets.TeleportRequestPacket;
 import com.mo.economy_system.network.packets.TerritoryRequestPacket;
+import com.mo.economy_system.screen.territory.TerritoryManagementScreen;
 import com.mo.economy_system.territory.Territory;
 import com.mo.economy_system.utils.MessageKeys;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -125,7 +127,7 @@ public class TerritoryScreen extends Screen {
                         startX, currentY + 18, 0xAAAAAA);
             });
 
-            // 如果是拥有的领地，显示“管理领地”按钮
+            // 如果是拥有的领地，显示“传送”和"管理"按钮
             if (ownedTerritories.contains(territory)) {
                 this.addRenderableWidget(
                         Button.builder(Component.literal("传送"), button -> {
@@ -136,16 +138,16 @@ public class TerritoryScreen extends Screen {
                 );
                 this.addRenderableWidget(
                         Button.builder(Component.literal("管理"), button -> {
-                                    // 打开管理界面逻辑
+                                    Minecraft.getInstance().setScreen(new TerritoryManagementScreen(territory));
                                 }).pos(this.width - startX - 60, currentY)
                                 .size(60, 20)
                                 .build()
                 );
             } else {
-                // 如果是有权限的领地，显示“关于领地”按钮
+                // 如果是有权限的领地，显示“传送”按钮
                 this.addRenderableWidget(
                         Button.builder(Component.literal("传送"), button -> {
-                                    // 打开详情界面逻辑
+                                    EconomyNetwork.INSTANCE.sendToServer(new TeleportRequestPacket(territory.getTerritoryID()));
                                 }).pos(this.width - startX - 60, currentY)
                                 .size(60, 20)
                                 .build()

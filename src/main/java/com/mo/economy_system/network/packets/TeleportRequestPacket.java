@@ -89,30 +89,34 @@ public class TeleportRequestPacket {
                     50, 1, 1, 1, 0.1
             );
 
-            // 执行传送
-            try {
-                player.teleportTo(
-                        targetLevel,
-                        backPoint.getX() + 0.5,
-                        backPoint.getY() + 1,
-                        backPoint.getZ() + 0.5,
-                        player.getYRot(),
-                        player.getXRot()
-                );
+            if (potionStack != null) {
+                // 执行传送
+                try {
+                    player.teleportTo(
+                            targetLevel,
+                            backPoint.getX() + 0.5,
+                            backPoint.getY() + 1,
+                            backPoint.getZ() + 0.5,
+                            player.getYRot(),
+                            player.getXRot()
+                    );
 
-                // 消耗物品
-                potionStack.shrink(1);
+                    // 消耗物品
+                    potionStack.shrink(1);
 
-                // 确保目标区块刷新
-                targetLevel.getChunkSource().updateChunkForced(
-                        new net.minecraft.world.level.ChunkPos(backPoint),
-                        true
-                );
+                    // 确保目标区块刷新
+                    targetLevel.getChunkSource().updateChunkForced(
+                            new net.minecraft.world.level.ChunkPos(backPoint),
+                            true
+                    );
 
-                player.sendSystemMessage(Component.literal("§a已成功传送到领地: " + territory.getName()));
-            } catch (Exception e) {
-                player.sendSystemMessage(Component.literal("§c传送失败，发生未知错误！"));
-                e.printStackTrace();
+                    player.sendSystemMessage(Component.literal("§a已成功传送到领地: " + territory.getName()));
+                } catch (Exception e) {
+                    player.sendSystemMessage(Component.literal("§c传送失败，发生未知错误！"));
+                    e.printStackTrace();
+                }
+            } else {
+                player.sendSystemMessage(Component.literal("§c传送失败，你没有足够的回忆药水！"));
             }
         });
         context.setPacketHandled(true);
