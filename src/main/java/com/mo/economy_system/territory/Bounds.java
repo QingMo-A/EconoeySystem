@@ -12,7 +12,7 @@ public class Bounds {
 
     // 判断当前边界是否包含一个点
     public boolean contains(int px, int pz) {
-        return px >= x && px < x + width && pz >= z && pz < z + height;
+        return px >= x && px < x + width + 1 && pz >= z && pz < z + height + 1;
     }
 
     // 判断当前边界是否完全包含另一个边界
