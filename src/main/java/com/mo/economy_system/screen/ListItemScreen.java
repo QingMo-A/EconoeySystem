@@ -4,6 +4,7 @@ import com.mo.economy_system.market.MarketItem;
 import com.mo.economy_system.network.EconomyNetwork;
 import com.mo.economy_system.network.packets.ListItemPacket;
 import com.mo.economy_system.network.packets.MarketRequestPacket;
+import com.mo.economy_system.utils.MessageKeys;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -17,19 +18,11 @@ import java.util.UUID;
 
 public class ListItemScreen extends Screen {
 
-    private static final String TITLE_KEY = "screen.list.title";
-    private static final String NO_ITEM_IN_HAND_TEXT_KEY = "text.list.no_item_in_hand";
-    private static final String PRICE_TEXT_KEY = "text.list.price";
-    private static final String LIST_BUTTON_KEY = "button.list.list";
-    private static final String NO_ITEM_IN_HAND_MESSAGE_KEY = "message.list.no_item_in_hand";
-    private static final String INVALID_PRICE_MESSAGE_KEY = "message.list.invalid_price";
-    private static final String HINT_TEXT_KEY = "text.list.hint";
-
     private final Player player;
     private EditBox priceInput; // 输入框用于设置价格
 
     public ListItemScreen(Player player) {
-        super(Component.translatable(TITLE_KEY));
+        super(Component.translatable(MessageKeys.LIST_TITLE_KEY));
         this.player = player;
     }
 
@@ -43,11 +36,11 @@ public class ListItemScreen extends Screen {
         // 添加价格输入框
         priceInput = new EditBox(this.font, this.width / 2 - 75, this.height / 2 - 20, 150, 20, Component.literal("Enter Price"));
         this.addRenderableWidget(priceInput);
-        this.priceInput.setHint(Component.translatable(HINT_TEXT_KEY)); // 提示文本
+        this.priceInput.setHint(Component.translatable(MessageKeys.LIST_HINT_TEXT_KEY)); // 提示文本
 
         // 添加上架按钮
         this.addRenderableWidget(
-                Button.builder(Component.translatable(LIST_BUTTON_KEY), button -> listItem())
+                Button.builder(Component.translatable(MessageKeys.LIST_LIST_BUTTON_KEY), button -> listItem())
                         .pos(this.width / 2 - 50, this.height / 2 + 20)
                         .size(100, 20)
                         .build()
@@ -79,17 +72,17 @@ public class ListItemScreen extends Screen {
 
         } else {
             // 动态计算文字居中的位置
-            int textWidth = this.font.width(Component.translatable(NO_ITEM_IN_HAND_TEXT_KEY));
+            int textWidth = this.font.width(Component.translatable(MessageKeys.LIST_NO_ITEM_IN_HAND_TEXT_KEY));
             int xPosition = (this.width - textWidth) / 2;
 
-            guiGraphics.drawString(this.font, Component.translatable(NO_ITEM_IN_HAND_TEXT_KEY), xPosition, this.height / 2 - 40, 0xAAAAAA);
+            guiGraphics.drawString(this.font, Component.translatable(MessageKeys.LIST_NO_ITEM_IN_HAND_TEXT_KEY), xPosition, this.height / 2 - 40, 0xAAAAAA);
         }
 
-        int textWidth = this.font.width(Component.translatable(PRICE_TEXT_KEY));
+        int textWidth = this.font.width(Component.translatable(MessageKeys.LIST_PRICE_TEXT_KEY));
         // 计算整体的居中位置
         int xPosition = (this.width - textWidth) / 2;
         // 渲染价格输入框
-        guiGraphics.drawString(this.font, Component.translatable(PRICE_TEXT_KEY), this.width / 2 - 78 - textWidth, this.height / 2 - 15, 0xFFFFFF);
+        guiGraphics.drawString(this.font, Component.translatable(MessageKeys.LIST_PRICE_TEXT_KEY), this.width / 2 - 78 - textWidth, this.height / 2 - 15, 0xFFFFFF);
 
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
     }
@@ -103,7 +96,7 @@ public class ListItemScreen extends Screen {
         ItemStack heldItem = player.getMainHandItem(); // 获取玩家手中的物品
 
         if (heldItem.isEmpty()) {
-            this.player.sendSystemMessage(Component.translatable(NO_ITEM_IN_HAND_MESSAGE_KEY));
+            this.player.sendSystemMessage(Component.translatable(MessageKeys.LIST_NO_ITEM_IN_HAND_MESSAGE_KEY));
             return;
         }
 
@@ -111,7 +104,7 @@ public class ListItemScreen extends Screen {
         Optional<Integer> price = parsePrice(priceText);
 
         if (price.isEmpty() || price.get() <= 0) {
-            this.player.sendSystemMessage(Component.translatable(INVALID_PRICE_MESSAGE_KEY));
+            this.player.sendSystemMessage(Component.translatable(MessageKeys.LIST_INVALID_PRICE_MESSAGE_KEY));
             return;
         }
 

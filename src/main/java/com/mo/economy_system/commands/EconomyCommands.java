@@ -3,6 +3,7 @@ package com.mo.economy_system.commands;
 import com.mo.economy_system.network.EconomyNetwork;
 import com.mo.economy_system.network.packets.TransferPacket;
 import com.mo.economy_system.system.EconomySavedData;
+import com.mo.economy_system.utils.MessageKeys;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.minecraft.commands.CommandSourceStack;
@@ -23,7 +24,7 @@ public class EconomyCommands {
                             ServerLevel serverLevel = player.serverLevel(); // 获取服务器世界实例
                             EconomySavedData data = EconomySavedData.getInstance(serverLevel);
                             int balance = data.getBalance(player.getUUID());
-                            context.getSource().sendSuccess(() -> Component.literal("Your balance: " + balance + " coins"), false);
+                            context.getSource().sendSuccess(() -> Component.translatable(MessageKeys.COIN_COMMAND_BALANCE, balance), false);
                             return 1;
                         }))
                 // 增加余额
@@ -36,7 +37,7 @@ public class EconomyCommands {
                                     ServerLevel serverLevel = player.serverLevel(); // 获取服务器世界实例
                                     EconomySavedData data = EconomySavedData.getInstance(serverLevel);
                                     data.addBalance(player.getUUID(), amount);
-                                    context.getSource().sendSuccess(() -> Component.literal("Added " + amount + " coins to your balance."), false);
+                                    context.getSource().sendSuccess(() -> Component.translatable(MessageKeys.COIN_COMMAND_ADD, amount), false);
                                     return 1;
                                 })))
                 // 减少余额
@@ -49,9 +50,9 @@ public class EconomyCommands {
                                     ServerLevel serverLevel = player.serverLevel(); // 获取服务器世界实例
                                     EconomySavedData data = EconomySavedData.getInstance(serverLevel);
                                     if (data.minBalance(player.getUUID(), amount)) {
-                                        context.getSource().sendSuccess(() -> Component.literal("Removed " + amount + " coins from your balance."), false);
+                                        context.getSource().sendSuccess(() -> Component.translatable(MessageKeys.COIN_COMMAND_MIN, amount), false);
                                     } else {
-                                        context.getSource().sendFailure(Component.literal("Insufficient balance!"));
+                                        context.getSource().sendFailure(Component.translatable(MessageKeys.COIN_COMMAND_INSUFFICIENT_BALANCE));
                                     }
                                     return 1;
                                 })))
@@ -65,7 +66,7 @@ public class EconomyCommands {
                                     ServerLevel serverLevel = player.serverLevel(); // 获取服务器世界实例
                                     EconomySavedData data = EconomySavedData.getInstance(serverLevel);
                                     data.setBalance(player.getUUID(), amount);
-                                    context.getSource().sendSuccess(() -> Component.literal("Set your balance to " + amount + " coins."), false);
+                                    context.getSource().sendSuccess(() -> Component.translatable(MessageKeys.COIN_COMMAND_SET, amount), false);
                                     return 1;
                                 })))
                 // 转账功能
@@ -77,13 +78,6 @@ public class EconomyCommands {
                                             int amount = IntegerArgumentType.getInteger(context, "amount");
 
                                             EconomyNetwork.INSTANCE.sendToServer(new TransferPacket(receiver.getUUID(), amount));
-                                            /*if (data.minBalance(sender.getUUID(), amount)) {
-                                                data.addBalance(receiver.getUUID(), amount);
-                                                context.getSource().sendSuccess(() -> Component.literal("Transferred " + amount + " coins to " + receiver.getName().getString()), false);
-                                                receiver.sendSystemMessage(Component.literal(sender.getName().getString() + " sent you " + amount + " coins."));
-                                            } else {
-                                                context.getSource().sendFailure(Component.literal("Insufficient balance!"));
-                                            }*/
                                             return 1;
                                         }))))
         );

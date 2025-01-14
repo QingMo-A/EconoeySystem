@@ -2,6 +2,29 @@
   "key.economy_system.open_screen": "打开菜单",
   "key.categories.economy_system": "Economy System",
 
+  "message.coin_command_balance": "余额: %s 枚梦鱼币",
+  "message.coin_command_add": "添加 %s 枚梦鱼币到你的账户上",
+  "message.coin_command_min": "从你的账户中移除 %s 枚梦鱼币",
+  "message.coin_command_insufficient_balance": "余额不足!!",
+  "message.coin_command_set": "将你的账户余额设置为 %s 枚梦鱼币",
+  "message.transfer.transfer_successfully": "已将 %s 枚梦鱼币发给 %s",
+  "message.transfer.receive_successfully": "你收到来自 %s 的 %s 枚梦鱼币",
+  "message.transfer.transfer_failed": "§4转账失败, §b可能是因为 §e目标不存在 余额不足 §b或是 §e目标为自己",
+
+  "message.tpa.self_error": "你不能向自己发送传送请求。",
+  "message.tpa.no_potion": "你需要一个虫洞药水才能发送传送请求。",
+  "message.tpa.request_sent": "已向 %s 发送了传送请求。",
+  "message.tpa.accept": "点击同意",
+  "message.tpa.deny": "点击拒绝",
+  "message.tpa.no_request": "你没有待处理的传送请求。",
+  "message.tpa.sender_offline": "发送传送请求的玩家已离线。",
+  "message.tpa.sender_no_potion": "%s 已经没有虫洞药水。",
+  "message.tpa.teleported": "你已被传送到 %s。",
+  "message.tpa.accepted": "你接受了来自 %s 的传送请求。",
+  "message.tpa.denied": "你拒绝了传送请求。",
+  "message.tpa.timeout_sender": "你向 %s 发送的传送请求已超时。",
+  "message.tpa.timeout_target": "%s 的传送请求已超时。",
+
   "screen.home.title": "主页",
   "text.home.fetching_balance": "获取余额中...",
   "text.home.balance": "余额: %s",
@@ -11,9 +34,6 @@
   "button.home.about": "关于本模组",
 
   "message.mob_reward": "你从 %s 的尸体上找到了 %s 枚梦鱼币",
-  "message.transfer.transfer_successfully": "已将 %s 枚梦鱼币发给 %s",
-  "message.transfer.receive_successfully": "你收到来自 %s 的 %s 枚梦鱼币",
-  "message.transfer.transfer_failed": "§4转账失败, §b可能是因为 §e目标不存在 余额不足 §b或是 §e目标为自己",
 
   "screen.shop.title": "商店",
   "screen.shop.item.price": "%s 枚梦鱼币 / 个",
@@ -67,22 +87,16 @@
   "screen.territory.territory_back_point": "领地传送点: %s %s %s",
   "screen.territory.territory_no_authorized_player": "你的领地中还没有成员哦",
 
+  "screen.about.title": "关于",
+  "screen.about.mod_name": "Economy System",
+  "screen.about.author_name": "作者: %s",
+  "screen.about.github_url": "Github仓库地址: %s",
+  "screen.about.show_github_text": "点击复制",
+  "message.about.copy_github_url": "Github仓库链接已经复制到粘贴板了",
+  "button.about.back": "返回",
+
   "item.economy_system.guitar": "吉他",
   "item.economy_system.wormhole_potion": "虫洞药水",
   "item.economy_system.recall_potion": "回忆药水",
-  "item.economy_system.claim_wand": "圈地杖",
-
-  "message.tpa.self_error": "你不能向自己发送传送请求。",
-  "message.tpa.no_potion": "你需要一个虫洞药水才能发送传送请求。",
-  "message.tpa.request_sent": "已向 %s 发送了传送请求。",
-  "message.tpa.accept": "点击同意",
-  "message.tpa.deny": "点击拒绝",
-  "message.tpa.no_request": "你没有待处理的传送请求。",
-  "message.tpa.sender_offline": "发送传送请求的玩家已离线。",
-  "message.tpa.sender_no_potion": "%s 已经没有虫洞药水。",
-  "message.tpa.teleported": "你已被传送到 %s。",
-  "message.tpa.accepted": "你接受了来自 %s 的传送请求。",
-  "message.tpa.denied": "你拒绝了传送请求。",
-  "message.tpa.timeout_sender": "你向 %s 发送的传送请求已超时。",
-  "message.tpa.timeout_target": "%s 的传送请求已超时。"
+  "item.economy_system.claim_wand": "圈地杖"
 }

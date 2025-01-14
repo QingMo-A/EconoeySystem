@@ -4,6 +4,7 @@ import com.mo.economy_system.shop.ShopItem;
 import com.mo.economy_system.network.EconomyNetwork;
 import com.mo.economy_system.network.packets.ShopRequestPacket;
 import com.mo.economy_system.network.packets.BuyItemPacket;
+import com.mo.economy_system.utils.MessageKeys;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -17,17 +18,6 @@ import java.util.Optional;
 
 public class ShopScreen extends Screen {
 
-    private static final String TITLE_KEY = "screen.shop.title";
-    private static final String ITEM_PRICE_KEY = "screen.shop.item.price";
-    private static final String ITEM_ID_KEY = "screen.shop.item.id";
-    private static final String ITEM_BASIC_PRICE_KEY = "screen.shop.item.basic_price";
-    private static final String ITEM_CURRENT_PRICE_KEY = "screen.shop.item.current_price";
-    private static final String ITEM_CHANGE_PRICE_KEY = "screen.shop.item.change_price";
-    private static final String ITEM_FLUCTUATION_FACTOR_KEY = "screen.shop.item.fluctuation_factor";
-    private static final String LOADING_SHOP_DATA_TEXT_KEY = "text.shop.loading_shop_data";
-    private static final String BUY_BUTTON_KEY = "button.shop.buy";
-    private static final String HINT_TEXT_KEY = "text.shop.hint";
-
     private List<ShopItem> items = new ArrayList<>(); // 商品列表
     private int currentPage = 0; // 当前页码
     private final int GAP = 35; // 每个商品的垂直间距
@@ -37,7 +27,7 @@ public class ShopScreen extends Screen {
     private EditBox searchBox; // 搜索框
 
     public ShopScreen() {
-        super(Component.translatable(TITLE_KEY));
+        super(Component.translatable(MessageKeys.SHOP_TITLE_KEY));
     }
 
     public void updateShopItems(List<ShopItem> items) {
@@ -82,16 +72,16 @@ public class ShopScreen extends Screen {
                 if (mouseX >= startX && mouseX <= startX + 16 && mouseY >= y && mouseY <= y + 16) {
                     // 显示 Tooltip
                     List<Component> tooltip = new ArrayList<>();
-                    tooltip.add(Component.translatable(ITEM_CHANGE_PRICE_KEY, priceChangeText));
-                    tooltip.add(Component.translatable(ITEM_BASIC_PRICE_KEY, item.getBasePrice()));
-                    tooltip.add(Component.translatable(ITEM_CURRENT_PRICE_KEY, item.getCurrentPrice()));
-                    tooltip.add(Component.translatable(ITEM_FLUCTUATION_FACTOR_KEY, item.getFluctuationFactor()));
-                    tooltip.add(Component.translatable(ITEM_ID_KEY, item.getItemId()));
+                    tooltip.add(Component.translatable(MessageKeys.SHOP_ITEM_CHANGE_PRICE_KEY, priceChangeText));
+                    tooltip.add(Component.translatable(MessageKeys.SHOP_ITEM_BASIC_PRICE_KEY, item.getBasePrice()));
+                    tooltip.add(Component.translatable(MessageKeys.SHOP_ITEM_CURRENT_PRICE_KEY, item.getCurrentPrice()));
+                    tooltip.add(Component.translatable(MessageKeys.SHOP_ITEM_FLUCTUATION_FACTOR_KEY, item.getFluctuationFactor()));
+                    tooltip.add(Component.translatable(MessageKeys.SHOP_ITEM_ID_KEY, item.getItemId()));
                     guiGraphics.renderTooltip(this.font, tooltip, Optional.empty(), mouseX, mouseY);
                 }
 
                 // 渲染物品价格
-                guiGraphics.drawString(this.font, Component.translatable(ITEM_PRICE_KEY, item.getCurrentPrice()), startX + 20, y + 5, 0xFFFFFF);
+                guiGraphics.drawString(this.font, Component.translatable(MessageKeys.SHOP_ITEM_PRICE_KEY, item.getCurrentPrice()), startX + 20, y + 5, 0xFFFFFF);
 
                 // 渲染物品描述
                 guiGraphics.drawString(this.font, item.getDescription(), startX, y + 18, 0xAAAAAA);
@@ -100,10 +90,10 @@ public class ShopScreen extends Screen {
             }
         } else {
             // 动态计算文字居中的位置
-            int textWidth = this.font.width(Component.translatable(LOADING_SHOP_DATA_TEXT_KEY));
+            int textWidth = this.font.width(Component.translatable(MessageKeys.SHOP_LOADING_SHOP_DATA_TEXT_KEY));
             int xPosition = (this.width - textWidth) / 2;
 
-            guiGraphics.drawString(this.font, Component.translatable(LOADING_SHOP_DATA_TEXT_KEY), xPosition, this.height / 2 - 10, 0xFFFFFF);
+            guiGraphics.drawString(this.font, Component.translatable(MessageKeys.SHOP_LOADING_SHOP_DATA_TEXT_KEY), xPosition, this.height / 2 - 10, 0xFFFFFF);
         }
 
         // 显示当前页数
@@ -192,7 +182,7 @@ public class ShopScreen extends Screen {
 
             // 添加 Buy x1 按钮
             this.addRenderableWidget(
-                    Button.builder(Component.translatable(BUY_BUTTON_KEY, 1), button -> {
+                    Button.builder(Component.translatable(MessageKeys.SHOP_BUY_BUTTON_KEY, 1), button -> {
                                 EconomyNetwork.INSTANCE.sendToServer(new BuyItemPacket(item.getItemId(), item.getCurrentPrice(), 1));
                             })
                             .pos(startX - 210, y)
@@ -202,7 +192,7 @@ public class ShopScreen extends Screen {
 
             // 添加 Buy x32 按钮
             this.addRenderableWidget(
-                    Button.builder(Component.translatable(BUY_BUTTON_KEY, 32), button -> {
+                    Button.builder(Component.translatable(MessageKeys.SHOP_BUY_BUTTON_KEY, 32), button -> {
                                 EconomyNetwork.INSTANCE.sendToServer(new BuyItemPacket(item.getItemId(), item.getCurrentPrice(), 32));
                             })
                             .pos(startX - 140, y)
@@ -212,7 +202,7 @@ public class ShopScreen extends Screen {
 
             // 添加 Buy x64 按钮
             this.addRenderableWidget(
-                    Button.builder(Component.translatable(BUY_BUTTON_KEY, 64), button -> {
+                    Button.builder(Component.translatable(MessageKeys.SHOP_BUY_BUTTON_KEY, 64), button -> {
                                 EconomyNetwork.INSTANCE.sendToServer(new BuyItemPacket(item.getItemId(), item.getCurrentPrice(), 64));
                             })
                             .pos(startX - 70, y)

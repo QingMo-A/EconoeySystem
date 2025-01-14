@@ -1,6 +1,7 @@
 package com.mo.economy_system.network.packets;
 
 import com.mo.economy_system.system.EconomySavedData;
+import com.mo.economy_system.utils.MessageKeys;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -12,10 +13,6 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 public class TransferPacket {
-
-    private static final String TRANSFER_SUCCESSFULLY_MESSAGE_KEY = "message.transfer.transfer_successfully";
-    private static final String RECEIVE_SUCCESSFULLY_MESSAGE_KEY = "message.transfer.receive_successfully";
-    private static final String TRANSFER_FAILED_MESSAGE_KEY = "message.transfer.transfer_failed";
 
     private final UUID targetUUID;
     private final int amount;
@@ -46,10 +43,10 @@ public class TransferPacket {
 
                     if (target != null && data.minBalance(sender.getUUID(), msg.amount) && target.getUUID() != sender.getUUID()) {
                         data.addBalance(target.getUUID(), msg.amount);
-                        sender.sendSystemMessage(Component.translatable(TRANSFER_SUCCESSFULLY_MESSAGE_KEY, msg.amount, target.getName().getString()));
-                        target.sendSystemMessage(Component.translatable(RECEIVE_SUCCESSFULLY_MESSAGE_KEY, sender.getName().getString(), msg.amount));
+                        sender.sendSystemMessage(Component.translatable(MessageKeys.TRANSFER_SUCCESSFULLY_MESSAGE_KEY, msg.amount, target.getName().getString()));
+                        target.sendSystemMessage(Component.translatable(MessageKeys.RECEIVE_SUCCESSFULLY_MESSAGE_KEY, sender.getName().getString(), msg.amount));
                     } else {
-                        sender.sendSystemMessage(Component.translatable(TRANSFER_FAILED_MESSAGE_KEY));
+                        sender.sendSystemMessage(Component.translatable(MessageKeys.TRANSFER_FAILED_MESSAGE_KEY));
                     }
                 }
             }

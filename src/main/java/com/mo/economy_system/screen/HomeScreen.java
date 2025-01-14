@@ -5,6 +5,7 @@ import com.mo.economy_system.network.packets.BalanceRequestPacket;
 import com.mo.economy_system.network.packets.MarketRequestPacket;
 import com.mo.economy_system.network.packets.ShopRequestPacket;
 import com.mo.economy_system.network.packets.TerritoryRequestPacket;
+import com.mo.economy_system.utils.MessageKeys;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.components.Button;
@@ -12,25 +13,17 @@ import net.minecraft.network.chat.Component;
 
 public class HomeScreen extends Screen {
 
-    private static final String TITLE_KEY = "screen.home.title";
-    private static final String FETCHING_BALANCE_TEXT_KEY = "text.home.fetching_balance";
-    private static final String BALANCE_TEXT_KEY = "text.home.balance";
-    private static final String SHOP_BUTTON_KEY = "button.home.shop";
-    private static final String MARKET_BUTTON_KEY = "button.home.market";
-    private static final String TERRITORY_BUTTON_KEY = "button.home.territory";
-    private static final String ABOUT_BUTTON_KEY = "button.home.about";
-
     private int balance = -1; // 用于存储玩家余额，默认值为 -1 表示未获取
 
     public HomeScreen() {
-        super(Component.translatable(TITLE_KEY));
+        super(Component.translatable(MessageKeys.HOME_TITLE_KEY));
     }
 
     @Override
     protected void init() {
         // 添加一个按钮示例
         this.addRenderableWidget(
-                Button.builder(Component.translatable(SHOP_BUTTON_KEY), button -> {
+                Button.builder(Component.translatable(MessageKeys.HOME_SHOP_BUTTON_KEY), button -> {
                             // 请求服务器的商店数据
                             EconomyNetwork.INSTANCE.sendToServer(new ShopRequestPacket());
                             // 打开 ShopScreen
@@ -44,7 +37,7 @@ public class HomeScreen extends Screen {
 
         // 添加按钮以打开 MarketScreen
         this.addRenderableWidget(
-                Button.builder(Component.translatable(MARKET_BUTTON_KEY), button -> {
+                Button.builder(Component.translatable(MessageKeys.HOME_MARKET_BUTTON_KEY), button -> {
                             // 请求服务器数据
                             EconomyNetwork.INSTANCE.sendToServer(new MarketRequestPacket());
                             // 打开 MarketScreen（初始化为空列表）
@@ -57,7 +50,7 @@ public class HomeScreen extends Screen {
 
         // 添加按钮
         this.addRenderableWidget(
-                Button.builder(Component.translatable(TERRITORY_BUTTON_KEY), button -> {
+                Button.builder(Component.translatable(MessageKeys.HOME_TERRITORY_BUTTON_KEY), button -> {
                             // 请求服务器数据
                             EconomyNetwork.INSTANCE.sendToServer(new TerritoryRequestPacket());
                             this.minecraft.setScreen(new TerritoryScreen());
@@ -69,7 +62,7 @@ public class HomeScreen extends Screen {
 
         // 添加按钮以打开
         this.addRenderableWidget(
-                Button.builder(Component.translatable(ABOUT_BUTTON_KEY), button -> {
+                Button.builder(Component.translatable(MessageKeys.HOME_ABOUT_BUTTON_KEY), button -> {
                             this.minecraft.setScreen(new AboutScreen());
                         })
                         .pos(this.width / 2 - 50, this.height / 2 + 60)  // 设置按钮位置
@@ -97,10 +90,10 @@ public class HomeScreen extends Screen {
 
         if (balance == -1) {
             // 获取本地化的 "Fetching balance..." 文本
-            balanceText = this.font.plainSubstrByWidth(Component.translatable(FETCHING_BALANCE_TEXT_KEY).getString(), Integer.MAX_VALUE);
+            balanceText = this.font.plainSubstrByWidth(Component.translatable(MessageKeys.HOME_FETCHING_BALANCE_TEXT_KEY).getString(), Integer.MAX_VALUE);
         } else {
             // 获取本地化的 "Your balance: %s coins" 文本，并替换占位符
-            balanceText = Component.translatable(BALANCE_TEXT_KEY, balance).getString();
+            balanceText = Component.translatable(MessageKeys.HOME_BALANCE_TEXT_KEY, balance).getString();
         }
 
         // 计算文本居中位置
