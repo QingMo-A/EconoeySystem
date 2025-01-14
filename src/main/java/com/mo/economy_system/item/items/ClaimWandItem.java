@@ -152,7 +152,7 @@ public class ClaimWandItem extends Item {
         timeoutTasks.put(playerUUID, executorService);
     }
 
-    private void stopTimeoutTask(UUID playerUUID) {
+    private static void stopTimeoutTask(UUID playerUUID) {
         ScheduledExecutorService executorService = timeoutTasks.remove(playerUUID);
         if (executorService != null) {
             executorService.shutdownNow();
@@ -175,6 +175,9 @@ public class ClaimWandItem extends Item {
         if (executorService != null) {
             executorService.shutdownNow();
         }
+
+        // 停止超时任务
+        stopTimeoutTask(playerUUID);
     }
 
     private boolean isOverlappingExistingTerritory(UUID playerUUID, BlockPos pos1, BlockPos pos2) {

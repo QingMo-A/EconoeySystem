@@ -13,6 +13,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLanguageProvider;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -32,6 +33,25 @@ public class EconomySystem {
     public EconomySystem(FMLJavaModLoadingContext context) {
         // 获取 mod 事件总线
         IEventBus modEventBus = context.getModEventBus();
+
+        // 注册客户端事件
+        modEventBus.addListener(this::onClientSetup);
+        // 注册物品
+        ModItems.ITEMS.register(modEventBus);
+
+        EconomyNetwork.register();
+
+        // 启动文件监听器
+        new ConfigWatcher(SHOP_MANAGER).watchConfigFile();
+        new RewardConfigWatcher(REWARD_MANAGER).watchConfigFile();
+
+        // 日志信息
+        LOGGER.info("Economy System Mod Initialized!");
+    }
+
+    public EconomySystem() {
+        // 获取 mod 事件总线
+        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         // 注册客户端事件
         modEventBus.addListener(this::onClientSetup);
