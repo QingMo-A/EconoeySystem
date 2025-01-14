@@ -4,6 +4,7 @@ import com.mo.economy_system.market.MarketItem;
 import com.mo.economy_system.market.MarketManager;
 import com.mo.economy_system.network.EconomyNetwork;
 import com.mo.economy_system.system.EconomySavedData;
+import com.mo.economy_system.utils.MessageKeys;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -15,11 +16,6 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 public class PurchaseItemPacket {
-
-    private static final String ITEM_DOES_NOT_EXIST_MESSAGE_KEY = "message.market.item_does_not_exist";
-    private static final String PURCHASE_FAILED_MESSAGE_KEY = "message.market.purchase_failed";
-    private static final String PURCHASE_SUCCESSFULLY_MESSAGE_KEY = "message.market.purchase_successfully";
-    private static final String COLLECT_MONEY_MESSAGE_KEY = "message.market.collect_money";
 
     private final UUID itemId; // 商品的唯一 ID
 
@@ -47,14 +43,14 @@ public class PurchaseItemPacket {
             // 查找市场中的商品
             MarketItem item = MarketManager.getMarketItemById(msg.itemId);
             if (item == null) {
-                buyer.sendSystemMessage(Component.translatable(ITEM_DOES_NOT_EXIST_MESSAGE_KEY));
+                buyer.sendSystemMessage(Component.translatable(MessageKeys.MARKET_ITEM_DOES_NOT_EXIST_MESSAGE_KEY));
                 return;
             }
 
             // 验证买家是否有足够货币
             int price = item.getPrice();
             if (!savedData.hasEnoughBalance(buyer.getUUID(), price)) {
-                buyer.sendSystemMessage(Component.translatable(PURCHASE_FAILED_MESSAGE_KEY));
+                buyer.sendSystemMessage(Component.translatable(MessageKeys.MARKET_PURCHASE_FAILED_MESSAGE_KEY));
                 return;
             }
 
@@ -70,16 +66,16 @@ public class PurchaseItemPacket {
             savedData.increaseBalance(sellerID, price);
 
             // 通知买家成功购买
-            buyer.sendSystemMessage(Component.translatable(PURCHASE_SUCCESSFULLY_MESSAGE_KEY, price, item.getItemStack().getHoverName().getString(), item.getItemStack().getCount()));
+            buyer.sendSystemMessage(Component.translatable(MessageKeys.MARKET_PURCHASE_SUCCESSFULLY_MESSAGE_KEY, price, item.getItemStack().getHoverName().getString(), item.getItemStack().getCount()));
 
             // 通知卖家（如果在线）
             ServerPlayer seller = serverLevel.getServer().getPlayerList().getPlayer(sellerID);
             if (seller != null) {
                 // 卖家在线，直接发送消息
-                seller.sendSystemMessage(Component.translatable(COLLECT_MONEY_MESSAGE_KEY, item.getItemStack().getHoverName().getString(), buyer.getName().getString(), price));
+                seller.sendSystemMessage(Component.translatable(MessageKeys.MARKET_COLLECT_MONEY_MESSAGE_KEY, item.getItemStack().getHoverName().getString(), buyer.getName().getString(), price));
             } else {
                 // 卖家不在线，将通知存储到离线消息中
-                String text = Component.translatable(COLLECT_MONEY_MESSAGE_KEY, item.getItemStack().getHoverName().getString(), buyer.getName().getString(), price).getString();
+                String text = Component.translatable(MessageKeys.MARKET_COLLECT_MONEY_MESSAGE_KEY, item.getItemStack().getHoverName().getString(), buyer.getName().getString(), price).getString();
                 savedData.storeOfflineMessage(sellerID, text);
             }
 

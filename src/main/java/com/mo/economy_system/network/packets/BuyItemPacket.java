@@ -1,6 +1,7 @@
 package com.mo.economy_system.network.packets;
 
 import com.mo.economy_system.system.EconomySavedData;
+import com.mo.economy_system.utils.MessageKeys;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -13,9 +14,6 @@ import net.minecraftforge.network.NetworkEvent;
 import java.util.function.Supplier;
 
 public class BuyItemPacket {
-
-    private static final String BUY_SUCCESSFULLY_MESSAGE_KEY = "message.shop.buy_successfully";
-    private static final String BUY_FAILED_MESSAGE_KEY = "message.shop.buy_failed";
 
     private final String itemID;
     private final int price;
@@ -68,10 +66,10 @@ public class BuyItemPacket {
                     }
 
                     // 通知玩家购买成功
-                    player.sendSystemMessage(Component.translatable(BUY_SUCCESSFULLY_MESSAGE_KEY, (msg.price * msg.quantity), msg.quantity, getItemStack(msg.itemID).getHoverName().getString()));
+                    player.sendSystemMessage(Component.translatable(MessageKeys.SHOP_BUY_SUCCESSFULLY_MESSAGE_KEY, (msg.price * msg.quantity), msg.quantity, getItemStack(msg.itemID).getHoverName().getString()));
                 } else {
                     // 通知玩家余额不足
-                    player.sendSystemMessage(Component.translatable(BUY_FAILED_MESSAGE_KEY));
+                    player.sendSystemMessage(Component.translatable(MessageKeys.SHOP_BUY_FAILED_MESSAGE_KEY));
                 }
             }
         });

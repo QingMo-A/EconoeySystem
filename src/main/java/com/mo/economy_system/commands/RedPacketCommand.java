@@ -3,6 +3,7 @@ package com.mo.economy_system.commands;
 import com.mo.economy_system.red_packet.RedPacket;
 import com.mo.economy_system.red_packet.RedPacketManager;
 import com.mo.economy_system.system.EconomySavedData;
+import com.mo.economy_system.utils.MessageKeys;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.minecraft.commands.CommandSourceStack;
@@ -36,27 +37,27 @@ public class RedPacketCommand {
         EconomySavedData data = EconomySavedData.getInstance(sender.serverLevel());
 
         if (data.getBalance(sender.getUUID()) < amount) {
-            sender.sendSystemMessage(Component.literal("§cYou do not have enough coins to create a red packet."));
+            sender.sendSystemMessage(Component.translatable(MessageKeys.RED_PACKET_INSUFFICIENT_BALANCE));
             return 0;
         }
 
         if (!RedPacketManager.addRedPacket(sender.getUUID(), new RedPacket(sender.getUUID(), sender.getName().getString(), amount, isLucky, duration))) {
-            sender.sendSystemMessage(Component.literal("§cYou already have an active red packet."));
+            sender.sendSystemMessage(Component.translatable(MessageKeys.RED_PACKET_ALREADY_ACTIVE));
             return 0;
         }
 
         data.minBalance(sender.getUUID(), amount);
 
-        Component claimButton = Component.literal("[抢]")
+        Component claimButton = Component.translatable(MessageKeys.RED_PACKET_CLAIM_BUTTON)
                 .withStyle(style -> style
                         .withColor(0x55FF55)
                         .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/redpacket claim " + sender.getName().getString()))
                         .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("§eClick to claim!"))));
 
         sender.getServer().getPlayerList().broadcastSystemMessage(
-                Component.literal("§a" + sender.getName().getString() + " has sent a red packet! ").append(claimButton), false);
+                Component.translatable(MessageKeys.RED_PACKET_BROADCAST, sender.getName().getString()).append(claimButton), false);
 
-        sender.sendSystemMessage(Component.literal("§aRed packet created successfully."));
+        sender.sendSystemMessage(Component.translatable(MessageKeys.RED_PACKET_CREATED_SUCCESSFULLY));
         return 1;
     }
 
@@ -73,12 +74,12 @@ public class RedPacketCommand {
         }
 
         if (redPacket == null || !redPacket.isClaimable()) {
-            player.sendSystemMessage(Component.literal("§cNo available red packet to claim."));
+            player.sendSystemMessage(Component.translatable(MessageKeys.RED_PACKET_NO_AVAILABLE));
             return 0;
         }
 
         if (redPacket.hasClaimed(player.getUUID())) {
-            player.sendSystemMessage(Component.literal("§cYou have already claimed this red packet."));
+            player.sendSystemMessage(Component.translatable(MessageKeys.RED_PACKET_ALREADY_CLAIMED));
             return 0;
         }
 
@@ -92,7 +93,7 @@ public class RedPacketCommand {
         EconomySavedData data = EconomySavedData.getInstance(player.serverLevel());
         data.addBalance(player.getUUID(), amount);
 
-        player.sendSystemMessage(Component.literal("§aYou claimed " + amount + " coins from " + redPacket.senderName + "'s red packet!"));
+        player.sendSystemMessage(Component.translatable(MessageKeys.RED_PACKET_CLAIM_SUCCESS, amount, redPacket.senderName));
         return 1;
     }
 }

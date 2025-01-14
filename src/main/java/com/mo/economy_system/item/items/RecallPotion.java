@@ -1,5 +1,6 @@
 package com.mo.economy_system.item.items;
 
+import com.mo.economy_system.utils.MessageKeys;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -64,7 +65,7 @@ public class RecallPotion extends Item {
 
             // 检查目标维度是否存在
             if (respawnLevel == null) {
-                player.sendSystemMessage(Component.literal("Error: Unable to locate your respawn dimension!"));
+                player.sendSystemMessage(Component.translatable(MessageKeys.RECALL_POTION_ERROR_DIMENSION_NOT_FOUND));
                 return stack;
             }
 

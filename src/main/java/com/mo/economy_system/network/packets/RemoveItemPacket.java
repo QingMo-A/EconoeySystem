@@ -3,6 +3,7 @@ package com.mo.economy_system.network.packets;
 import com.mo.economy_system.market.MarketItem;
 import com.mo.economy_system.market.MarketManager;
 import com.mo.economy_system.network.EconomyNetwork;
+import com.mo.economy_system.utils.MessageKeys;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -13,10 +14,6 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 public class RemoveItemPacket {
-
-    private static final String REMOVE_FAILED_MESSAGE_KEY = "message.market.remove_failed";
-    private static final String UNMATCHED_SELLER_MESSAGE_KEY = "message.market.unmatched_seller";
-    private static final String ITEM_HAS_BEEN_RETURNED_MESSAGE_KEY = "message.market.item_has_been_returned";
 
     private final UUID itemId;
 
@@ -41,13 +38,13 @@ public class RemoveItemPacket {
             // 获取市场中的商品
             MarketItem item = MarketManager.getMarketItemById(msg.itemId);
             if (item == null) {
-                player.sendSystemMessage(Component.translatable(REMOVE_FAILED_MESSAGE_KEY));
+                player.sendSystemMessage(Component.translatable(MessageKeys.MARKET_REMOVE_FAILED_MESSAGE_KEY));
                 return;
             }
 
             // 验证是否是卖家
             if (!item.getSellerID().equals(player.getUUID())) {
-                player.sendSystemMessage(Component.translatable(UNMATCHED_SELLER_MESSAGE_KEY));
+                player.sendSystemMessage(Component.translatable(MessageKeys.MARKET_UNMATCHED_SELLER_MESSAGE_KEY));
                 return;
             }
 
@@ -63,7 +60,7 @@ public class RemoveItemPacket {
             // 通知客户端刷新市场界面
             EconomyNetwork.INSTANCE.sendToServer(new MarketRequestPacket());
 
-            player.sendSystemMessage(Component.translatable(ITEM_HAS_BEEN_RETURNED_MESSAGE_KEY));
+            player.sendSystemMessage(Component.translatable(MessageKeys.MARKET_ITEM_HAS_BEEN_RETURNED_MESSAGE_KEY));
         });
         context.setPacketHandled(true);
     }

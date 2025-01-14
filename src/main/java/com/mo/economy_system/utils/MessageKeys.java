@@ -24,6 +24,8 @@ public class MessageKeys {
     public static final String TPA_TIMEOUT_SENDER = "message.tpa.timeout_sender";
     public static final String TPA_TIMEOUT_TARGET = "message.tpa.timeout_target";
 
+    public static final String RECALL_POTION_ERROR_DIMENSION_NOT_FOUND = "message.recall_potion.error_dimension_not_found";
+
     public static final String HOME_TITLE_KEY = "screen.home.title";
     public static final String HOME_FETCHING_BALANCE_TEXT_KEY = "text.home.fetching_balance";
     public static final String HOME_BALANCE_TEXT_KEY = "text.home.balance";
@@ -42,6 +44,8 @@ public class MessageKeys {
     public static final String SHOP_LOADING_SHOP_DATA_TEXT_KEY = "text.shop.loading_shop_data";
     public static final String SHOP_BUY_BUTTON_KEY = "button.shop.buy";
     public static final String SHOP_HINT_TEXT_KEY = "text.shop.hint";
+    public static final String SHOP_BUY_SUCCESSFULLY_MESSAGE_KEY = "message.shop.buy_successfully";
+    public static final String SHOP_BUY_FAILED_MESSAGE_KEY = "message.shop.buy_failed";
 
     public static final String LIST_TITLE_KEY = "screen.list.title";
     public static final String LIST_NO_ITEM_IN_HAND_TEXT_KEY = "text.list.no_item_in_hand";
@@ -63,6 +67,22 @@ public class MessageKeys {
     public static final String MARKET_BUY_BUTTON_KEY = "button.market.buy";
     public static final String MARKET_REMOVE_BUTTON_KEY = "button.market.remove";
     public static final String MARKET_HINT_TEXT_KEY = "text.market.hint";
+    public static final String MARKET_ITEM_DOES_NOT_EXIST_MESSAGE_KEY = "message.market.item_does_not_exist";
+    public static final String MARKET_PURCHASE_FAILED_MESSAGE_KEY = "message.market.purchase_failed";
+    public static final String MARKET_PURCHASE_SUCCESSFULLY_MESSAGE_KEY = "message.market.purchase_successfully";
+    public static final String MARKET_COLLECT_MONEY_MESSAGE_KEY = "message.market.collect_money";
+    public static final String MARKET_REMOVE_FAILED_MESSAGE_KEY = "message.market.remove_failed";
+    public static final String MARKET_UNMATCHED_SELLER_MESSAGE_KEY = "message.market.unmatched_seller";
+    public static final String MARKET_ITEM_HAS_BEEN_RETURNED_MESSAGE_KEY = "message.market.item_has_been_returned";
+
+    public static final String RED_PACKET_INSUFFICIENT_BALANCE = "message.red_packet.insufficient_balance";
+    public static final String RED_PACKET_ALREADY_ACTIVE = "message.red_packet.already_active";
+    public static final String RED_PACKET_CREATED_SUCCESSFULLY = "message.red_packet.created_successfully";
+    public static final String RED_PACKET_NO_AVAILABLE = "message.red_packet.no_available";
+    public static final String RED_PACKET_ALREADY_CLAIMED = "message.red_packet.already_claimed";
+    public static final String RED_PACKET_CLAIM_SUCCESS = "message.red_packet.claim_success";
+    public static final String RED_PACKET_CLAIM_BUTTON = "message.red_packet.claim_button";
+    public static final String RED_PACKET_BROADCAST = "message.red_packet.broadcast";
 
     public static final String TERRITORY_TITLE_KEY = "screen.territory.title";
     public static final String TERRITORY_NO_TERRITORIES_TEXT_KEY = "text.territory.no_territories";
@@ -103,6 +123,19 @@ public class MessageKeys {
     public static final String INVITE_RECEIVED = "message.invite.received"; // 玩家 {inviterName} 邀请你加入领地: {territoryName}
     public static final String INVITE_INSTRUCTIONS = "message.invite.instructions"; // 输入 /accept_invite 接受 或 /decline_invite 拒绝
     public static final String INVITE_SELF_ERROR = "message.invite.self_error"; // 你不能向自己发出邀请!
+
+    public static final String INVITE_NOT_IN_TERRITORY = "message.invite.not_in_territory";
+    public static final String INVITE_SENT_TO_PLAYER = "message.invite.sent_to_player";
+    public static final String INVITE_RECEIVED_PLAYER = "message.invite.received_player";
+    public static final String COMMAND_PLAYER_ONLY = "message.command.player_only";
+    public static final String TERRITORY_SETBACKPOINT_NO_PERMISSION = "message.territory.setbackpoint.no_permission";
+    public static final String TERRITORY_SETBACKPOINT_SUCCESS = "message.territory.setbackpoint.success";
+    public static final String INVITE_NO_PENDING = "message.invite.no_pending";
+    public static final String INVITE_TARGET_NOT_FOUND = "message.invite.target_not_found";
+    public static final String INVITE_ACCEPTED = "message.invite.accepted";
+    public static final String INVITE_DECLINE_NO_PENDING = "message.invite.decline_no_pending";
+    public static final String INVITE_DECLINED = "message.invite.declined";
+
 
     public static final String CLAIM_WAND_SELECT_POINTS = "message.claim_wand.select_points";
     public static final String CLAIM_INSUFFICIENT_BALANCE = "message.claim.insufficient_balance";

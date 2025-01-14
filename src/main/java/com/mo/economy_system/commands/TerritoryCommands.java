@@ -3,6 +3,7 @@ package com.mo.economy_system.commands;
 import com.mo.economy_system.territory.InviteManager;
 import com.mo.economy_system.territory.Territory;
 import com.mo.economy_system.territory.TerritoryManager;
+import com.mo.economy_system.utils.MessageKeys;
 import com.mo.economy_system.utils.PlayerUtils;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
@@ -43,13 +44,13 @@ public class TerritoryCommands {
 
                                     Territory territory = TerritoryManager.getTerritoryAtIgnoreY(x, z);
                                     if (territory == null || !territory.isOwner(sender.getUUID())) {
-                                        sender.sendSystemMessage(Component.literal("你不在自己的领地范围内，无法发送邀请！"));
+                                        sender.sendSystemMessage(Component.translatable(MessageKeys.INVITE_NOT_IN_TERRITORY));
                                         return 0;
                                     }
 
                                     InviteManager.sendInvite(sender.getUUID(), target.getUUID(), territory.getTerritoryID());
-                                    sender.sendSystemMessage(Component.literal("邀请已发送给 " + target.getName().getString()));
-                                    target.sendSystemMessage(Component.literal(sender.getName().getString() + " 邀请你加入领地: " + territory.getName()));
+                                    sender.sendSystemMessage(Component.translatable(MessageKeys.INVITE_SENT_TO_PLAYER, target.getName().getString()));
+                                    target.sendSystemMessage(Component.translatable(MessageKeys.INVITE_RECEIVED_PLAYER, sender.getName().getString(), territory.getName()));
                                     return 1;
                                 }))
         );
@@ -60,7 +61,7 @@ public class TerritoryCommands {
         CommandSourceStack source = context.getSource();
 
         if (!(source.getEntity() instanceof ServerPlayer player)) {
-            source.sendFailure(Component.literal("此指令仅能由玩家执行！"));
+            source.sendFailure(Component.translatable(MessageKeys.COMMAND_PLAYER_ONLY));
             return 0;
         }
 
@@ -73,7 +74,7 @@ public class TerritoryCommands {
         // 检查玩家是否在自己的领地
         Territory territory = TerritoryManager.getTerritoryAtIgnoreY(x, z);
         if (territory == null || !territory.isOwner(player.getUUID())) {
-            source.sendFailure(Component.literal("你不在自己的领地范围内，无法设置回城点！"));
+            source.sendFailure(Component.translatable(MessageKeys.TERRITORY_SETBACKPOINT_NO_PERMISSION));
             return 0;
         }
 
@@ -81,25 +82,25 @@ public class TerritoryCommands {
         territory.setBackpoint(new BlockPos(x, y, z));
         TerritoryManager.markDirty(); // 如果有保存机制，标记数据需要保存
 
-        source.sendSuccess(() -> Component.literal("成功设置回城点为: " + x + ", " + y + ", " + z), true);
+        source.sendSuccess(() -> Component.translatable(MessageKeys.TERRITORY_SETBACKPOINT_SUCCESS, x, y, z), true);
         return 1;
     }
 
     private static int handleAccept(CommandSourceStack source) {
         if (!(source.getEntity() instanceof ServerPlayer player)) {
-            source.sendFailure(Component.literal("此指令仅能由玩家执行！"));
+                source.sendFailure(Component.translatable(MessageKeys.COMMAND_PLAYER_ONLY));
             return 0;
         }
 
         InviteManager.Invite invite = InviteManager.getInvite(player.getUUID());
         if (invite == null) {
-            source.sendFailure(Component.literal("没有待接受的领地邀请！"));
+            source.sendFailure(Component.translatable(MessageKeys.INVITE_NO_PENDING));
             return 0;
         }
 
         Territory territory = TerritoryManager.getTerritoryByID(invite.getTerritoryID());
         if (territory == null) {
-            source.sendFailure(Component.literal("目标领地不存在！"));
+            source.sendFailure(Component.translatable(MessageKeys.INVITE_TARGET_NOT_FOUND));
             InviteManager.removeInvite(player.getUUID());
             return 0;
         }
@@ -108,24 +109,24 @@ public class TerritoryCommands {
         TerritoryManager.markDirty();
         InviteManager.removeInvite(player.getUUID());
 
-        source.sendSuccess(() -> Component.literal("成功接受邀请，现在你有权进入领地: " + territory.getName()), true);
+        source.sendSuccess(() -> Component.translatable(MessageKeys.INVITE_ACCEPTED, territory.getName()), true);
         return 1;
     }
 
     private static int handleDecline(CommandSourceStack source) {
         if (!(source.getEntity() instanceof ServerPlayer player)) {
-            source.sendFailure(Component.literal("此指令仅能由玩家执行！"));
+            source.sendFailure(Component.translatable(MessageKeys.COMMAND_PLAYER_ONLY));
             return 0;
         }
 
         InviteManager.Invite invite = InviteManager.getInvite(player.getUUID());
         if (invite == null) {
-            source.sendFailure(Component.literal("没有待拒绝的领地邀请！"));
+            source.sendFailure(Component.translatable(MessageKeys.INVITE_DECLINE_NO_PENDING));
             return 0;
         }
 
         InviteManager.removeInvite(player.getUUID());
-        source.sendSuccess(() -> Component.literal("已拒绝邀请。"), true);
+        source.sendSuccess(() -> Component.translatable(MessageKeys.INVITE_DECLINED), true);
         return 1;
     }
 }
