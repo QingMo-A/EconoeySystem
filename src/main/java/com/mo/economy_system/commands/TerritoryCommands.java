@@ -41,7 +41,7 @@ public class TerritoryCommands {
                                     int x = (int) Math.floor(senderPos.x);
                                     int z = (int) Math.floor(senderPos.z);
 
-                                    Territory territory = TerritoryManager.getTerritoryAtIgnoringY(x, z);
+                                    Territory territory = TerritoryManager.getTerritoryAtIgnoreY(x, z);
                                     if (territory == null || !territory.isOwner(sender.getUUID())) {
                                         sender.sendSystemMessage(Component.literal("你不在自己的领地范围内，无法发送邀请！"));
                                         return 0;
@@ -71,7 +71,7 @@ public class TerritoryCommands {
         int z = (int) Math.floor(playerPos.z);
 
         // 检查玩家是否在自己的领地
-        Territory territory = TerritoryManager.getTerritoryAtIgnoringY(x, z);
+        Territory territory = TerritoryManager.getTerritoryAtIgnoreY(x, z);
         if (territory == null || !territory.isOwner(player.getUUID())) {
             source.sendFailure(Component.literal("你不在自己的领地范围内，无法设置回城点！"));
             return 0;

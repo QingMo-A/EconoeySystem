@@ -1,36 +1,61 @@
 package com.mo.economy_system.territory;
 
+import com.mo.economy_system.utils.ServerMessageUtil;
 import net.minecraft.server.level.ServerLevel;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class TerritoryManager {
 
     private static TerritorySavedData savedData;
-    private static boolean initialized = false; // 避免重复初始化
+    private static boolean initialized = false;
 
-    private static final Map<UUID, Territory> territoryByID = new HashMap<>();
-    private static final Map<UUID, List<Territory>> territoriesByOwner = new HashMap<>();
+    private static final Map<UUID, Territory> territoryByID = Collections.synchronizedMap(new HashMap<>());
+    private static final Map<UUID, List<Territory>> territoriesByOwner = new ConcurrentHashMap<>();
+
+    // 初始化一个有限边界的四叉树
+    private static QuadTree quadTree = new QuadTree(0, new Bounds(-30000, -30000, 60000, 60000));
+
+    // 自动保存间隔（60秒）
+    private static final long AUTO_SAVE_INTERVAL = 60000L;
+    private static long lastSaveTime = System.currentTimeMillis();
 
     // 初始化领地管理器
     public static void initialize(ServerLevel level) {
-        if (initialized) return; // 避免重复初始化
+        if (initialized) return;
+
+        quadTree.clear(); // 清空四叉树
         savedData = TerritorySavedData.getInstance(level);
+
+        ServerMessageUtil.log("Initializing TerritoryManager...");
+
         for (Territory territory : savedData.getAllTerritories()) {
             addTerritory(territory);
         }
+
         initialized = true;
+        ServerMessageUtil.log("TerritoryManager initialized with " + territoryByID.size() + " territories.");
     }
 
     // 添加领地
     public static void addTerritory(Territory territory) {
-        if (!territoryByID.containsKey(territory.getTerritoryID())) { // 防止重复添加
+        if (!territoryByID.containsKey(territory.getTerritoryID())) {
             territoryByID.put(territory.getTerritoryID(), territory);
-            System.out.println(territory.getTerritoryID());
             territoriesByOwner.computeIfAbsent(territory.getOwnerUUID(), k -> new ArrayList<>()).add(territory);
+
+            // 动态扩展四叉树边界
+            if (!quadTree.getBounds().contains(territory.getBounds())) {
+                expandQuadTreeBounds(territory.getBounds());
+            }
+
+            quadTree.insert(territory); // 插入四叉树
             if (savedData != null) {
                 savedData.addTerritory(territory);
             }
+
+            autoSave(); // 自动保存
+            ServerMessageUtil.log("Territory added: " + territory.getName());
         }
     }
 
@@ -39,110 +64,52 @@ public class TerritoryManager {
         Territory territory = territoryByID.remove(territoryID);
         if (territory != null) {
             territoriesByOwner.getOrDefault(territory.getOwnerUUID(), new ArrayList<>()).remove(territory);
+
+            quadTree.remove(territory); // 从四叉树中移除
             if (savedData != null) {
                 savedData.removeTerritory(territoryID);
             }
+
+            autoSave(); // 自动保存
+            ServerMessageUtil.log("Territory removed: " + territory.getName());
         }
     }
 
-    // 获取指定位置的领地
-    public static Territory getTerritoryAt(int x, int y, int z) {
-        for (Territory territory : territoryByID.values()) {
-            if (territory.isWithinBounds(x, y, z)) {
-                return territory;
-            }
-        }
-        return null;
-    }
-
-    public static Territory getTerritoryAtIgnoringY(int x, int z) {
-        for (Territory territory : territoryByID.values()) {
-            if (x >= Math.min(territory.getPos1().getX(), territory.getPos2().getX()) &&
-                    x <= Math.max(territory.getPos1().getX(), territory.getPos2().getX()) &&
-                    z >= Math.min(territory.getPos1().getZ(), territory.getPos2().getZ()) &&
-                    z <= Math.max(territory.getPos1().getZ(), territory.getPos2().getZ())) {
-                return territory;
-            }
-        }
-        return null;
-    }
-
-    // 获取所有领地
-    public static List<Territory> getAllTerritories() {
-        return new ArrayList<>(territoryByID.values());
-    }
-
-
-    /**
-     * 忽略 Y 轴的范围判断，根据 X 和 Z 判断领地
-     */
+    // 查询指定位置的领地（X 和 Z 轴）
     public static Territory getTerritoryAtIgnoreY(int x, int z) {
-        for (Territory territory : territoryByID.values()) {
-            if (territory.isWithinBoundsIgnoreY(x, z)) {
-                return territory;
-            }
-        }
-        return null;
+        List<Territory> candidates = quadTree.query(x, z);
+        return candidates.stream()
+                .filter(territory -> territory.isWithinBoundsIgnoreY(x, z))
+                .findFirst()
+                .orElse(null);
     }
 
-    // 根据领地 ID 获取领地
-    public static Territory getTerritoryByID(UUID territoryID) {
-        System.out.println("Current territoryByID size: " + territoryByID.size());
-        System.out.println("Current territoryByID entries:");
-        for (Map.Entry<UUID, Territory> entry : territoryByID.entrySet()) {
-            System.out.println("ID: " + entry.getKey() + ", Territory: " + entry.getValue());
-        }
-
-        Territory result = territoryByID.get(territoryID);
-        if (result == null) {
-            System.out.println("No territory found for ID: " + territoryID);
-        } else {
-            System.out.println("Found territory: " + result.getName() + " for ID: " + territoryID);
-        }
-        return result;
-    }
-
-
-    // 获取玩家拥有的领地
+    // 获取玩家拥有的所有领地
     public static List<Territory> getTerritoriesByOwner(UUID ownerUUID) {
         return territoriesByOwner.getOrDefault(ownerUUID, new ArrayList<>());
     }
 
-    // 添加授权玩家
-    public static void addAuthorizedPlayer(UUID territoryID, UUID playerUUID, String playerName) {
-        Territory territory = getTerritoryByID(territoryID);
-        if (territory != null) {
-            // 添加玩家到领地，并保存玩家名称
-            territory.addAuthorizedPlayer(playerUUID, playerName);
-
-            // 标记数据已更改（如果有保存机制）
-            if (savedData != null) {
-                savedData.setDirty();
-            }
-        }
-    }
-
-
     // 获取玩家有权限的领地（排除自己拥有的领地）
     public static List<Territory> getAuthorizedTerritories(UUID playerUUID) {
         List<Territory> authorizedTerritories = new ArrayList<>();
-        for (Territory territory : territoryByID.values()) {
-            if (!territory.isOwner(playerUUID) && territory.hasPermission(playerUUID)) { // 排除所有者
-                authorizedTerritories.add(territory);
+        synchronized (territoryByID) {
+            for (Territory territory : territoryByID.values()) {
+                if (!territory.isOwner(playerUUID) && territory.hasPermission(playerUUID)) {
+                    authorizedTerritories.add(territory);
+                }
             }
         }
         return authorizedTerritories;
     }
 
-    // 移除授权玩家
-    public static void removeAuthorizedPlayer(UUID territoryID, UUID playerUUID) {
-        Territory territory = getTerritoryByID(territoryID);
-        if (territory != null) {
-            territory.removeAuthorizedPlayer(playerUUID);
-            if (savedData != null) {
-                savedData.setDirty();
-            }
-        }
+    // 根据 ID 获取领地
+    public static Territory getTerritoryByID(UUID territoryID) {
+        return territoryByID.get(territoryID);
+    }
+
+    // 获取所有领地
+    public static List<Territory> getAllTerritories() {
+        return new ArrayList<>(territoryByID.values());
     }
 
     // 检查玩家是否有权限
@@ -151,17 +118,50 @@ public class TerritoryManager {
         return territory != null && territory.hasPermission(playerUUID);
     }
 
+    // 扩展四叉树边界
+    private static void expandQuadTreeBounds(Bounds newBounds) {
+        Bounds currentBounds = quadTree.getBounds();
+        int newMinX = Math.min(currentBounds.x, newBounds.x);
+        int newMinZ = Math.min(currentBounds.z, newBounds.z);
+        int newMaxX = Math.max(currentBounds.x + currentBounds.width, newBounds.x + newBounds.width);
+        int newMaxZ = Math.max(currentBounds.z + currentBounds.height, newBounds.z + newBounds.height);
+
+        Bounds expandedBounds = new Bounds(newMinX, newMinZ, newMaxX - newMinX, newMaxZ - newMinZ);
+
+        QuadTree newQuadTree = new QuadTree(0, expandedBounds);
+        synchronized (territoryByID) {
+            for (Territory territory : territoryByID.values()) {
+                newQuadTree.insert(territory);
+            }
+        }
+        quadTree.clear();
+        quadTree.copyFrom(newQuadTree);
+        ServerMessageUtil.log("QuadTree bounds expanded: " + expandedBounds);
+    }
+
+    // 自动保存
+    private static void autoSave() {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastSaveTime >= AUTO_SAVE_INTERVAL) {
+            markDirty();
+            lastSaveTime = currentTime;
+            ServerMessageUtil.log("Territory data saved.");
+        }
+    }
+
     public static void markDirty() {
         if (savedData != null) {
             savedData.setDirty();
         }
     }
 
-    // 重置领地管理器
+    // 清空领地管理器
     public static void reset() {
         savedData = null;
         initialized = false;
         territoryByID.clear();
         territoriesByOwner.clear();
+        quadTree.clear();
+        ServerMessageUtil.log("TerritoryManager has been reset.");
     }
 }

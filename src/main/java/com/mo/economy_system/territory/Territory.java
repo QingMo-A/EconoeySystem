@@ -77,6 +77,15 @@ public class Territory {
         return new BlockPos(x2, y2, z2);
     }
 
+    public Bounds getBounds() {
+        int minX = Math.min(x1, x2);
+        int maxX = Math.max(x1, x2);
+        int minZ = Math.min(z1, z2);
+        int maxZ = Math.max(z1, z2);
+
+        return new Bounds(minX, minZ, maxX - minX, maxZ - minZ);
+    }
+
     public boolean isWithinBounds(int x, int y, int z) {
         return x >= Math.min(x1, x2) && x <= Math.max(x1, x2) &&
                 y >= Math.min(y1, y2) && y <= Math.max(y1, y2) &&
@@ -84,8 +93,7 @@ public class Territory {
     }
 
     public boolean isWithinBoundsIgnoreY(int x, int z) {
-        return x >= Math.min(x1, x2) && x <= Math.max(x1, x2) &&
-                z >= Math.min(z1, z2) && z <= Math.max(z1, z2);
+        return getBounds().contains(x, z);
     }
 
     public Set<PlayerInfo> getAuthorizedPlayers() {
