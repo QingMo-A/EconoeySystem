@@ -1,6 +1,7 @@
 package com.mo.economy_system.network.packets;
 
 import com.mo.economy_system.territory.TerritoryManager;
+import com.mo.economy_system.utils.MessageKeys;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -35,12 +36,12 @@ public class RemovePlayerFromTerritoryPacket {
 
             var territory = TerritoryManager.getTerritoryByID(msg.territoryID);
             if (territory == null) {
-                sender.sendSystemMessage(Component.literal("领地不存在！"));
+                sender.sendSystemMessage(Component.translatable(MessageKeys.TERRITORY_NOT_EXIST));
                 return;
             }
 
             if (!territory.isOwner(sender.getUUID())) {
-                sender.sendSystemMessage(Component.literal("你无权管理此领地！"));
+                sender.sendSystemMessage(Component.translatable(MessageKeys.TERRITORY_NO_PERMISSION));
                 return;
             }
 
@@ -48,13 +49,13 @@ public class RemovePlayerFromTerritoryPacket {
             ServerPlayer target = sender.server.getPlayerList().getPlayer(msg.playerUUID);
 
             if (target != null) {
-                target.sendSystemMessage(Component.literal("你被从领地 " + territory.getName() + " 中踢出"));
+                target.sendSystemMessage(Component.translatable(MessageKeys.TERRITORY_PLAYER_KICKED, territory.getName()));
             }
 
             territory.removeAuthorizedPlayer(msg.playerUUID);
             TerritoryManager.markDirty();
 
-            sender.sendSystemMessage(Component.literal("成功将玩家移出领地！"));
+            sender.sendSystemMessage(Component.translatable(MessageKeys.TERRITORY_PLAYER_REMOVED));
         });
         context.setPacketHandled(true);
     }

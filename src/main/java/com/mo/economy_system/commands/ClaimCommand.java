@@ -4,6 +4,7 @@ import com.mo.economy_system.item.items.ClaimWandItem;
 import com.mo.economy_system.territory.Territory;
 import com.mo.economy_system.territory.TerritoryManager;
 import com.mo.economy_system.system.EconomySavedData;
+import com.mo.economy_system.utils.MessageKeys;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.commands.CommandSourceStack;
@@ -25,7 +26,7 @@ public class ClaimCommand {
 
                             // 检查玩家是否有两个选定点
                             if (ClaimWandItem.getFirstPosition(playerUUID) == null || ClaimWandItem.getSecondPosition(playerUUID) == null) {
-                                player.sendSystemMessage(Component.literal("§c请先用圈地杖选定两个点！"));
+                                player.sendSystemMessage(Component.translatable(MessageKeys.CLAIM_WAND_SELECT_POINTS));
                                 return 0;
                             }
 
@@ -40,7 +41,7 @@ public class ClaimCommand {
                             // 检查余额
                             EconomySavedData data = EconomySavedData.getInstance(player.serverLevel());
                             if (data.getBalance(playerUUID) < price) {
-                                player.sendSystemMessage(Component.literal("§c余额不足，圈地所需价格为 " + price + " 金币。"));
+                                player.sendSystemMessage(Component.translatable(MessageKeys.CLAIM_INSUFFICIENT_BALANCE, price));
                                 return 0;
                             }
 
@@ -51,7 +52,7 @@ public class ClaimCommand {
                             TerritoryManager.addTerritory(territory);
                             data.minBalance(playerUUID, price);
 
-                            player.sendSystemMessage(Component.literal("§a领地创建成功！名称: " + name + "，价格: " + price + " 金币。"));
+                            player.sendSystemMessage(Component.translatable(MessageKeys.CLAIM_SUCCESS, name, price));
                             ClaimWandItem.clearPositions(playerUUID); // 清除点位记录
                             return 1;
                         })));

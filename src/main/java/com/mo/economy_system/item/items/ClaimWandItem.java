@@ -2,6 +2,7 @@ package com.mo.economy_system.item.items;
 
 import com.mo.economy_system.territory.Territory;
 import com.mo.economy_system.territory.TerritoryManager;
+import com.mo.economy_system.utils.MessageKeys;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -42,17 +43,17 @@ public class ClaimWandItem extends Item {
         if (!firstPositions.containsKey(playerUUID)) {
             // 玩家未选定第一个点
             firstPositions.put(playerUUID, clickedPos);
-            player.sendSystemMessage(Component.literal("§a第一个点已确定 坐标: " + clickedPos.getX() + " " + clickedPos.getY() + " " + clickedPos.getZ()));
+            player.sendSystemMessage(Component.translatable(MessageKeys.CLAIM_WAND_FIRST_POSITION_SET, clickedPos.getX(), clickedPos.getY(), clickedPos.getZ()));
             startTimeoutTask(player); // 开始倒计时任务
         } else if (!secondPositions.containsKey(playerUUID)) {
             // 玩家未选定第二个点
             secondPositions.put(playerUUID, clickedPos);
-            player.sendSystemMessage(Component.literal("§a第二个点已确定 坐标: " + clickedPos.getX() + " " + clickedPos.getY() + " " + clickedPos.getZ()));
+            player.sendSystemMessage(Component.translatable(MessageKeys.CLAIM_WAND_SECOND_POSITION_SET, clickedPos.getX(), clickedPos.getY(), clickedPos.getZ()));
 
             // 检查新圈地是否包含已有领地
             BlockPos firstPos = firstPositions.get(playerUUID);
             if (isOverlappingExistingTerritory(playerUUID, firstPos, clickedPos)) {
-                player.sendSystemMessage(Component.literal("§c圈地失败！新领地与现有领地重叠，请重新选择点位。"));
+                player.sendSystemMessage(Component.translatable(MessageKeys.CLAIM_WAND_OVERLAP_ERROR));
                 firstPositions.remove(playerUUID);
                 secondPositions.remove(playerUUID);
                 return InteractionResult.FAIL;
@@ -62,9 +63,9 @@ public class ClaimWandItem extends Item {
             int volume = calculateVolume(firstPos, clickedPos);
             int price = volume * 20;
 
-            player.sendSystemMessage(Component.literal("§e领地范围: " + volume + " 格子"));
-            player.sendSystemMessage(Component.literal("§e圈地所需价格: " + price + " 金币"));
-            player.sendSystemMessage(Component.literal("§b如果不满意，第三次右键即可取消。如果满意，请执行指令 /confirm_claim <领地名称> 来确认购买！"));
+            player.sendSystemMessage(Component.translatable(MessageKeys.CLAIM_WAND_VOLUME, volume));
+            player.sendSystemMessage(Component.translatable(MessageKeys.CLAIM_WAND_PRICE, price));
+            player.sendSystemMessage(Component.translatable(MessageKeys.CLAIM_WAND_INSTRUCTION));
 
             // 显示粒子效果（仅显示边缘）
             showParticleEffect((ServerLevel) player.level(), firstPos, clickedPos, player);
@@ -77,7 +78,7 @@ public class ClaimWandItem extends Item {
             stopParticleEffect(playerUUID);
             stopTimeoutTask(playerUUID);
 
-            player.sendSystemMessage(Component.literal("§c圈地已取消！"));
+            player.sendSystemMessage(Component.translatable(MessageKeys.CLAIM_WAND_CANCEL));
         }
 
         return InteractionResult.SUCCESS;
@@ -145,7 +146,7 @@ public class ClaimWandItem extends Item {
                 firstPositions.remove(playerUUID);
                 secondPositions.remove(playerUUID);
                 stopParticleEffect(playerUUID);
-                player.sendSystemMessage(Component.literal("§c圈地已超时自动取消！"));
+                player.sendSystemMessage(Component.translatable(MessageKeys.CLAIM_WAND_TIMEOUT));
             }
         }, 60, TimeUnit.SECONDS); // 60秒后执行
 

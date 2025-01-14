@@ -78,10 +78,10 @@ public class TerritoryManagementScreen extends Screen {
 
         // 显示领地 ID
         this.addRenderableWidget(
-                Button.builder(Component.literal("复制领地ID"), button -> {
+                Button.builder(Component.translatable(MessageKeys.TERRITORY_MANAGEMENT_COPY_ID), button -> {
                             GLFW.glfwSetClipboardString(Minecraft.getInstance().getWindow().getWindow(),
                                     territory.getTerritoryID().toString());
-                            this.minecraft.player.sendSystemMessage(Component.literal("领地ID已复制到剪贴板！"));
+                            this.minecraft.player.sendSystemMessage(Component.translatable(MessageKeys.TERRITORY_MANAGEMENT_COPY_SUCCESS));
                         }).pos(this.width - (this.width / 4) - 60, startY)
                         .size(120, 20)
                         .build()
@@ -89,7 +89,7 @@ public class TerritoryManagementScreen extends Screen {
 
         // 邀请玩家按钮
         this.addRenderableWidget(
-                Button.builder(Component.literal("邀请玩家"), button -> {
+                Button.builder(Component.translatable(MessageKeys.TERRITORY_MANAGEMENT_INVITE_PLAYER), button -> {
                             Minecraft.getInstance().setScreen(new InvitePlayerScreen(territory));
                         }).pos(this.width - (this.width / 4) - 60, startY + 55)
                         .size(120, 20)
@@ -98,7 +98,7 @@ public class TerritoryManagementScreen extends Screen {
 
         // 删除领地按钮
         this.addRenderableWidget(
-                Button.builder(Component.literal("删除领地"), button -> {
+                Button.builder(Component.translatable(MessageKeys.TERRITORY_MANAGEMENT_DELETE_TERRITORY), button -> {
                             EconomyNetwork.INSTANCE.sendToServer(new RemoveTerritoryPacket(territory.getTerritoryID()));
                             this.minecraft.setScreen(null); // 关闭界面
                         }).pos(this.width - (this.width / 4) - 60, startY + 110)
@@ -141,9 +141,8 @@ public class TerritoryManagementScreen extends Screen {
 
     private void addKickButton(UUID playerUUID, int buttonX, int buttonY) {
         this.addRenderableWidget(
-                Button.builder(Component.literal("踢出"), button -> {
+                Button.builder(Component.translatable(MessageKeys.TERRITORY_MANAGEMENT_KICK_PLAYER), button -> {
                             EconomyNetwork.INSTANCE.sendToServer(new RemovePlayerFromTerritoryPacket(territory.getTerritoryID(), playerUUID));
-                            this.minecraft.player.sendSystemMessage(Component.literal("已移除玩家: " + playerUUID));
                             EconomyNetwork.INSTANCE.sendToServer(new TerritoryRequestPacket());
                             this.minecraft.setScreen(new TerritoryScreen());
                         })

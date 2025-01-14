@@ -4,6 +4,7 @@ import com.mo.economy_system.territory.InviteManager;
 import com.mo.economy_system.territory.PlayerInfo;
 import com.mo.economy_system.territory.Territory;
 import com.mo.economy_system.territory.TerritoryManager;
+import com.mo.economy_system.utils.MessageKeys;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -39,14 +40,14 @@ public class InvitePlayerPacket {
             // 获取领地信息
             Territory territory = TerritoryManager.getTerritoryByID(msg.territoryID);
             if (territory == null || !territory.isOwner(inviter.getUUID())) {
-                inviter.sendSystemMessage(Component.literal("§c你没有权限邀请玩家加入此领地！"));
+                inviter.sendSystemMessage(Component.translatable(MessageKeys.INVITE_NO_PERMISSION));
                 return;
             }
 
             // 获取目标玩家
             ServerPlayer target = inviter.server.getPlayerList().getPlayerByName(msg.playerName);
             if (target == null) {
-                inviter.sendSystemMessage(Component.literal("§c玩家 " + msg.playerName + " 不在线！"));
+                inviter.sendSystemMessage(Component.translatable(MessageKeys.INVITE_PLAYER_OFFLINE, msg.playerName));
                 return;
             }
 
@@ -54,7 +55,7 @@ public class InvitePlayerPacket {
                 System.out.println(target.getUUID() + "\n" + territory.getOwnerUUID());
                 for (PlayerInfo playerInfo : territory.getAuthorizedPlayers()) {
                     if (playerInfo.getUuid().equals(target.getUUID())) {
-                        inviter.sendSystemMessage(Component.literal("§c玩家 " + msg.playerName + " 已经是你的领地成员了！"));
+                        inviter.sendSystemMessage(Component.translatable(MessageKeys.INVITE_ALREADY_MEMBER, msg.playerName));
                         return;
                     }
                 }
@@ -62,11 +63,11 @@ public class InvitePlayerPacket {
                 InviteManager.sendInvite(inviter.getUUID(), target.getUUID(), msg.territoryID);
 
                 // 发送邀请消息
-                inviter.sendSystemMessage(Component.literal("§a已向玩家 " + msg.playerName + " 发送邀请！"));
-                target.sendSystemMessage(Component.literal("§e玩家 " + inviter.getName().getString() + " 邀请你加入领地: " + territory.getName()));
-                target.sendSystemMessage(Component.literal("§a输入 /accept_invite 接受 或 /decline_invite 拒绝"));
+                inviter.sendSystemMessage(Component.translatable(MessageKeys.INVITE_SENT, msg.playerName));
+                target.sendSystemMessage(Component.translatable(MessageKeys.INVITE_RECEIVED, inviter.getName().getString(), territory.getName()));
+                target.sendSystemMessage(Component.translatable(MessageKeys.INVITE_INSTRUCTIONS));
             } else {
-                inviter.sendSystemMessage(Component.literal("§c你不能向自己发出邀请!"));
+                inviter.sendSystemMessage(Component.translatable(MessageKeys.INVITE_SELF_ERROR));
             }
 
         });

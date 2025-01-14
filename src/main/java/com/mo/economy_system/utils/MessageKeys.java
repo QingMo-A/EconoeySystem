@@ -64,12 +64,65 @@ public class MessageKeys {
     public static final String MARKET_REMOVE_BUTTON_KEY = "button.market.remove";
     public static final String MARKET_HINT_TEXT_KEY = "text.market.hint";
 
+    public static final String TERRITORY_TITLE_KEY = "screen.territory.title";
+    public static final String TERRITORY_NO_TERRITORIES_TEXT_KEY = "text.territory.no_territories";
+    public static final String TERRITORY_TERRITORY_NAME_TEXT_KEY = "text.territory.territory_name";
+    public static final String TERRITORY_TERRITORY_AREA_TEXT_KEY = "text.territory.territory_area";
+    public static final String TERRITORY_TELEPORT_BUTTON_KEY = "button.territory.teleport";
+    public static final String TERRITORY_MANAGE_BUTTON_KEY = "button.territory.manage";
     public static final String TERRITORY_TERRITORY_NAME_KEY = "screen.territory.territory_name";
     public static final String TERRITORY_TERRITORY_UUID_KEY = "screen.territory.territory_uuid";
     public static final String TERRITORY_TERRITORY_OWNER_NAME_KEY = "screen.territory.territory_owner_name";
     public static final String TERRITORY_TERRITORY_OWNER_UUID_KEY = "screen.territory.territory_owner_name_uuid";
     public static final String TERRITORY_TERRITORY_BACK_POINT_KEY = "screen.territory.territory_back_point";
     public static final String TERRITORY_TERRITORY_NO_AUTHORIZED_PLAYER_KEY = "screen.territory.territory_no_authorized_player";
+
+    public static final String TERRITORY_MANAGEMENT_COPY_ID = "message.territory_management.copy_id";
+    public static final String TERRITORY_MANAGEMENT_INVITE_PLAYER = "message.territory_management.invite_player";
+    public static final String TERRITORY_MANAGEMENT_DELETE_TERRITORY = "message.territory_management.delete_territory";
+    public static final String TERRITORY_MANAGEMENT_COPY_SUCCESS = "message.territory_management.copy_success";
+    public static final String TERRITORY_MANAGEMENT_KICK_PLAYER = "message.territory_management.kick_player";
+
+    public static final String TERRITORY_NOT_FOUND = "message.territory.not_found";
+    public static final String TERRITORY_NO_OWNER_PERMISSION = "message.territory.no_owner_permission";
+    public static final String TERRITORY_REMOVE_SUCCESS = "message.territory.remove_success";
+
+    public static final String TERRITORY_NOT_EXIST = "message.territory.not_exist";
+    public static final String TERRITORY_NO_PERMISSION = "message.territory.no_permission";
+    public static final String TERRITORY_PLAYER_KICKED = "message.territory.player_kicked";
+    public static final String TERRITORY_PLAYER_REMOVED = "message.territory.player_removed";
+
+    public static final String INVITE_TITLE_KEY = "screen.invite.title";
+    public static final String INVITE_INVITE_BUTTON_KEY = "button.invite.invite";
+    public static final String INVITE_NO_NAME_KEY = "message.invite.no_name";
+    public static final String INVITE_BACK_BUTTON = "button.invite.back";
+    public static final String INVITE_NO_PERMISSION = "message.invite.no_permission"; // 你没有权限邀请玩家加入此领地！
+    public static final String INVITE_PLAYER_OFFLINE = "message.invite.player_offline"; // 玩家 {playerName} 不在线！
+    public static final String INVITE_ALREADY_MEMBER = "message.invite.already_member"; // 玩家 {playerName} 已经是你的领地成员了！
+    public static final String INVITE_SENT = "message.invite.sent"; // 已向玩家 {playerName} 发送邀请！
+    public static final String INVITE_RECEIVED = "message.invite.received"; // 玩家 {inviterName} 邀请你加入领地: {territoryName}
+    public static final String INVITE_INSTRUCTIONS = "message.invite.instructions"; // 输入 /accept_invite 接受 或 /decline_invite 拒绝
+    public static final String INVITE_SELF_ERROR = "message.invite.self_error"; // 你不能向自己发出邀请!
+
+    public static final String CLAIM_WAND_SELECT_POINTS = "message.claim_wand.select_points";
+    public static final String CLAIM_INSUFFICIENT_BALANCE = "message.claim.insufficient_balance";
+    public static final String CLAIM_SUCCESS = "message.claim.success";
+    public static final String CLAIM_WAND_FIRST_POSITION_SET = "message.claim_wand.first_position_set";
+    public static final String CLAIM_WAND_SECOND_POSITION_SET = "message.claim_wand.second_position_set";
+    public static final String CLAIM_WAND_OVERLAP_ERROR = "message.claim_wand.overlap_error";
+    public static final String CLAIM_WAND_VOLUME = "message.claim_wand.volume";
+    public static final String CLAIM_WAND_PRICE = "message.claim_wand.price";
+    public static final String CLAIM_WAND_INSTRUCTION = "message.claim_wand.instruction";
+    public static final String CLAIM_WAND_CANCEL = "message.claim_wand.cancel";
+    public static final String CLAIM_WAND_TIMEOUT = "message.claim_wand.timeout";
+
+    public static final String TELEPORT_TARGET_NOT_FOUND = "message.teleport.target_not_found";
+    public static final String TELEPORT_NO_PERMISSION = "message.teleport.no_permission";
+    public static final String TELEPORT_NO_BACKPOINT = "message.teleport.no_backpoint";
+    public static final String TELEPORT_DIMENSION_NOT_FOUND = "message.teleport.dimension_not_found";
+    public static final String TELEPORT_NO_POTION = "message.teleport.no_potion";
+    public static final String TELEPORT_SUCCESS = "message.teleport.success";
+    public static final String TELEPORT_FAILED = "message.teleport.failed";
 
     public static final String ABOUT_TITLE_KEY = "screen.about.title";
     public static final String ABOUT_MOD_NAME_KEY = "screen.about.mod_name";

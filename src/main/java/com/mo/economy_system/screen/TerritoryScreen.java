@@ -2,7 +2,6 @@ package com.mo.economy_system.screen;
 
 import com.mo.economy_system.network.EconomyNetwork;
 import com.mo.economy_system.network.packets.TeleportRequestPacket;
-import com.mo.economy_system.network.packets.TerritoryRequestPacket;
 import com.mo.economy_system.screen.territory.TerritoryManagementScreen;
 import com.mo.economy_system.territory.Territory;
 import com.mo.economy_system.utils.MessageKeys;
@@ -10,11 +9,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.Level;
 
 import java.util.*;
 
@@ -32,7 +28,7 @@ public class TerritoryScreen extends Screen {
     private List<RunnableWithGraphics> renderCache = new ArrayList<>();
 
     public TerritoryScreen() {
-        super(Component.literal("领地管理"));
+        super(Component.translatable(MessageKeys.TERRITORY_TITLE_KEY));
     }
 
     @Override
@@ -75,7 +71,9 @@ public class TerritoryScreen extends Screen {
         if (ownedTerritories.isEmpty() && authorizedTerritories.isEmpty()) {
             // 没有领地时，显示提示信息
             renderCache.add((guiGraphics) -> {
-                guiGraphics.drawCenteredString(this.font, "你还没有领地哦", this.width / 2, this.height / 2, 0xFFFFFF);
+                int textWidth = this.font.width(Component.translatable(MessageKeys.TERRITORY_NO_TERRITORIES_TEXT_KEY));
+                int xPosition = (this.width - textWidth) / 2;
+                guiGraphics.drawCenteredString(this.font, Component.translatable(MessageKeys.TERRITORY_NO_TERRITORIES_TEXT_KEY), xPosition, this.height / 2, 0xFFFFFF);
             });
 
             return;
@@ -117,27 +115,28 @@ public class TerritoryScreen extends Screen {
 
             // 添加图标渲染任务
             renderCache.add((guiGraphics) -> {
-                guiGraphics.drawString(this.font, "领地名称: " + territory.getName(), startX+ 20, currentY + 5, 0xFFFFFF);
+                guiGraphics.drawString(this.font, Component.translatable(MessageKeys.TERRITORY_TERRITORY_NAME_TEXT_KEY, territory.getName()), startX+ 20, currentY + 5, 0xFFFFFF);
             });
             renderCache.add((guiGraphics) -> {
-                guiGraphics.drawString(this.font, "范围: " +
-                        territory.getPos1().getX() + " " + territory.getPos1().getY() + " " + territory.getPos1().getZ()
+                guiGraphics.drawString(this.font, Component.translatable(MessageKeys.TERRITORY_TERRITORY_AREA_TEXT_KEY,
+                                "范围: " +
+                                territory.getPos1().getX() + " " + territory.getPos1().getY() + " " + territory.getPos1().getZ()
                                 + " -> " +
-                        territory.getPos2().getX() + " " + territory.getPos2().getY() + " " + territory.getPos2().getZ() ,
+                                territory.getPos2().getX() + " " + territory.getPos2().getY() + " " + territory.getPos2().getZ()) ,
                         startX, currentY + 18, 0xAAAAAA);
             });
 
             // 如果是拥有的领地，显示“传送”和"管理"按钮
             if (ownedTerritories.contains(territory)) {
                 this.addRenderableWidget(
-                        Button.builder(Component.literal("传送"), button -> {
+                        Button.builder(Component.translatable(MessageKeys.TERRITORY_TELEPORT_BUTTON_KEY), button -> {
                                     EconomyNetwork.INSTANCE.sendToServer(new TeleportRequestPacket(territory.getTerritoryID()));
                                 }).pos(this.width - startX - 60 - 80, currentY)
                                 .size(60, 20)
                                 .build()
                 );
                 this.addRenderableWidget(
-                        Button.builder(Component.literal("管理"), button -> {
+                        Button.builder(Component.translatable(MessageKeys.TERRITORY_MANAGE_BUTTON_KEY), button -> {
                                     Minecraft.getInstance().setScreen(new TerritoryManagementScreen(territory));
                                 }).pos(this.width - startX - 60, currentY)
                                 .size(60, 20)
@@ -146,7 +145,7 @@ public class TerritoryScreen extends Screen {
             } else {
                 // 如果是有权限的领地，显示“传送”按钮
                 this.addRenderableWidget(
-                        Button.builder(Component.literal("传送"), button -> {
+                        Button.builder(Component.translatable(MessageKeys.TERRITORY_TELEPORT_BUTTON_KEY), button -> {
                                     EconomyNetwork.INSTANCE.sendToServer(new TeleportRequestPacket(territory.getTerritoryID()));
                                 }).pos(this.width - startX - 60, currentY)
                                 .size(60, 20)

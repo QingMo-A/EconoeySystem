@@ -2,6 +2,7 @@ package com.mo.economy_system.network.packets;
 
 import com.mo.economy_system.item.ModItems;
 import com.mo.economy_system.territory.TerritoryManager;
+import com.mo.economy_system.utils.MessageKeys;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.FriendlyByteBuf;
@@ -40,25 +41,25 @@ public class TeleportRequestPacket {
 
             var territory = TerritoryManager.getTerritoryByID(msg.territoryID);
             if (territory == null) {
-                player.sendSystemMessage(Component.literal("§c未找到目标领地！"));
+                player.sendSystemMessage(Component.translatable(MessageKeys.TELEPORT_TARGET_NOT_FOUND));
                 return;
             }
 
             if (!territory.isOwner(player.getUUID()) && !territory.hasPermission(player.getUUID())) {
-                player.sendSystemMessage(Component.literal("§c你没有权限传送到此领地！"));
+                player.sendSystemMessage(Component.translatable(MessageKeys.TELEPORT_NO_PERMISSION));
                 return;
             }
 
             BlockPos backPoint = territory.getBackpoint();
             if (backPoint == null) {
-                player.sendSystemMessage(Component.literal("§c该领地没有设置回城点，无法传送！"));
+                player.sendSystemMessage(Component.translatable(MessageKeys.TELEPORT_NO_BACKPOINT));
                 return;
             }
 
             ResourceKey<Level> dimension = territory.getDimension();
             ServerLevel targetLevel = player.server.getLevel(dimension);
             if (targetLevel == null) {
-                player.sendSystemMessage(Component.literal("§c无法找到目标维度！"));
+                player.sendSystemMessage(Component.translatable(MessageKeys.TELEPORT_DIMENSION_NOT_FOUND));
                 return;
             }
 
@@ -110,13 +111,13 @@ public class TeleportRequestPacket {
                             true
                     );
 
-                    player.sendSystemMessage(Component.literal("§a已成功传送到领地: " + territory.getName()));
+                    player.sendSystemMessage(Component.translatable(MessageKeys.TELEPORT_SUCCESS, territory.getName()));
                 } catch (Exception e) {
-                    player.sendSystemMessage(Component.literal("§c传送失败，发生未知错误！"));
+                    player.sendSystemMessage(Component.translatable(MessageKeys.TELEPORT_FAILED));
                     e.printStackTrace();
                 }
             } else {
-                player.sendSystemMessage(Component.literal("§c传送失败，你没有足够的回忆药水！"));
+                player.sendSystemMessage(Component.translatable(MessageKeys.TELEPORT_NO_POTION));
             }
         });
         context.setPacketHandled(true);

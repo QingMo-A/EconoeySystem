@@ -5,6 +5,7 @@ import com.mo.economy_system.network.packets.InvitePlayerPacket;
 import com.mo.economy_system.network.packets.TerritoryRequestPacket;
 import com.mo.economy_system.screen.TerritoryScreen;
 import com.mo.economy_system.territory.Territory;
+import com.mo.economy_system.utils.MessageKeys;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -16,7 +17,7 @@ public class InvitePlayerScreen extends Screen {
     private EditBox playerNameField;
 
     public InvitePlayerScreen(Territory territory) {
-        super(Component.literal("邀请玩家到领地"));
+        super(Component.translatable(MessageKeys.INVITE_TITLE_KEY));
         this.territory = territory;
     }
 
@@ -33,13 +34,13 @@ public class InvitePlayerScreen extends Screen {
 
         // 发送邀请按钮
         this.addRenderableWidget(
-                Button.builder(Component.literal("发送邀请"), button -> {
+                Button.builder(Component.translatable(MessageKeys.INVITE_INVITE_BUTTON_KEY), button -> {
                             String playerName = playerNameField.getValue();
                             if (!playerName.isEmpty()) {
                                 EconomyNetwork.INSTANCE.sendToServer(new InvitePlayerPacket(territory.getTerritoryID(), playerName));
                                 this.minecraft.setScreen(null); // 关闭当前界面
                             } else {
-                                this.minecraft.player.sendSystemMessage(Component.literal("§c请输入玩家名称！"));
+                                this.minecraft.player.sendSystemMessage(Component.translatable(MessageKeys.INVITE_NO_NAME_KEY));
                             }
                         }).pos(centerX - 50, centerY + 20)
                         .size(100, 20)
@@ -48,7 +49,7 @@ public class InvitePlayerScreen extends Screen {
 
         // 返回按钮
         this.addRenderableWidget(
-                Button.builder(Component.literal("返回"), button -> {
+                Button.builder(Component.translatable(MessageKeys.INVITE_BACK_BUTTON), button -> {
                             // 请求服务器数据
                             EconomyNetwork.INSTANCE.sendToServer(new TerritoryRequestPacket());
                             this.minecraft.setScreen(new TerritoryScreen());
