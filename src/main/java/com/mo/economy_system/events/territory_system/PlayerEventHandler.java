@@ -1,4 +1,4 @@
-package com.mo.economy_system.events;
+package com.mo.economy_system.events.territory_system;
 
 import com.mo.economy_system.EconomySystem;
 import com.mo.economy_system.territory.Territory;

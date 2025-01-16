@@ -1,9 +1,7 @@
 package com.mo.economy_system.red_packet;
 
-import com.mo.economy_system.system.EconomySavedData;
+import com.mo.economy_system.system.economy_system.EconomySavedData;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.HashMap;

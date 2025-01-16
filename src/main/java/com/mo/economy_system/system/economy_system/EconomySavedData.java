@@ -1,4 +1,4 @@
-package com.mo.economy_system.system;
+package com.mo.economy_system.system.economy_system;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;

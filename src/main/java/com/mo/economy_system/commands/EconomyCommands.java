@@ -2,7 +2,7 @@ package com.mo.economy_system.commands;
 
 import com.mo.economy_system.network.EconomyNetwork;
 import com.mo.economy_system.network.packets.TransferPacket;
-import com.mo.economy_system.system.EconomySavedData;
+import com.mo.economy_system.system.economy_system.EconomySavedData;
 import com.mo.economy_system.utils.MessageKeys;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;

@@ -3,7 +3,7 @@ package com.mo.economy_system.commands;
 import com.mo.economy_system.item.items.ClaimWandItem;
 import com.mo.economy_system.territory.Territory;
 import com.mo.economy_system.territory.TerritoryManager;
-import com.mo.economy_system.system.EconomySavedData;
+import com.mo.economy_system.system.economy_system.EconomySavedData;
 import com.mo.economy_system.utils.MessageKeys;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;

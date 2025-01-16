@@ -1,10 +1,9 @@
-package com.mo.economy_system.events;
+package com.mo.economy_system.events.territory_system;
 
 import com.mo.economy_system.EconomySystem;
 import com.mo.economy_system.territory.Territory;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
 import net.minecraft.server.level.ServerPlayer;

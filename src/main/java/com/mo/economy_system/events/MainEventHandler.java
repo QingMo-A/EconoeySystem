@@ -8,7 +8,7 @@ import com.mo.economy_system.market.MarketSavedData;
 import com.mo.economy_system.red_packet.RedPacketManager;
 import com.mo.economy_system.reward.RewardManager;
 import com.mo.economy_system.shop.ShopManager;
-import com.mo.economy_system.system.EconomySavedData;
+import com.mo.economy_system.system.economy_system.EconomySavedData;
 import com.mo.economy_system.territory.TerritoryManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Random;
 
 @Mod.EventBusSubscriber(modid = EconomySystem.MODID)
-public class EconomyEventHandler {
+public class MainEventHandler {
 
     private static ShopManager shopManager;
 

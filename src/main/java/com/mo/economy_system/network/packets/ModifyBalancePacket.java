@@ -1,6 +1,6 @@
 package com.mo.economy_system.network.packets;
 
-import com.mo.economy_system.system.EconomySavedData;
+import com.mo.economy_system.system.economy_system.EconomySavedData;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
