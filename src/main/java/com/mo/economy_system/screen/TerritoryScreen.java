@@ -11,6 +11,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 
 import java.util.*;
 
@@ -106,7 +107,16 @@ public class TerritoryScreen extends Screen {
             // 添加图标渲染任务
             renderCache.add((guiGraphics) -> {
                 if (ownedTerritories.contains(territory)) {
-                    guiGraphics.renderItem(Items.GRASS_BLOCK.getDefaultInstance(), startX, currentY);
+                    if (territory.getDimension().equals(Level.OVERWORLD)) {
+                        guiGraphics.renderItem(Items.GRASS_BLOCK.getDefaultInstance(), startX, currentY);
+                    } else if (territory.getDimension().equals(Level.NETHER)) {
+                        guiGraphics.renderItem(Items.NETHERRACK.getDefaultInstance(), startX, currentY);
+                    } else if (territory.getDimension().equals(Level.END)) {
+                        guiGraphics.renderItem(Items.END_STONE.getDefaultInstance(), startX, currentY);
+                    } else {
+                        guiGraphics.renderItem(Items.BEDROCK.getDefaultInstance(), startX, currentY);
+                    }
+
                 } else {
                     guiGraphics.renderItem(Items.OAK_DOOR.getDefaultInstance(), startX, currentY);
                 }
