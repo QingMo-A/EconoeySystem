@@ -1,6 +1,8 @@
 package com.mo.economy_system.system;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 
 import java.util.*;
@@ -119,7 +121,13 @@ public class EconomySavedData extends SavedData {
         return data;
     }
 
-    public static EconomySavedData getInstance(net.minecraft.server.level.ServerLevel level) {
-        return level.getDataStorage().computeIfAbsent(EconomySavedData::load, EconomySavedData::new, DATA_NAME);
+    public static EconomySavedData getInstance(ServerLevel level) {
+        // 获取主世界（Overworld）的保存数据
+        ServerLevel overworld = level.getServer().getLevel(Level.OVERWORLD);
+        if (overworld == null) {
+            throw new IllegalStateException("Overworld is not loaded!");
+        }
+        return overworld.getDataStorage().computeIfAbsent(EconomySavedData::load, EconomySavedData::new, DATA_NAME);
     }
+
 }
