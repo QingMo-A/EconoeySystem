@@ -41,7 +41,19 @@ public abstract class ServerLevelMixin {
         int minute = now.getMinute();
         int second = now.getSecond();
 
-        // 游戏内时间映射: 每小时 = 1000 tick
-        return hour * 1000 + (minute * 1000 / 60) + (second * 1000 / 3600);
+        // 调整：现实时间下午2点，映射为游戏内的白天时间段
+        long gameTime;
+
+        if (hour >= 6 && hour < 18) {
+            // 白天：游戏时间映射到白天时段 0-12000（白天）
+            gameTime = (hour - 6) * 1000 + (minute * 1000 / 60) + (second * 1000 / 3600);
+            gameTime = gameTime % 12000; // 保证在 0 到 12000 之间
+        } else {
+            // 夜晚：游戏时间映射到夜晚时段 12000-24000（夜晚）
+            gameTime = ((hour - 18) + 24) * 1000 + (minute * 1000 / 60) + (second * 1000 / 3600);
+            gameTime = (12000 + gameTime % 12000) % 24000; // 保证在 12000 到 24000 之间
+        }
+
+        return gameTime;
     }
 }
