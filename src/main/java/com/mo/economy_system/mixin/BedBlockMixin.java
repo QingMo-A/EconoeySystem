@@ -90,6 +90,12 @@ public class BedBlockMixin {
                 // 让玩家进入睡眠状态，不管白天黑夜
                 player.setSleepingPos(blockPos); // 设置玩家的睡觉位置
                 player.startSleeping(blockPos); // 启动睡眠
+
+                // 设置玩家的重生点
+                if (player instanceof ServerPlayer serverPlayer) {
+                    serverPlayer.setRespawnPosition(level.dimension(), blockPos, 0.0F, false, true);
+                }
+
                 // 重置玩家幻翼生成倒计时
                 CompoundTag persistentData = player.getPersistentData();
                 persistentData.putLong("TimeSinceRest", 0); // 重置休息时间
