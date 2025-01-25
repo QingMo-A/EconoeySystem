@@ -82,7 +82,7 @@ public class PlayerEventHandler {
         }
 
         UUID playerUUID = player.getUUID();
-        stopParticleEffect(playerUUID);
+        // stopParticleEffect(playerUUID);
     }
 
     public static void setCheckInterval(long interval) {
@@ -121,6 +121,7 @@ public class PlayerEventHandler {
                 level.sendParticles(ParticleTypes.END_ROD, minX + 0.5, y + 2.5, maxZ + 0.5, 1, 0, 0, 0, 0);
                 level.sendParticles(ParticleTypes.END_ROD, maxX + 0.5, y + 2.5, maxZ + 0.5, 1, 0, 0, 0, 0);
             }
+            stopParticleEffect(playerUUID);
         }, 0, 2, TimeUnit.SECONDS); // 每秒生成一次粒子效果
 
         particleTasks.put(playerUUID, executorService);

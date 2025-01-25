@@ -93,7 +93,7 @@ public class RedPacketCommand {
         EconomySavedData data = EconomySavedData.getInstance(player.serverLevel());
         data.addBalance(player.getUUID(), amount);
 
-        player.sendSystemMessage(Component.translatable(MessageKeys.RED_PACKET_CLAIM_SUCCESS, amount, redPacket.senderName));
+        player.sendSystemMessage(Component.translatable(MessageKeys.RED_PACKET_CLAIM_SUCCESS, redPacket.senderName, amount));
         return 1;
     }
 }

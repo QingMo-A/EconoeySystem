@@ -12,6 +12,9 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+
+import java.util.UUID;
 
 public class EconomyCommands {
 
@@ -75,9 +78,26 @@ public class EconomyCommands {
                                 .then(Commands.argument("amount", IntegerArgumentType.integer(1))
                                         .executes(context -> {
                                             ServerPlayer receiver = EntityArgument.getPlayer(context, "target");
+                                            UUID receiverUUID = receiver.getUUID();
+                                            ServerPlayer sender = context.getSource().getPlayerOrException();
                                             int amount = IntegerArgumentType.getInteger(context, "amount");
 
-                                            EconomyNetwork.INSTANCE.sendToServer(new TransferPacket(receiver.getUUID(), amount));
+                                            if (sender != null) {
+                                                ServerLevel serverLevel = sender.serverLevel(); // 使用 sender.serverLevel() 获取 ServerLevel
+                                                if (serverLevel != null) {
+                                                    EconomySavedData data = EconomySavedData.getInstance(serverLevel);
+                                                    Player target = serverLevel.getPlayerByUUID(receiverUUID); // 根据 UUID 获取目标玩家
+
+                                                    if (target != null && data.minBalance(sender.getUUID(), amount) && target.getUUID() != sender.getUUID()) {
+                                                        data.addBalance(target.getUUID(), amount);
+                                                        sender.sendSystemMessage(Component.translatable(MessageKeys.TRANSFER_SUCCESSFULLY_MESSAGE_KEY, amount, target.getName().getString()));
+                                                        target.sendSystemMessage(Component.translatable(MessageKeys.RECEIVE_SUCCESSFULLY_MESSAGE_KEY, sender.getName().getString(), amount));
+                                                    } else {
+                                                        sender.sendSystemMessage(Component.translatable(MessageKeys.TRANSFER_FAILED_MESSAGE_KEY));
+                                                    }
+                                                }
+                                            }
+                                            // EconomyNetwork.INSTANCE.sendToServer(new TransferPacket(receiver.getUUID(), amount));
                                             return 1;
                                         }))))
         );

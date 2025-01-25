@@ -13,6 +13,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AnvilBlock;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.FallingBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,7 +22,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AnvilBlock.class)
-public class AnvilBlockMixin {
+public class AnvilBlockMixin extends FallingBlock {
+
+    public AnvilBlockMixin(Properties p_53205_) {
+        super(p_53205_);
+    }
 
     @Inject(method = "use", at = @At("HEAD"), cancellable = true)
     private void repairAnvil(BlockState blockState, Level level, BlockPos blockPos, Player player,

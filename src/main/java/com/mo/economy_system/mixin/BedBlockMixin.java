@@ -13,12 +13,16 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BedBlock;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BedPart;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -28,7 +32,11 @@ import java.awt.*;
 import java.util.List;
 
 @Mixin(BedBlock.class)
-public class BedBlockMixin {
+public class BedBlockMixin extends HorizontalDirectionalBlock implements EntityBlock {
+
+    protected BedBlockMixin(Properties p_54120_) {
+        super(p_54120_);
+    }
 
     // 注入 BedBlock 的 use 方法，绕过白天和怪物限制
     /*@Inject(method = "use", at = @At("HEAD"), cancellable = true)
@@ -112,5 +120,11 @@ public class BedBlockMixin {
             ((Villager)$$2.get(0)).stopSleeping();
             return true;
         }
+    }
+
+    @Nullable
+    @Override
+    public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
+        return null;
     }
 }

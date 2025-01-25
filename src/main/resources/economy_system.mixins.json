@@ -4,12 +4,12 @@
   "package": "com.mo.economy_system.mixin",
   "compatibilityLevel": "JAVA_17",
   "refmap": "test.refmap.json",
-  "mixins": [
+  "client": [
+  ],
+  "server": [
     "ServerLevelMixin",
     "BedBlockMixin",
     "AnvilBlockMixin"
-  ],
-  "client": [
   ],
   "injectors": {
     "defaultRequire": 1

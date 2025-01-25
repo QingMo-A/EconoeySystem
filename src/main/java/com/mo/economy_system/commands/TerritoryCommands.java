@@ -23,12 +23,12 @@ public class TerritoryCommands {
                         .executes(TerritoryCommands::setBackPoint)
         );
         dispatcher.register(
-                Commands.literal("accept")
+                Commands.literal("accept_invite")
                         .executes(context -> handleAccept(context.getSource()))
         );
 
         dispatcher.register(
-                Commands.literal("decline")
+                Commands.literal("decline_invite")
                         .executes(context -> handleDecline(context.getSource()))
         );
         dispatcher.register(
