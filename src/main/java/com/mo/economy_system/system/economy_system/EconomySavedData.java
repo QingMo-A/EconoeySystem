@@ -23,12 +23,12 @@ public class EconomySavedData extends SavedData {
         this.setDirty(); // 标记数据已更改，确保保存到文件
     }
 
-    // 存款
+    // 增加余额
     public void addBalance(UUID playerUUID, int amount) {
         setBalance(playerUUID, getBalance(playerUUID) + amount);
     }
 
-    // 取款
+    // 减少余额
     public boolean minBalance(UUID playerUUID, int amount) {
         int balance = getBalance(playerUUID);
         if (balance >= amount) {
@@ -41,18 +41,6 @@ public class EconomySavedData extends SavedData {
     // 检查是否有足够余额
     public boolean hasEnoughBalance(UUID playerUUID, int amount) {
         return getBalance(playerUUID) >= amount;
-    }
-
-    // 增加余额
-    public void increaseBalance(UUID playerUUID, int amount) {
-        addBalance(playerUUID, amount);
-    }
-
-    // 减少余额
-    public void decreaseBalance(UUID playerUUID, int amount) {
-        if (!minBalance(playerUUID, amount)) {
-            throw new IllegalStateException("Insufficient balance for player: " + playerUUID);
-        }
     }
 
     // 存储离线消息

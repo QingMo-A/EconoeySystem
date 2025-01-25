@@ -1,6 +1,7 @@
 package com.mo.economy_system.red_packet;
 
 import com.mo.economy_system.system.economy_system.EconomySavedData;
+import com.mo.economy_system.utils.MessageKeys;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -20,6 +21,15 @@ public class RedPacketManager {
             return false; // 玩家已有未销毁的红包
         }
         redPackets.put(senderUUID, redPacket);
+        return true;
+    }
+
+    /**
+     * 移除一个红包
+     */
+    public static boolean removeRedPacket(UUID senderUUID) {
+
+        redPackets.remove(senderUUID);
         return true;
     }
 
@@ -65,7 +75,7 @@ public class RedPacketManager {
     /**
      * 处理过期红包
      */
-    private static void handleExpiredRedPacket(RedPacket redPacket) {
+    public static void handleExpiredRedPacket(RedPacket redPacket) {
         // 退还未抢金额给发送者
         ServerPlayer sender = getPlayerByUUID(redPacket.senderUUID);
         if (sender != null && redPacket.totalAmount > redPacket.claimedAmount) {
@@ -73,13 +83,13 @@ public class RedPacketManager {
             EconomySavedData data = EconomySavedData.getInstance(sender.serverLevel());
             data.addBalance(redPacket.senderUUID, remainingAmount);
 
-            sender.sendSystemMessage(Component.literal("§cYour red packet has expired. Remaining " + remainingAmount + " coins have been refunded."));
+            sender.sendSystemMessage(Component.translatable(MessageKeys.RED_PACKET_EXPIRED_REFUNDED, remainingAmount));
         }
 
         // 广播全服红包过期消息
         if (sender != null) {
             sender.getServer().getPlayerList().broadcastSystemMessage(
-                    Component.literal("§cThe red packet from " + redPacket.senderName + " has expired!"), false);
+                    Component.translatable(MessageKeys.RED_PACKET_EXPIRED_BROADCAST, redPacket.senderName), false);
         }
     }
 

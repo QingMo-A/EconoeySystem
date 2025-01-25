@@ -83,6 +83,13 @@ public class MessageKeys {
     public static final String RED_PACKET_CLAIM_SUCCESS = "message.red_packet.claim_success";
     public static final String RED_PACKET_CLAIM_BUTTON = "message.red_packet.claim_button";
     public static final String RED_PACKET_BROADCAST = "message.red_packet.broadcast";
+    public static final String RED_PACKET_NO_ACTIVE = "message.red_packet.no_active";
+    public static final String RED_PACKET_CANCELLED = "message.red_packet.cancelled";
+    public static final String RED_PACKET_FULLY_CLAIMED = "message.red_packet.fully_claimed";
+    public static final String RED_PACKET_EXPIRED_REFUNDED = "message.red_packet.expired_refunded";
+    public static final String RED_PACKET_EXPIRED_BROADCAST = "message.red_packet.expired_broadcast";
+    public static final String RED_PACKET_CLAIM_BROADCAST = "message.red_packet.claim_broadcast";
+
 
     public static final String TERRITORY_TITLE_KEY = "screen.territory.title";
     public static final String TERRITORY_NO_TERRITORIES_TEXT_KEY = "text.territory.no_territories";
@@ -133,8 +140,10 @@ public class MessageKeys {
     public static final String INVITE_NO_PENDING = "message.invite.no_pending";
     public static final String INVITE_TARGET_NOT_FOUND = "message.invite.target_not_found";
     public static final String INVITE_ACCEPTED = "message.invite.accepted";
+    public static final String INVITE_ACCEPT_BUTTON = "button.invite.accept";
     public static final String INVITE_DECLINE_NO_PENDING = "message.invite.decline_no_pending";
     public static final String INVITE_DECLINED = "message.invite.declined";
+    public static final String INVITE_DECLINE_BUTTON = "button.invite.decline";
 
 
     public static final String CLAIM_WAND_SELECT_POINTS = "message.claim_wand.select_points";

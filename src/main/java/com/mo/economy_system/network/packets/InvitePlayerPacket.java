@@ -6,7 +6,9 @@ import com.mo.economy_system.territory.Territory;
 import com.mo.economy_system.territory.TerritoryManager;
 import com.mo.economy_system.utils.MessageKeys;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -64,7 +66,20 @@ public class InvitePlayerPacket {
 
                 // 发送邀请消息
                 inviter.sendSystemMessage(Component.translatable(MessageKeys.INVITE_SENT, msg.playerName));
-                target.sendSystemMessage(Component.translatable(MessageKeys.INVITE_RECEIVED, inviter.getName().getString(), territory.getName()));
+
+                Component acceptButton = Component.translatable(MessageKeys.INVITE_ACCEPT_BUTTON)
+                        .withStyle(style -> style
+                                .withColor(0x55FF55)
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/accept_invite"))
+                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("§eClick to accept!"))));
+
+                Component declinedButton = Component.translatable(MessageKeys.INVITE_DECLINE_BUTTON)
+                        .withStyle(style -> style
+                                .withColor(0x55FF55)
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/decline_invite"))
+                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("§eClick to decline!"))));
+
+                target.sendSystemMessage(Component.translatable(MessageKeys.INVITE_RECEIVED, inviter.getName().getString(), territory.getName()).append(acceptButton).append(declinedButton));
                 target.sendSystemMessage(Component.translatable(MessageKeys.INVITE_INSTRUCTIONS));
             } else {
                 inviter.sendSystemMessage(Component.translatable(MessageKeys.INVITE_SELF_ERROR));

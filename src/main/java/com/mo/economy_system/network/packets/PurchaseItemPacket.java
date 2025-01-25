@@ -63,7 +63,7 @@ public class PurchaseItemPacket {
 
             // 直接通过 SellerUUID 增加余额
             UUID sellerID = item.getSellerID();
-            savedData.increaseBalance(sellerID, price);
+            savedData.addBalance(sellerID, price);
 
             // 通知买家成功购买
             buyer.sendSystemMessage(Component.translatable(MessageKeys.MARKET_PURCHASE_SUCCESSFULLY_MESSAGE_KEY, price, item.getItemStack().getHoverName().getString(), item.getItemStack().getCount()));

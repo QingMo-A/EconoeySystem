@@ -30,8 +30,43 @@ public class RedPacketCommand {
                 .then(Commands.literal("claim")
                         .executes(context -> claimRedPacket(context.getSource().getPlayerOrException()))
                         .then(Commands.argument("player", EntityArgument.player())
-                                .executes(context -> claimRedPacket(context.getSource().getPlayerOrException(), EntityArgument.getPlayer(context, "player"))))));
+                                .executes(context -> claimRedPacket(context.getSource().getPlayerOrException(), EntityArgument.getPlayer(context, "player")))))
+                .then(Commands.literal("cancel")
+                        .executes(context -> cancelRedPacket(context.getSource().getPlayerOrException()))));
     }
+
+
+    private static int cancelRedPacket(ServerPlayer sender) {
+        // 获取当前玩家的红包
+        RedPacket redPacket = RedPacketManager.getRedPacketBySender(sender.getUUID());
+
+        if (redPacket == null) {
+            sender.sendSystemMessage(Component.translatable(MessageKeys.RED_PACKET_NO_ACTIVE)); // 没有可取消的红包
+            return 0;
+        }
+
+        // 计算未被领取的金额
+        int remainingAmount = redPacket.totalAmount - redPacket.claimedAmount;
+
+        // 将未被领取的金额返还给玩家
+        if (remainingAmount > 0) {
+            EconomySavedData data = EconomySavedData.getInstance(sender.serverLevel());
+            data.addBalance(sender.getUUID(), remainingAmount);
+        }
+
+        // 从红包管理器中移除该红包
+        RedPacketManager.removeRedPacket(sender.getUUID());
+
+        // 通知发送者红包已取消
+        sender.sendSystemMessage(Component.translatable(MessageKeys.RED_PACKET_CANCELLED, remainingAmount));
+
+        /*// 广播给其他玩家
+        sender.getServer().getPlayerList().broadcastSystemMessage(
+                Component.literal("§c" + sender.getName().getString() + "取消了自己的红包！"), false);*/
+
+        return 1;
+    }
+
 
     private static int createRedPacket(ServerPlayer sender, int amount, int duration, boolean isLucky) {
         EconomySavedData data = EconomySavedData.getInstance(sender.serverLevel());
@@ -94,6 +129,34 @@ public class RedPacketCommand {
         data.addBalance(player.getUUID(), amount);
 
         player.sendSystemMessage(Component.translatable(MessageKeys.RED_PACKET_CLAIM_SUCCESS, redPacket.senderName, amount));
+
+        // 广播给其他玩家：谁抢了谁的红包，抢了多少钱
+        broadcastClaimMessage(player, redPacket.senderName, amount);
+
+        // 检查是否领完红包
+        if (redPacket.claimedAmount >= redPacket.totalAmount) {
+            // 广播红包已被领完
+            player.getServer().getPlayerList().broadcastSystemMessage(
+                    Component.translatable(MessageKeys.RED_PACKET_FULLY_CLAIMED, redPacket.senderName), false);
+
+            // 从管理器中移除红包
+            RedPacketManager.removeRedPacket(sender.getUUID());
+        }
         return 1;
     }
+
+    private static void broadcastClaimMessage(ServerPlayer claimer, String senderName, int amount) {
+        String claimerName = claimer.getName().getString();
+
+        // 构建消息内容
+        Component message = Component.translatable(MessageKeys.RED_PACKET_CLAIM_BROADCAST, claimerName, senderName, amount);
+
+        // 向所有其他玩家发送消息
+        claimer.getServer().getPlayerList().getPlayers().forEach(player -> {
+            if (!player.getUUID().equals(claimer.getUUID())) { // 排除抢红包的玩家
+                player.sendSystemMessage(message);
+            }
+        });
+    }
+
 }
