@@ -79,6 +79,6 @@ public class TerritoryPermissionHandler {
         if (territory == null) return true; // 如果不在领地内，允许操作
 
         // 检查是否是领地所有者或被授权的玩家
-        return territory.isOwner(player.getUUID()) || territory.hasPermission(player.getUUID());
+        return territory.isOwner(player.getUUID()) || territory.hasPermission(player.getUUID()) || player.hasPermissions(2);
     }
 }

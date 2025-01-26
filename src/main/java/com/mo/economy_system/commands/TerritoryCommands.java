@@ -11,7 +11,9 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
 
@@ -49,8 +51,21 @@ public class TerritoryCommands {
                                     }
 
                                     InviteManager.sendInvite(sender.getUUID(), target.getUUID(), territory.getTerritoryID());
+
+                                    Component acceptButton = Component.translatable(MessageKeys.INVITE_ACCEPT_BUTTON)
+                                            .withStyle(style -> style
+                                                    .withColor(0x55FF55)
+                                                    .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/accept_invite"))
+                                                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("§eClick to accept!"))));
+
+                                    Component declinedButton = Component.translatable(MessageKeys.INVITE_DECLINE_BUTTON)
+                                            .withStyle(style -> style
+                                                    .withColor(0x55FF55)
+                                                    .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/decline_invite"))
+                                                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("§eClick to decline!"))));
+
                                     sender.sendSystemMessage(Component.translatable(MessageKeys.INVITE_SENT_TO_PLAYER, target.getName().getString()));
-                                    target.sendSystemMessage(Component.translatable(MessageKeys.INVITE_RECEIVED_PLAYER, sender.getName().getString(), territory.getName()));
+                                    target.sendSystemMessage(Component.translatable(MessageKeys.INVITE_RECEIVED_PLAYER, sender.getName().getString(), territory.getName()).append(acceptButton).append(declinedButton));
                                     return 1;
                                 }))
         );

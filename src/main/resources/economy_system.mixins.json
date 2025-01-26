@@ -7,9 +7,6 @@
   "client": [
   ],
   "server": [
-    "ServerLevelMixin",
-    "BedBlockMixin",
-    "AnvilBlockMixin"
   ],
   "injectors": {
     "defaultRequire": 1

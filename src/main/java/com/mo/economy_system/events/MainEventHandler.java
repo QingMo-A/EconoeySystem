@@ -44,6 +44,7 @@ public class MainEventHandler {
         RedPacketCommand.register(event.getServer().getCommands().getDispatcher());
         ClaimCommand.register(event.getServer().getCommands().getDispatcher());
         TerritoryCommands.register(event.getServer().getCommands().getDispatcher());
+        InfoCommand.register(event.getServer().getCommands().getDispatcher());
 
         ServerLevel overworld = event.getServer().overworld();
 
