@@ -47,8 +47,8 @@ jobs:
       # 7. 验证构建文件存在
       - name: Verify Build Artifacts
         run: |
-          if [ ! -f build/libs/*.jar ]; then
-            echo "Build artifacts not found!"
+          if [ -z "$(ls -A build/libs/*.jar 2>/dev/null)" ]; then
+            echo "Build artifacts not found! Exiting."
             exit 1
           fi
 
@@ -60,6 +60,7 @@ jobs:
           tag_name: v${{ env.VERSION }}
           body: |
             Automated release for version ${{ env.VERSION }}.
+            This release was created and uploaded by GitHub Actions.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -68,5 +69,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: build/libs/*.jar
+          tag_name: v${{ env.VERSION }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
