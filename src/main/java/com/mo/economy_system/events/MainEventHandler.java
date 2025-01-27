@@ -90,7 +90,7 @@ public class MainEventHandler {
             }
         }
 
-        // 定时检查红包（每 100 tick 检查一次）
+        // 定时检查红包
         if (dayTime % 100 == 0) {
             RedPacketManager.checkAndExpireRedPackets();
         }
