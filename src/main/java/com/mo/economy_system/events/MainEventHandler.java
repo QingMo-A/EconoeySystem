@@ -39,7 +39,7 @@ public class MainEventHandler {
 
     @SubscribeEvent
     public static void onServerStarting(ServerStartingEvent event) {
-        // 在服务器启动时加载数据
+        // 注册指令
         EconomyCommands.register(event.getServer().getCommands().getDispatcher());
         TpaCommand.register(event.getServer().getCommands().getDispatcher());
         RedPacketCommand.register(event.getServer().getCommands().getDispatcher());
@@ -48,6 +48,7 @@ public class MainEventHandler {
         InfoCommand.register(event.getServer().getCommands().getDispatcher());
         StarterKitCommand.register(event.getServer().getCommands().getDispatcher());
 
+        // 获取服务器主世界
         ServerLevel overworld = event.getServer().overworld();
 
         EconomySavedData.getInstance(overworld);
