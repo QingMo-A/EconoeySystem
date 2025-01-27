@@ -18,7 +18,19 @@ plugins {
 
 apply plugin: 'org.spongepowered.mixin'
 
-version = mod_version
+// 解析 mods.toml 文件
+def modsTomlFile = file("src/main/resources/META-INF/mods.toml")
+def modVersion = "undefined" // 默认版本号，防止解析失败时出错
+
+if (modsTomlFile.exists()) {
+    modsTomlFile.eachLine { line ->
+        if (line.trim().startsWith("version=")) {
+            modVersion = line.split("=")[1].replace("\"", "").trim() // 提取版本号
+        }
+    }
+}
+
+version = modVersion // 将解析到的版本号赋值给 build.gradle 的版本
 group = mod_group_id
 
 base {
@@ -107,7 +119,7 @@ tasks.named('processResources', ProcessResources).configure {
             minecraft_version: minecraft_version, minecraft_version_range: minecraft_version_range,
             forge_version: forge_version, forge_version_range: forge_version_range,
             loader_version_range: loader_version_range,
-            mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
+            mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: version,
             mod_authors: mod_authors, mod_description: mod_description,
     ]
     inputs.properties replaceProperties
