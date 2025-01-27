@@ -21,7 +21,6 @@ public class TerritoryCommands {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(
                 Commands.literal("setbackpoint")
-                        .requires(source -> source.hasPermission(2)) // 仅允许管理员或玩家执行
                         .executes(TerritoryCommands::setBackPoint)
         );
         dispatcher.register(

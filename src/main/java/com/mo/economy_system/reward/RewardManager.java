@@ -63,8 +63,35 @@ public class RewardManager {
         rewards.add(new RewardEntry("minecraft:zombie", 0.1, 1, 5));
         rewards.add(new RewardEntry("minecraft:skeleton", 0.2, 2, 8));
         rewards.add(new RewardEntry("minecraft:creeper", 0.15, 5, 10));
+        rewards.add(new RewardEntry("minecraft:spider", 0.18, 1, 4));
+        rewards.add(new RewardEntry("minecraft:witch", 0.25, 3, 7));
+        rewards.add(new RewardEntry("minecraft:enderman", 0.12, 1, 3));
+        rewards.add(new RewardEntry("minecraft:slime", 0.2, 2, 5));
+        rewards.add(new RewardEntry("minecraft:blaze", 0.3, 2, 6));
+        rewards.add(new RewardEntry("minecraft:ghast", 0.15, 1, 2));
+        rewards.add(new RewardEntry("minecraft:magma_cube", 0.2, 3, 6));
+        rewards.add(new RewardEntry("minecraft:phantom", 0.1, 1, 2));
+        rewards.add(new RewardEntry("minecraft:piglin", 0.15, 1, 4));
+        rewards.add(new RewardEntry("minecraft:piglin_brute", 0.2, 2, 6));
+        rewards.add(new RewardEntry("minecraft:hoglin", 0.18, 1, 3));
+        rewards.add(new RewardEntry("minecraft:zombified_piglin", 0.1, 1, 4));
+        rewards.add(new RewardEntry("minecraft:vindicator", 0.2, 2, 5));
+        rewards.add(new RewardEntry("minecraft:evoker", 0.25, 3, 8));
+        rewards.add(new RewardEntry("minecraft:illusioner", 0.25, 2, 6));
+        rewards.add(new RewardEntry("minecraft:pillager", 0.15, 1, 4));
+        rewards.add(new RewardEntry("minecraft:ravager", 0.35, 5, 12));
+        rewards.add(new RewardEntry("minecraft:drowned", 0.2, 1, 4));
+        rewards.add(new RewardEntry("minecraft:guardian", 0.2, 2, 5));
+        rewards.add(new RewardEntry("minecraft:elder_guardian", 0.3, 4, 8));
+        rewards.add(new RewardEntry("minecraft:shulker", 0.2, 2, 4));
+        rewards.add(new RewardEntry("minecraft:wither_skeleton", 0.22, 1, 3));
+        rewards.add(new RewardEntry("minecraft:wither", 0.5, 1, 1));
+        rewards.add(new RewardEntry("minecraft:ender_dragon", 1.0, 1, 1));
+
+        // 保存到配置文件
         saveToConfig();
     }
+
 
     public static class RewardEntry {
         public String type; // 实体类型

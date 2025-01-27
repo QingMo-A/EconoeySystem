@@ -108,32 +108,49 @@ public class RedPacketCommand {
             redPacket = RedPacketManager.getRedPacketBySender(sender.getUUID());
         }
 
+        // 检查红包是否可领取
         if (redPacket == null || !redPacket.isClaimable()) {
             player.sendSystemMessage(Component.translatable(MessageKeys.RED_PACKET_NO_AVAILABLE));
             return 0;
         }
 
-        if (redPacket.hasClaimed(player.getUUID())) {
+        // 检查是否已经领取过
+        if (redPacket.claimedPlayers.contains(player.getUUID())) {
             player.sendSystemMessage(Component.translatable(MessageKeys.RED_PACKET_ALREADY_CLAIMED));
             return 0;
         }
 
-        int amount = redPacket.isLucky
-                ? Math.max(1, new Random().nextInt(Math.max(1, redPacket.totalAmount - redPacket.claimedAmount)))
-                : Math.max(1, (redPacket.totalAmount - redPacket.claimedAmount) / Math.max(1, redPacket.claimedPlayers.size()));
+        // 动态计算剩余的玩家数
+        int remainingPlayers = Math.max(1, redPacket.claimedPlayers.size() + 1); // 剩余玩家至少为1
+        int remainingAmount = redPacket.totalAmount - redPacket.claimedAmount;
+        int amount;
 
+        if (remainingPlayers == 1) {
+            // 最后一人领取剩余金额
+            amount = remainingAmount;
+        } else if (redPacket.isLucky) {
+            // 拼手气红包：加权随机分配
+            amount = Math.max(1, new Random().nextInt(Math.max(1, remainingAmount)));
+        } else {
+            // 普通红包：平均分配
+            amount = Math.max(1, remainingAmount / remainingPlayers);
+        }
+
+        // 更新红包状态
         redPacket.claimedAmount += amount;
-        redPacket.addClaimedPlayer(player.getUUID());
+        redPacket.claimedPlayers.add(player.getUUID());
 
+        // 更新玩家余额
         EconomySavedData data = EconomySavedData.getInstance(player.serverLevel());
         data.addBalance(player.getUUID(), amount);
 
+        // 通知领取者
         player.sendSystemMessage(Component.translatable(MessageKeys.RED_PACKET_CLAIM_SUCCESS, redPacket.senderName, amount));
 
-        // 广播给其他玩家：谁抢了谁的红包，抢了多少钱
+        // 广播信息
         broadcastClaimMessage(player, redPacket.senderName, amount);
 
-        // 检查是否领完红包
+        // 检查红包是否已被领完
         if (redPacket.claimedAmount >= redPacket.totalAmount) {
             // 广播红包已被领完
             player.getServer().getPlayerList().broadcastSystemMessage(
@@ -142,8 +159,10 @@ public class RedPacketCommand {
             // 从管理器中移除红包
             RedPacketManager.removeRedPacket(sender.getUUID());
         }
+
         return 1;
     }
+
 
     private static void broadcastClaimMessage(ServerPlayer claimer, String senderName, int amount) {
         String claimerName = claimer.getName().getString();

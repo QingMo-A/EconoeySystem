@@ -28,14 +28,14 @@ public class TerritoryManager {
         quadTree.clear(); // 清空四叉树
         savedData = TerritorySavedData.getInstance(level);
 
-        ServerMessageUtil.log("Initializing TerritoryManager...");
+        // ServerMessageUtil.log("Initializing TerritoryManager...");
 
         for (Territory territory : savedData.getAllTerritories()) {
             addTerritory(territory);
         }
 
         initialized = true;
-        ServerMessageUtil.log("TerritoryManager initialized with " + territoryByID.size() + " territories.");
+        // ServerMessageUtil.log("TerritoryManager initialized with " + territoryByID.size() + " territories.");
     }
 
     // 添加领地
@@ -55,7 +55,7 @@ public class TerritoryManager {
             }
 
             autoSave(); // 自动保存
-            ServerMessageUtil.log("Territory added: " + territory.getName());
+            // ServerMessageUtil.log("Territory added: " + territory.getName());
         }
     }
 
@@ -71,7 +71,7 @@ public class TerritoryManager {
             }
 
             autoSave(); // 自动保存
-            ServerMessageUtil.log("Territory removed: " + territory.getName());
+            // ServerMessageUtil.log("Territory removed: " + territory.getName());
         }
     }
 
@@ -136,7 +136,7 @@ public class TerritoryManager {
         }
         quadTree.clear();
         quadTree.copyFrom(newQuadTree);
-        ServerMessageUtil.log("QuadTree bounds expanded: " + expandedBounds);
+        // ServerMessageUtil.log("QuadTree bounds expanded: " + expandedBounds);
     }
 
     // 自动保存
@@ -145,7 +145,7 @@ public class TerritoryManager {
         if (currentTime - lastSaveTime >= AUTO_SAVE_INTERVAL) {
             markDirty();
             lastSaveTime = currentTime;
-            ServerMessageUtil.log("Territory data saved.");
+            // ServerMessageUtil.log("Territory data saved.");
         }
     }
 
