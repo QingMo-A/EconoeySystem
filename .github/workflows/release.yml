@@ -14,11 +14,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. 确保 `gradlew` 可执行
+      # 2. 确保 gradlew 可执行
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
-      # 3. 提取版本号（从 `mods.toml` 文件中读取）
+      # 3. 提取版本号
       - name: Extract version from mods.toml
         id: extract_version
         run: |
@@ -34,26 +34,36 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git tag -a "v${{ env.VERSION }}" -m "Release version ${{ env.VERSION }}"
-          git push https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/QingMo-A/EconoeySystem.git "v${{ env.VERSION }}"
-          echo "Created and pushed tag: v${{ env.VERSION }}"
+          git push https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/<your-username>/<repo-name>.git "v${{ env.VERSION }}"
 
-      # 5. 创建 Release
+      # 5. 等待 Tag 同步
+      - name: Wait for Tag Synchronization
+        run: sleep 10
+
+      # 6. 构建项目
+      - name: Build Project
+        run: ./gradlew build
+
+      # 7. 验证构建文件存在
+      - name: Verify Build Artifacts
+        run: |
+          if [ ! -f build/libs/*.jar ]; then
+            echo "Build artifacts not found!"
+            exit 1
+          fi
+
+      # 8. 创建 GitHub Release
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           name: Release ${{ env.VERSION }}
           tag_name: v${{ env.VERSION }}
           body: |
-            This is an automated release for version ${{ env.VERSION }}.
-            Check the release notes for details.
+            Automated release for version ${{ env.VERSION }}.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 6. 构建项目
-      - name: Build Project
-        run: ./gradlew build
-
-      # 7. 上传构建的文件
+      # 9. 上传构建文件到 Release
       - name: Upload Artifact to Release
         uses: softprops/action-gh-release@v1
         with:
