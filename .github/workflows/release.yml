@@ -3,7 +3,7 @@ name: Auto Release on Push
 on:
   push:
     branches:
-      - master # 监听 `main` 分支的代码推送
+      - master
 
 jobs:
   release:
@@ -22,8 +22,8 @@ jobs:
       - name: Extract version from mods.toml
         id: extract_version
         run: |
-          # 假设 `mods.toml` 位于项目根目录
           version=$(grep -E "^version=" src/main/resources/META-INF/mods.toml | cut -d'"' -f2)
+          echo "Extracted version: $version"
           echo "VERSION=$version" >> $GITHUB_ENV
 
       # 4. 创建 Tag
@@ -35,9 +35,9 @@ jobs:
           git config user.email "actions@github.com"
           git tag -a "v${{ env.VERSION }}" -m "Release version ${{ env.VERSION }}"
           git push https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/QingMo-A/EconoeySystem.git "v${{ env.VERSION }}"
-      
+          echo "Created and pushed tag: v${{ env.VERSION }}"
 
-        # 5. 创建 Release
+      # 5. 创建 Release
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
@@ -51,13 +51,12 @@ jobs:
 
       # 6. 构建项目
       - name: Build Project
-        run: |
-          ./gradlew build
+        run: ./gradlew build
 
+      # 7. 上传构建的文件
       - name: Upload Artifact to Release
         uses: softprops/action-gh-release@v1
         with:
-          files: build/libs/*.jar # 修改为构建文件路径
+          files: build/libs/*.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
