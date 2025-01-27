@@ -24,13 +24,16 @@ jobs:
 
       # 3. 创建 Tag
       - name: Create Tag
+        env:
+          PAT: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git tag -a "v${{ env.VERSION }}" -m "Release version ${{ env.VERSION }}"
-          git push origin "v${{ env.VERSION }}"
+          git push https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/QingMo-A/EconoeySystem.git "v${{ env.VERSION }}"
+      
 
-      # 4. 创建 Release
+        # 4. 创建 Release
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
