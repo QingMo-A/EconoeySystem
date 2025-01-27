@@ -1,0 +1,56 @@
+name: Auto Release on Push
+
+on:
+  push:
+    branches:
+      - master # 监听 `main` 分支的代码推送
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 检出代码
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. 提取版本号（从 `mods.toml` 文件中读取）
+      - name: Extract version from mods.toml
+        id: extract_version
+        run: |
+          # 假设 `mods.toml` 位于项目根目录
+          version=$(grep -E "^version=" src/main/resources/META-INF/mods.toml | cut -d'"' -f2)
+          echo "VERSION=$version" >> $GITHUB_ENV
+
+      # 3. 创建 Tag
+      - name: Create Tag
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git tag -a "v${{ env.VERSION }}" -m "Release version ${{ env.VERSION }}"
+          git push origin "v${{ env.VERSION }}"
+
+      # 4. 创建 Release
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ env.VERSION }}
+          tag_name: v${{ env.VERSION }}
+          body: |
+            This is an automated release for version ${{ env.VERSION }}.
+            Check the release notes for details.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 5. 构建项目（可选）
+      - name: Build Project
+        run: |
+          ./gradlew build
+
+      - name: Upload Artifact to Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/libs/*.jar # 修改为构建文件路径
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
