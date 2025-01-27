@@ -6,9 +6,13 @@ import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -140,14 +144,48 @@ public class TpaCommand {
     private static void teleportPlayerToTarget(ServerPlayer sender, ServerPlayer target) {
         ServerLevel targetLevel = target.serverLevel(); // 获取目标玩家所在的维度
         ServerLevel senderLevel = sender.serverLevel(); // 获取发送玩家所在的维度
+        BlockPos targetBlockPos = target.getOnPos();
 
-        // 如果两人不在同一维度，先将发送玩家传送到目标玩家的维度
-        if (senderLevel != targetLevel) {
-            sender.changeDimension(targetLevel); // 将玩家切换到目标维度
+        // 强制加载目标区块
+        if (!targetLevel.isLoaded(targetBlockPos)) { // 如果目标区块未加载
+            targetLevel.getChunkSource().addRegionTicket( // 添加强制加载票，确保区块加载
+                    net.minecraft.server.level.TicketType.POST_TELEPORT, // 票类型为传送后
+                    new net.minecraft.world.level.ChunkPos(targetBlockPos), // 目标区块位置
+                    1, // 优先级
+                    sender.getId() // 玩家ID
+            );
         }
 
-        // 在目标玩家的位置附近传送发送玩家
-        sender.teleportTo(target.getX(), target.getY(), target.getZ());
+        // 传送粒子效果
+        targetLevel.sendParticles(
+                ParticleTypes.PORTAL,
+                targetBlockPos.getX() + 0.5, targetBlockPos.getY() + 1, targetBlockPos.getZ() + 0.5,
+                50, 1, 1, 1, 0.1
+        );
+
+        // 执行传送
+        try {
+            sender.teleportTo(
+                    targetLevel,
+                    targetBlockPos.getX() + 0.5,
+                    targetBlockPos.getY() + 1,
+                    targetBlockPos.getZ() + 0.5,
+                    sender.getYRot(),
+                    sender.getXRot()
+            );
+
+            // 确保目标区块刷新
+            targetLevel.getChunkSource().updateChunkForced(
+                    new net.minecraft.world.level.ChunkPos(targetBlockPos),
+                    true
+            );
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // 播放音效
+        targetLevel.playSound(null, targetBlockPos, SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1.0F, 1.0F);
     }
 
 

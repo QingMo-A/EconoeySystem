@@ -59,12 +59,12 @@ public class PlayerEventHandler {
 
         // 处理领地进入和离开事件
         if (!Objects.equals(previousTerritory, currentTerritory)) {
-            if (previousTerritory != null) {
+            if (previousTerritory != null && player.serverLevel().dimension().equals(previousTerritory.getDimension())) {
                 // ServerMessageUtil.sendDebugMessage("玩家离开领地");
                 MinecraftForge.EVENT_BUS.post(new PlayerLeaveTerritoryEvent(player, previousTerritory));
                 stopParticleEffect(playerUUID);
             }
-            if (currentTerritory != null) {
+            if (currentTerritory != null && player.serverLevel().dimension().equals(currentTerritory.getDimension())) {
                 // ServerMessageUtil.sendDebugMessage("玩家进入领地");
                 MinecraftForge.EVENT_BUS.post(new PlayerEnterTerritoryEvent(player, currentTerritory));
                 showParticleEffect(player.serverLevel(), currentTerritory.getPos1(), currentTerritory.getPos2(), player);

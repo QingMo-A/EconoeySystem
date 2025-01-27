@@ -2,7 +2,10 @@ package com.mo.economy_system.update_checker;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.mo.economy_system.utils.MessageKeys;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.fml.ModList;
 
@@ -18,7 +21,7 @@ public class UpdateChecker {
         new Thread(() -> {
             try {
                 // 获取当前版本号
-                String currentVersion = ModList.get().getModContainerById("economy_system")
+                String currentVersion = "v" + ModList.get().getModContainerById("economy_system")
                         .map(mod -> mod.getModInfo().getVersion().toString())
                         .orElse("unknown");
 
@@ -29,7 +32,7 @@ public class UpdateChecker {
 
                 // 检查响应码
                 if (connection.getResponseCode() != 200) {
-                    player.sendSystemMessage(Component.literal("无法检查更新，请稍后重试！"));
+                    player.sendSystemMessage(Component.literal("§b[§6EconomySystem§b] §c无法检查更新，请稍后重试！"));
                     return;
                 }
 
@@ -41,14 +44,22 @@ public class UpdateChecker {
 
                 // 比较版本号
                 if (!currentVersion.equals(latestVersion)) {
-                    player.sendSystemMessage(Component.literal("发现新版本：" + latestVersion + "！"));
-                    player.sendSystemMessage(Component.literal("点击下载更新：" + downloadUrl));
+                    Component copyDownloadURL = Component.literal("[下载链接]")
+                            .withStyle(style -> style
+                                    .withColor(0x55FF55)
+                                    .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, downloadUrl))
+                                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("§e点击复制!"))));
+
+                    player.sendSystemMessage(Component.literal("§b[§6EconomySystem§b] §a发现新版本：§r" + latestVersion)
+                            .append(" ")
+                            .append(copyDownloadURL)
+                    );
                 } else {
-                    player.sendSystemMessage(Component.literal("当前已是最新版本！"));
+                    player.sendSystemMessage(Component.literal("§b[§6EconomySystem§b] §a当前已是最新版本！"));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                player.sendSystemMessage(Component.literal("检查更新时出错！"));
+                player.sendSystemMessage(Component.literal("§b[§6EconomySystem§b] §c检查更新时出错！"));
             }
         }).start();
     }

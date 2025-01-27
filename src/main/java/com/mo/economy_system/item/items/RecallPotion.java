@@ -62,24 +62,53 @@ public class RecallPotion extends Item {
 
             // 获取目标维度的 ServerLevel
             ServerLevel respawnLevel = currentLevel.getServer().getLevel(respawnDimensionKey);
-
             // 检查目标维度是否存在
             if (respawnLevel == null) {
                 player.sendSystemMessage(Component.translatable(MessageKeys.RECALL_POTION_ERROR_DIMENSION_NOT_FOUND));
                 return stack;
             }
 
+            // 强制加载目标区块
+            if (!respawnLevel.isLoaded(respawnPosition)) {
+                respawnLevel.getChunkSource().addRegionTicket(
+                        net.minecraft.server.level.TicketType.POST_TELEPORT,
+                        new net.minecraft.world.level.ChunkPos(respawnPosition),
+                        1,
+                        player.getId()
+                );
+            }
+
             // 传送前粒子效果
             currentLevel.sendParticles(ParticleTypes.PORTAL, player.getX(), player.getY(), player.getZ(), 50, 1, 1, 1, 0.1);
 
-            // 如果需要切换维度
+            /*// 如果需要切换维度
             if (!currentLevel.dimension().equals(respawnDimensionKey)) {
                 // 切换维度
                 player.changeDimension(respawnLevel);
             }
 
             // 在目标维度传送到出生点
-            player.teleportTo(respawnPosition.getX() + 0.5, respawnPosition.getY(), respawnPosition.getZ() + 0.5);
+            player.teleportTo(respawnPosition.getX() + 0.5, respawnPosition.getY(), respawnPosition.getZ() + 0.5);*/
+            // 执行传送
+            try {
+                player.teleportTo(
+                        respawnLevel,
+                        respawnPosition.getX() + 0.5,
+                        respawnPosition.getY() + 1,
+                        respawnPosition.getZ() + 0.5,
+                        player.getYRot(),
+                        player.getXRot()
+                );
+
+                // 确保目标区块刷新
+                respawnLevel.getChunkSource().updateChunkForced(
+                        new net.minecraft.world.level.ChunkPos(respawnPosition),
+                        true
+                );
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             // 传送后粒子效果
             respawnLevel.sendParticles(ParticleTypes.PORTAL, respawnPosition.getX(), respawnPosition.getY(), respawnPosition.getZ(), 50, 1, 1, 1, 0.1);

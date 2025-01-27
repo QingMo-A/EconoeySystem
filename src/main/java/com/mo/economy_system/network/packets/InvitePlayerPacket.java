@@ -71,15 +71,19 @@ public class InvitePlayerPacket {
                         .withStyle(style -> style
                                 .withColor(0x55FF55)
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/accept_invite"))
-                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("§eClick to accept!"))));
+                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("§e点击同意!"))));
 
                 Component declinedButton = Component.translatable(MessageKeys.INVITE_DECLINE_BUTTON)
                         .withStyle(style -> style
-                                .withColor(0x55FF55)
+                                .withColor(0xFF5555)
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/decline_invite"))
-                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("§eClick to decline!"))));
+                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("§e点击拒绝!"))));
 
-                target.sendSystemMessage(Component.translatable(MessageKeys.INVITE_RECEIVED, inviter.getName().getString(), territory.getName()).append(acceptButton).append(declinedButton));
+                target.sendSystemMessage(Component.translatable(MessageKeys.INVITE_RECEIVED, inviter.getName().getString(), territory.getName())
+                        .append(" ")
+                        .append(acceptButton)
+                        .append(" ")
+                        .append(declinedButton));
                 target.sendSystemMessage(Component.translatable(MessageKeys.INVITE_INSTRUCTIONS));
             } else {
                 inviter.sendSystemMessage(Component.translatable(MessageKeys.INVITE_SELF_ERROR));

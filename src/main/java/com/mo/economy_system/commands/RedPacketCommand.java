@@ -76,7 +76,9 @@ public class RedPacketCommand {
             return 0;
         }
 
-        if (!RedPacketManager.addRedPacket(sender.getUUID(), new RedPacket(sender.getUUID(), sender.getName().getString(), amount, isLucky, duration))) {
+        int totalCount = sender.server.getPlayerCount();
+
+        if (!RedPacketManager.addRedPacket(sender.getUUID(), new RedPacket(sender.getUUID(), sender.getName().getString(), amount, isLucky, duration, totalCount))) {
             sender.sendSystemMessage(Component.translatable(MessageKeys.RED_PACKET_ALREADY_ACTIVE));
             return 0;
         }
@@ -121,16 +123,23 @@ public class RedPacketCommand {
         }
 
         // 动态计算剩余的玩家数
-        int remainingPlayers = Math.max(1, redPacket.claimedPlayers.size() + 1); // 剩余玩家至少为1
+        int totalPlayers = redPacket.totalCount; // 红包总人数（可以在红包生成时记录总人数）
+        int remainingPlayers = totalPlayers - redPacket.claimedPlayers.size();
         int remainingAmount = redPacket.totalAmount - redPacket.claimedAmount;
-        int amount;
 
+        // 检查是否已经分配完毕
+        if (remainingPlayers <= 0 || remainingAmount <= 0) {
+            player.sendSystemMessage(Component.translatable(MessageKeys.RED_PACKET_NO_AVAILABLE));
+            return 0;
+        }
+
+        int amount;
         if (remainingPlayers == 1) {
             // 最后一人领取剩余金额
             amount = remainingAmount;
         } else if (redPacket.isLucky) {
             // 拼手气红包：加权随机分配
-            amount = Math.max(1, new Random().nextInt(Math.max(1, remainingAmount)));
+            amount = Math.max(1, new Random().nextInt(remainingAmount - (remainingPlayers - 1)) + 1);
         } else {
             // 普通红包：平均分配
             amount = Math.max(1, remainingAmount / remainingPlayers);
@@ -162,6 +171,7 @@ public class RedPacketCommand {
 
         return 1;
     }
+
 
 
     private static void broadcastClaimMessage(ServerPlayer claimer, String senderName, int amount) {

@@ -76,7 +76,7 @@ public class TerritoryPermissionHandler {
      */
     private static boolean hasPermission(ServerPlayer player, BlockPos pos) {
         Territory territory = TerritoryManager.getTerritoryAtIgnoreY(pos.getX(), pos.getZ());
-        if (territory == null) return true; // 如果不在领地内，允许操作
+        if (territory == null || !(player.serverLevel().dimension().equals(territory.getDimension()))) return true; // 如果不在领地内，允许操作
 
         // 检查是否是领地所有者或被授权的玩家
         return territory.isOwner(player.getUUID()) || territory.hasPermission(player.getUUID()) || player.hasPermissions(2);

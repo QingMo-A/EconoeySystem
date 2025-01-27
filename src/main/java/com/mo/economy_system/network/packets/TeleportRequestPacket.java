@@ -10,6 +10,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.network.NetworkEvent;
@@ -56,32 +58,33 @@ public class TeleportRequestPacket {
                 return;
             }
 
-            ResourceKey<Level> dimension = territory.getDimension();
-            ServerLevel targetLevel = player.server.getLevel(dimension);
-            if (targetLevel == null) {
-                player.sendSystemMessage(Component.translatable(MessageKeys.TELEPORT_DIMENSION_NOT_FOUND));
-                return;
+            ResourceKey<Level> dimension = territory.getDimension(); // 获取目标领地所在的维度
+            ServerLevel targetLevel = player.server.getLevel(dimension); // 根据维度获取目标服务器层级
+            if (targetLevel == null) { // 如果目标服务器层级不存在
+                player.sendSystemMessage(Component.translatable(MessageKeys.TELEPORT_DIMENSION_NOT_FOUND)); // 发送维度未找到的消息给玩家
+                return; // 结束方法执行
             }
 
-            // 检查是否持有回忆药水
-            var inventory = player.getInventory();
-            ItemStack potionStack = null;
-            for (ItemStack itemStack : inventory.items) {
-                if (itemStack.getItem() == ModItems.RECALL_POTION.get()) {
-                    potionStack = itemStack;
-                    break;
+            // 检查玩家是否持有回忆药水
+            var inventory = player.getInventory(); // 获取玩家的物品栏
+            ItemStack potionStack = null; // 初始化药水堆栈为null
+            for (ItemStack itemStack : inventory.items) { // 遍历玩家物品栏中的所有物品
+                if (itemStack.getItem() == ModItems.RECALL_POTION.get()) { // 如果找到回忆药水
+                    potionStack = itemStack; // 将找到的药水堆栈赋值给potionStack
+                    break; // 退出循环
                 }
             }
 
             // 强制加载目标区块
-            if (!targetLevel.isLoaded(backPoint)) {
-                targetLevel.getChunkSource().addRegionTicket(
-                        net.minecraft.server.level.TicketType.POST_TELEPORT,
-                        new net.minecraft.world.level.ChunkPos(backPoint),
-                        1,
-                        player.getId()
+            if (!targetLevel.isLoaded(backPoint)) { // 如果目标区块未加载
+                targetLevel.getChunkSource().addRegionTicket( // 添加强制加载票，确保区块加载
+                        net.minecraft.server.level.TicketType.POST_TELEPORT, // 票类型为传送后
+                        new net.minecraft.world.level.ChunkPos(backPoint), // 目标区块位置
+                        1, // 优先级
+                        player.getId() // 玩家ID
                 );
             }
+
 
             // 传送粒子效果
             targetLevel.sendParticles(
@@ -116,6 +119,8 @@ public class TeleportRequestPacket {
                     player.sendSystemMessage(Component.translatable(MessageKeys.TELEPORT_FAILED));
                     e.printStackTrace();
                 }
+                // 播放音效
+                targetLevel.playSound(null, backPoint, SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1.0F, 1.0F);
             } else {
                 player.sendSystemMessage(Component.translatable(MessageKeys.TELEPORT_NO_POTION));
             }

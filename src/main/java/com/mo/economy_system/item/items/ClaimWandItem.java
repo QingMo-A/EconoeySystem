@@ -51,7 +51,7 @@ public class ClaimWandItem extends Item {
 
             // 检查新圈地是否包含已有领地
             BlockPos firstPos = firstPositions.get(playerUUID);
-            if (isOverlappingExistingTerritory(playerUUID, firstPos, clickedPos)) {
+            if (isOverlappingExistingTerritory(player, firstPos, clickedPos)) {
                 player.sendSystemMessage(Component.translatable(MessageKeys.CLAIM_WAND_OVERLAP_ERROR));
                 firstPositions.remove(playerUUID);
                 secondPositions.remove(playerUUID);
@@ -180,7 +180,7 @@ public class ClaimWandItem extends Item {
         stopTimeoutTask(playerUUID);
     }
 
-    private boolean isOverlappingExistingTerritory(UUID playerUUID, BlockPos pos1, BlockPos pos2) {
+    private boolean isOverlappingExistingTerritory(ServerPlayer player, BlockPos pos1, BlockPos pos2) {
         // 计算新领地的范围
         int minX = Math.min(pos1.getX(), pos2.getX());
         int maxX = Math.max(pos1.getX(), pos2.getX());
@@ -201,7 +201,7 @@ public class ClaimWandItem extends Item {
             int existingMaxZ = Math.max(territory.getPos1().getZ(), territory.getPos2().getZ());
 
             // 检测范围是否重叠
-            if (maxX >= existingMinX && minX <= existingMaxX && maxZ >= existingMinZ && minZ <= existingMaxZ) {
+            if (maxX >= existingMinX && minX <= existingMaxX && maxZ >= existingMinZ && minZ <= existingMaxZ && player.serverLevel().dimension().equals(territory.getDimension())) {
                 return true; // 存在重叠
             }
         }
