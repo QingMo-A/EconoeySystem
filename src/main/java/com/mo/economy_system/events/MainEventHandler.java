@@ -10,6 +10,7 @@ import com.mo.economy_system.reward.RewardManager;
 import com.mo.economy_system.shop.ShopManager;
 import com.mo.economy_system.system.economy_system.EconomySavedData;
 import com.mo.economy_system.territory.TerritoryManager;
+import com.mo.economy_system.update_checker.UpdateChecker;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -98,6 +99,8 @@ public class MainEventHandler {
     @SubscribeEvent
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+            UpdateChecker.checkForUpdates(serverPlayer);
+
             ServerLevel serverLevel = serverPlayer.serverLevel();
             EconomySavedData savedData = EconomySavedData.getInstance(serverLevel);
 
