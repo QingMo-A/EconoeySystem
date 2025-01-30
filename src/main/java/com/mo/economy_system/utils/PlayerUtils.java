@@ -3,6 +3,7 @@ package com.mo.economy_system.utils;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
 
@@ -26,5 +27,13 @@ public class PlayerUtils {
         }
 
         return null; // 玩家不在线
+    }
+
+    public static boolean isOP(Player player) {
+        return player.hasPermissions(2) || player.hasPermissions(3) || player.hasPermissions(4);
+    }
+
+    public static boolean isOP(ServerPlayer player) {
+        return player.hasPermissions(2) || player.hasPermissions(3) || player.hasPermissions(4);
     }
 }

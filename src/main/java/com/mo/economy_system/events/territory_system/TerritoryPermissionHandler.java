@@ -1,7 +1,7 @@
 package com.mo.economy_system.events.territory_system;
 
-import com.mo.economy_system.territory.Territory;
-import com.mo.economy_system.territory.TerritoryManager;
+import com.mo.economy_system.system.territory_system.Territory;
+import com.mo.economy_system.system.territory_system.TerritoryManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;

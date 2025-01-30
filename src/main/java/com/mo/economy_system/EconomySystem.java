@@ -1,23 +1,16 @@
 package com.mo.economy_system;
 
 import com.mo.economy_system.item.ModItems;
-import com.mo.economy_system.reward.RewardConfigWatcher;
-import com.mo.economy_system.reward.RewardManager;
-import com.mo.economy_system.shop.ConfigWatcher;
-import com.mo.economy_system.shop.ShopManager;
+import com.mo.economy_system.system.economy_system.reward.RewardConfigWatcher;
+import com.mo.economy_system.system.economy_system.reward.RewardManager;
+import com.mo.economy_system.system.economy_system.shop.ConfigWatcher;
+import com.mo.economy_system.system.economy_system.shop.ShopManager;
 import com.mo.economy_system.network.EconomyNetwork;
 import com.mojang.logging.LogUtils;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLanguageProvider;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
 import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/mods.toml file

@@ -54,6 +54,30 @@ public class MessageKeys {
     public static final String LIST_NO_ITEM_IN_HAND_MESSAGE_KEY = "message.list.no_item_in_hand";
     public static final String LIST_INVALID_PRICE_MESSAGE_KEY = "message.list.invalid_price";
     public static final String LIST_HINT_TEXT_KEY = "text.list.hint";
+    public static final String LIST_SUCCESSFULLY_MESSAGE_KEY = "message.list.list_successfully";
+    public static final String LIST_INSUFFICIENT_ITEM_MESSAGE_KEY = "message.list.list_insufficient_item";
+    public static final String LIST_UNMATCHED_ITEM_MESSAGE_KEY = "message.list.list_unmatched_item";
+
+    public static final String REQUEST_TITLE_KEY = "screen.request.title";
+    public static final String REQUEST_PRICE_TEXT_KEY = "text.request.price";
+    public static final String REQUEST_ITEM_COUNT_TEXT_KEY = "text.request.item_count";
+    public static final String REQUEST_ITEM_ID_TEXT_KEY = "text.request.item_id";
+    public static final String REQUEST_REQUEST_BUTTON_KEY = "button.request.request";
+    public static final String REQUEST_PRICE_HINT_TEXT_KEY = "text.request.price.hint";
+    public static final String REQUEST_ITEM_COUNT_HINT_TEXT_KEY = "text.request.item_count.hint";
+    public static final String REQUEST_ITEM_ID_HINT_TEXT_KEY = "text.request.item_id.hint";
+    public static final String REQUEST_UNKNOWN_ITEM_ID_KEY = "text.request.unknown_item_id";
+    public static final String REQUEST_INVALID_ITEM_COUNT_KEY = "text.request.invalid_item_count";
+    public static final String REQUEST_EXCESSIVE_ITEM_COUNT_KEY = "text.request.excessive_item_count";
+    public static final String REQUEST_INVALID_PRICE_KEY = "text.request.invalid_price";
+    public static final String REQUEST_DELIVER_BUTTON_KEY = "button.request.deliver";
+    public static final String REQUEST_DELIVERED_STATUS_KEY = "button.request.delivered_status"; // 已交付
+    public static final String REQUEST_CLAIM_BUTTON_KEY = "button.request.claim"; // 领取
+    public static final String DELIVERY_NOT_ENOUGH_ITEMS_KEY = "message.delivery.not_enough_items"; // 你没有足够的物品来交付
+    public static final String DELIVERY_SUCCESS_KEY = "message.delivery.success"; // 你成功交付了这个物品
+    public static final String CLAIM_SUCCESS_KEY = "message.request.claim.success"; // 成功领取物品
+    public static final String CLAIM_NOT_OWNER_KEY = "message.claim.not_owner"; // 你不能领取不属于你的物品
+    public static final String ORDER_DELIVERED_BY_PLAYER_KEY = "message.order.delivered_by_player";
 
     public static final String MARKET_TITLE_KEY = "screen.market.title";
     public static final String MARKET_SELLER_NAME_KEY = "screen.market.item.seller_name";
@@ -64,6 +88,12 @@ public class MessageKeys {
     public static final String MARKET_ITEM_PRICE_KEY = "screen.market.item.price";
     public static final String MARKET_NO_ITEMS_TEXT_KEY = "text.market.no_items";
     public static final String MARKET_LIST_BUTTON_KEY = "button.market.list";
+    public static final String MARKET_REQUEST_BUTTON_KEY = "button.market.request";
+    public static final String MARKET_SWITCH_DISPLAY_TYPE_0_BUTTON_KEY = "button.market.switch_display_type_0";
+    public static final String MARKET_SWITCH_DISPLAY_TYPE_1_BUTTON_KEY = "button.market.switch_display_type_1";
+    public static final String MARKET_SWITCH_DISPLAY_TYPE_2_BUTTON_KEY = "button.market.switch_display_type_2";
+    public static final String MARKET_SWITCH_DISPLAY_TYPE_3_BUTTON_KEY = "button.market.switch_display_type_3";
+    public static final String MARKET_SWITCH_DISPLAY_TYPE_4_BUTTON_KEY = "button.market.switch_display_type_4";
     public static final String MARKET_BUY_BUTTON_KEY = "button.market.buy";
     public static final String MARKET_REMOVE_BUTTON_KEY = "button.market.remove";
     public static final String MARKET_HINT_TEXT_KEY = "text.market.hint";

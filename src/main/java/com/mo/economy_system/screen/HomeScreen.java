@@ -1,10 +1,13 @@
 package com.mo.economy_system.screen;
 
 import com.mo.economy_system.network.EconomyNetwork;
-import com.mo.economy_system.network.packets.BalanceRequestPacket;
-import com.mo.economy_system.network.packets.MarketRequestPacket;
-import com.mo.economy_system.network.packets.ShopRequestPacket;
-import com.mo.economy_system.network.packets.TerritoryRequestPacket;
+import com.mo.economy_system.network.packets.economy_system.BalanceRequestPacket;
+import com.mo.economy_system.network.packets.economy_system.MarketDataRequestPacket;
+import com.mo.economy_system.network.packets.economy_system.ShopRequestPacket;
+import com.mo.economy_system.network.packets.territory_system.TerritoryRequestPacket;
+import com.mo.economy_system.screen.economy_system.MarketScreen;
+import com.mo.economy_system.screen.economy_system.ShopScreen;
+import com.mo.economy_system.screen.territory_system.TerritoryScreen;
 import com.mo.economy_system.utils.MessageKeys;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -39,7 +42,7 @@ public class HomeScreen extends Screen {
         this.addRenderableWidget(
                 Button.builder(Component.translatable(MessageKeys.HOME_MARKET_BUTTON_KEY), button -> {
                             // 请求服务器数据
-                            EconomyNetwork.INSTANCE.sendToServer(new MarketRequestPacket());
+                            EconomyNetwork.INSTANCE.sendToServer(new MarketDataRequestPacket());
                             // 打开 MarketScreen（初始化为空列表）
                             this.minecraft.setScreen(new MarketScreen());
                         })

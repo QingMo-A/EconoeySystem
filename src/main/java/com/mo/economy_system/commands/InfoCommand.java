@@ -1,9 +1,9 @@
 package com.mo.economy_system.commands;
 
 import com.mo.economy_system.system.economy_system.EconomySavedData;
-import com.mo.economy_system.territory.PlayerInfo;
-import com.mo.economy_system.territory.Territory;
-import com.mo.economy_system.territory.TerritoryManager;
+import com.mo.economy_system.system.territory_system.PlayerInfo;
+import com.mo.economy_system.system.territory_system.Territory;
+import com.mo.economy_system.system.territory_system.TerritoryManager;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;

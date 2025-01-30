@@ -14,7 +14,7 @@ public class AboutScreen extends Screen {
 
     private static final String MOD_NAME = "Economy System";
     private static final String AUTHOR_NAME = "QingMo";
-    private static final String GITHUB_URL = "https://github.com/QingMo-A/EconoeySystem/tree/master"; // 替换为你的 GitHub 链接
+    private static final String GITHUB_URL = "https://github.com/QingMo-A/EconoeySystem"; // 替换为你的 GitHub 链接
 
     // 背景图像的资源路径（可选，如果需要自定义背景）
     private static final ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation("economy_system", "textures/gui/about_screen_background.png");

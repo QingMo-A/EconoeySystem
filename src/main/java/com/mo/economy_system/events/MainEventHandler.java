@@ -2,14 +2,14 @@ package com.mo.economy_system.events;
 
 import com.mo.economy_system.EconomySystem;
 import com.mo.economy_system.commands.*;
-import com.mo.economy_system.market.MarketItem;
-import com.mo.economy_system.market.MarketManager;
-import com.mo.economy_system.market.MarketSavedData;
-import com.mo.economy_system.red_packet.RedPacketManager;
-import com.mo.economy_system.reward.RewardManager;
-import com.mo.economy_system.shop.ShopManager;
+import com.mo.economy_system.system.economy_system.market.MarketItem;
+import com.mo.economy_system.system.economy_system.market.MarketManager;
+import com.mo.economy_system.system.economy_system.market.MarketSavedData;
+import com.mo.economy_system.system.economy_system.red_packet.RedPacketManager;
+import com.mo.economy_system.system.economy_system.reward.RewardManager;
+import com.mo.economy_system.system.economy_system.shop.ShopManager;
 import com.mo.economy_system.system.economy_system.EconomySavedData;
-import com.mo.economy_system.territory.TerritoryManager;
+import com.mo.economy_system.system.territory_system.TerritoryManager;
 import com.mo.economy_system.update_checker.UpdateChecker;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -40,11 +40,11 @@ public class MainEventHandler {
     @SubscribeEvent
     public static void onServerStarting(ServerStartingEvent event) {
         // 注册指令
-        EconomyCommands.register(event.getServer().getCommands().getDispatcher());
+        EconomyCommand.register(event.getServer().getCommands().getDispatcher());
         TpaCommand.register(event.getServer().getCommands().getDispatcher());
         RedPacketCommand.register(event.getServer().getCommands().getDispatcher());
-        ClaimCommand.register(event.getServer().getCommands().getDispatcher());
-        TerritoryCommands.register(event.getServer().getCommands().getDispatcher());
+        TerritoryClaimCommand.register(event.getServer().getCommands().getDispatcher());
+        TerritoryCommand.register(event.getServer().getCommands().getDispatcher());
         InfoCommand.register(event.getServer().getCommands().getDispatcher());
         StarterKitCommand.register(event.getServer().getCommands().getDispatcher());
 
