@@ -24,7 +24,7 @@ public class MarketScreen extends Screen {
     private int currentPage = 0; // 当前页码
     private static final int BOTTOM_MARGIN = 30; // 距离底部的最小空白高度
     private int itemsPerPage; // 动态计算的每页商品数
-    private final int GAP = 35; // 动态调整的垂直间距
+    private final int ITEM_SPACING = 35; // 动态调整的垂直间距
     // 计数器变量，初始为 0
     private int displayTypeIndex = 0;
     // 定义按钮显示的文本数组
@@ -126,7 +126,7 @@ public class MarketScreen extends Screen {
 
         // 动态计算每页可显示的商品数和间距
         int availableHeight = this.height - 100; // 减去顶部和底部的空白区域
-        itemsPerPage = Math.max(1, availableHeight / GAP); // 至少显示 1 件商品
+        itemsPerPage = Math.max(1, availableHeight / ITEM_SPACING); // 至少显示 1 件商品
 
         int startIndex = currentPage * itemsPerPage;
         int endIndex = Math.min(startIndex + itemsPerPage, filteredItems.size());
@@ -158,7 +158,7 @@ public class MarketScreen extends Screen {
             // 添加购买或下架按钮（确保在初始化时添加按钮）
             addPurchaseOrRemoveButton(item, this.width - startX, currentY, playerUUID);
 
-            y += GAP; // 调整下一件商品的位置
+            y += ITEM_SPACING; // 调整下一件商品的位置
         }
     }
 
@@ -184,7 +184,7 @@ public class MarketScreen extends Screen {
                 guiGraphics.renderTooltip(this.font, tooltip, Optional.empty(), mouseX, mouseY);
             }
 
-            y += GAP;
+            y += ITEM_SPACING;
         }
     }
 
@@ -209,7 +209,7 @@ public class MarketScreen extends Screen {
     // 添加购买按钮
     private void addItemButtons() {
         // 动态计算每页可显示的商品数
-        this.itemsPerPage = Math.max((this.height - 50 - BOTTOM_MARGIN) / GAP, 1);
+        this.itemsPerPage = Math.max((this.height - 50 - BOTTOM_MARGIN) / ITEM_SPACING, 1);
 
         // 计算当前页的起始和结束索引
         int startIndex = currentPage * itemsPerPage;
@@ -227,7 +227,7 @@ public class MarketScreen extends Screen {
             // 添加购买或下架按钮
             this.addPurchaseOrRemoveButton(item, this.width - startX, y, playerUUID);
 
-            y += GAP;
+            y += ITEM_SPACING;
         }
     }
 
