@@ -20,7 +20,7 @@ public class ShopScreen extends Screen {
 
     private List<ShopItem> items = new ArrayList<>(); // 商品列表
     private int currentPage = 0; // 当前页码
-    private final int GAP = 35; // 每个商品的垂直间距
+    private final int ITEM_SPACING = 35; // 每个商品的垂直间距
     private static final int BOTTOM_MARGIN = 30; // 距离底部的最小空白高度
     private int itemsPerPage; // 动态计算的每页商品数
 
@@ -39,8 +39,9 @@ public class ShopScreen extends Screen {
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         this.renderBackground(guiGraphics);
 
-        // 动态计算每页可显示的商品数
-        itemsPerPage = Math.max((this.height - 50 - BOTTOM_MARGIN) / GAP, 1); // 确保至少显示 1 个商品
+        // 动态计算每页可显示的商品数和间距
+        int availableHeight = this.height - 100; // 减去顶部和底部的空白区域
+        itemsPerPage = Math.max(1, availableHeight / ITEM_SPACING); // 至少显示 1 件商品
 
         // 计算当前页的起始和结束索引
         int startIndex = currentPage * itemsPerPage;
@@ -86,7 +87,7 @@ public class ShopScreen extends Screen {
                 // 渲染物品描述
                 guiGraphics.drawString(this.font, item.getDescription(), startX, y + 18, 0xAAAAAA);
 
-                y += GAP;
+                y += ITEM_SPACING;
             }
         } else {
             // 动态计算文字居中的位置
@@ -166,7 +167,7 @@ public class ShopScreen extends Screen {
     // 动态为每个商品添加按钮
     private void addItemButtons() {
         // 动态计算每页可显示的商品数
-        itemsPerPage = Math.max((this.height - 50 - BOTTOM_MARGIN) / GAP, 1); // 确保至少显示 1 个商品
+        itemsPerPage = Math.max((this.height - 50 - BOTTOM_MARGIN) / ITEM_SPACING, 1); // 确保至少显示 1 个商品
 
         // 计算当前页的起始和结束索引
         int startIndex = currentPage * itemsPerPage;
@@ -210,7 +211,7 @@ public class ShopScreen extends Screen {
                             .build()
             );
 
-            y += GAP;
+            y += ITEM_SPACING;
         }
     }
 }
