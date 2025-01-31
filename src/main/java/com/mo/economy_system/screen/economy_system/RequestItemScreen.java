@@ -71,25 +71,25 @@ public class RequestItemScreen extends Screen {
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (this.itemIDInput.isFocused() && keyCode == 257) { // 检测回车键（keyCode 257）
-            String itemID = this.itemIDInput.getValue();
-            String itemCount = this.itemCountInput.getValue();
-            String itemPrice = this.priceInput.getValue();
+            String itemID = this.itemIDInput.getValue().replaceAll("[^a-z0-9/._-]", "");;
+            String itemCount = this.itemCountInput.getValue().replaceAll("[^a-z0-9/._-]", "");;
+            String itemPrice = this.priceInput.getValue().replaceAll("[^a-z0-9/._-]", "");;
             checkItemID(itemID, itemCount, itemPrice);
             return true; // 防止事件进一步传播
         }
 
         if (this.itemCountInput.isFocused() && keyCode == 257) { // 检测回车键（keyCode 257）
-            String itemID = this.itemIDInput.getValue();
-            String itemCount = this.itemCountInput.getValue();
-            String itemPrice = this.priceInput.getValue();
+            String itemID = this.itemIDInput.getValue().replaceAll("[^a-z0-9/._-]", "");;
+            String itemCount = this.itemCountInput.getValue().replaceAll("[^a-z0-9/._-]", "");;
+            String itemPrice = this.priceInput.getValue().replaceAll("[^a-z0-9/._-]", "");;
             checkItemID(itemID, itemCount, itemPrice);
             return true; // 防止事件进一步传播
         }
 
         if (this.priceInput.isFocused() && keyCode == 257) { // 检测回车键（keyCode 257）
-            String itemID = this.itemIDInput.getValue();
-            String itemCount = this.itemCountInput.getValue();
-            String itemPrice = this.priceInput.getValue();
+            String itemID = this.itemIDInput.getValue().replaceAll("[^a-z0-9/._-]", "");;
+            String itemCount = this.itemCountInput.getValue().replaceAll("[^a-z0-9/._-]", "");;
+            String itemPrice = this.priceInput.getValue().replaceAll("[^a-z0-9/._-]", "");;
             checkItemID(itemID, itemCount, itemPrice);
             return true; // 防止事件进一步传播
         }

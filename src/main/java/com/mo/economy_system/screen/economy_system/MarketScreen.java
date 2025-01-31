@@ -472,6 +472,7 @@ public class MarketScreen extends Screen {
         } else {
             // 如果玩家ID等于商品的卖家ID (卖家)
             if (item.getSellerID().equals(playerUUID)) {
+                // 如果已交付
                 if (item.isDeliveredItem()) {
                     Button claimButton = Button.builder(Component.translatable(MessageKeys.REQUEST_CLAIM_BUTTON_KEY), btn -> {
                                 // 发送下架请求到服务器
@@ -485,7 +486,7 @@ public class MarketScreen extends Screen {
                             .build();
                     this.addRenderableWidget(claimButton);
                 } else {
-                    Button removeButton = Button.builder(Component.translatable(MessageKeys.MARKET_REMOVE_BUTTON_KEY), btn -> {
+                    Button removeButton = Button.builder(Component.translatable(MessageKeys.REQUEST_CANCEL_KEY), btn -> {
                                 // 发送下架请求到服务器
                                 EconomyNetwork.INSTANCE.sendToServer(new MarketRemoveRequestItemPacket(item.getTradeID()));
                                 refreshItemButtons(); // 局部更新商品按钮
@@ -529,7 +530,7 @@ public class MarketScreen extends Screen {
                         deliverButton.active = false;
                         // 如果没有交付
                     } else {
-                        Button removeButton = Button.builder(Component.translatable(MessageKeys.MARKET_REMOVE_BUTTON_KEY), btn -> {
+                        Button removeButton = Button.builder(Component.translatable(MessageKeys.REQUEST_CANCEL_KEY), btn -> {
                                     // 发送下架请求到服务器
                                     EconomyNetwork.INSTANCE.sendToServer(new MarketRemoveMarketItemPacket(item.getTradeID()));
                                     refreshItemButtons(); // 局部更新商品按钮

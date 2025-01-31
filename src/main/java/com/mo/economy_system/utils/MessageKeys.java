@@ -72,6 +72,7 @@ public class MessageKeys {
     public static final String REQUEST_INVALID_PRICE_KEY = "text.request.invalid_price";
     public static final String REQUEST_DELIVER_BUTTON_KEY = "button.request.deliver";
     public static final String REQUEST_DELIVERED_STATUS_KEY = "button.request.delivered_status"; // 已交付
+    public static final String REQUEST_CANCEL_KEY = "button.request.cancel"; // 已交付
     public static final String REQUEST_CLAIM_BUTTON_KEY = "button.request.claim"; // 领取
     public static final String DELIVERY_NOT_ENOUGH_ITEMS_KEY = "message.delivery.not_enough_items"; // 你没有足够的物品来交付
     public static final String DELIVERY_SUCCESS_KEY = "message.delivery.success"; // 你成功交付了这个物品
@@ -119,7 +120,6 @@ public class MessageKeys {
     public static final String RED_PACKET_EXPIRED_REFUNDED = "message.red_packet.expired_refunded";
     public static final String RED_PACKET_EXPIRED_BROADCAST = "message.red_packet.expired_broadcast";
     public static final String RED_PACKET_CLAIM_BROADCAST = "message.red_packet.claim_broadcast";
-
 
     public static final String TERRITORY_TITLE_KEY = "screen.territory.title";
     public static final String TERRITORY_NO_TERRITORIES_TEXT_KEY = "text.territory.no_territories";
