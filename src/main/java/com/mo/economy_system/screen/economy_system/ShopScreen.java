@@ -166,8 +166,9 @@ public class ShopScreen extends Screen {
 
     // 动态为每个商品添加按钮
     private void addItemButtons() {
-        // 动态计算每页可显示的商品数
-        itemsPerPage = Math.max((this.height - 50 - BOTTOM_MARGIN) / ITEM_SPACING, 1); // 确保至少显示 1 个商品
+        // 动态计算每页可显示的商品数和间距
+        int availableHeight = this.height - 100; // 减去顶部和底部的空白区域
+        itemsPerPage = Math.max(1, availableHeight / ITEM_SPACING); // 至少显示 1 件商品
 
         // 计算当前页的起始和结束索引
         int startIndex = currentPage * itemsPerPage;

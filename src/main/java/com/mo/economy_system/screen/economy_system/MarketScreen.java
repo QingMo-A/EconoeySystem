@@ -208,8 +208,9 @@ public class MarketScreen extends Screen {
 
     // 添加购买按钮
     private void addItemButtons() {
-        // 动态计算每页可显示的商品数
-        this.itemsPerPage = Math.max((this.height - 50 - BOTTOM_MARGIN) / ITEM_SPACING, 1);
+        // 动态计算每页可显示的商品数和间距
+        int availableHeight = this.height - 100; // 减去顶部和底部的空白区域
+        itemsPerPage = Math.max(1, availableHeight / ITEM_SPACING); // 至少显示 1 件商品
 
         // 计算当前页的起始和结束索引
         int startIndex = currentPage * itemsPerPage;
@@ -324,7 +325,7 @@ public class MarketScreen extends Screen {
 
     // 处理与显示类型相关的操作
     private void handleDisplayTypeAction(int displayTypeIndex) {
-        switch (displayTypeIndex) {
+        /*switch (displayTypeIndex) {
             case 0: // 无显示类型
                 new Thread(() -> {
                     List<MarketItem> result;
@@ -403,7 +404,9 @@ public class MarketScreen extends Screen {
                 }).start();
 
                 break;
-        }
+        }*/
+        this.displayTypeIndex = displayTypeIndex; // 保存过滤条件
+        applyFilters(); // 调用联合过滤逻辑
     }
 
     // 添加购买或下架按钮方法
@@ -608,7 +611,7 @@ public class MarketScreen extends Screen {
 
     private void applySearch(String searchText) {
         // List<MarketItem> itemsSnapshot = new ArrayList<>(this.items); // 深拷贝当前的 items 列表
-        new Thread(() -> {
+        /*new Thread(() -> {
             List<MarketItem> result;
             if (searchText.isEmpty()) {
                 result = new ArrayList<>(itemsSnapshot); // 如果没有搜索内容，显示全部商品
@@ -626,7 +629,8 @@ public class MarketScreen extends Screen {
                 refreshItemButtons();
                 initializeRenderCache(); // 重新初始化渲染缓存
             });
-        }).start();
+        }).start();*/
+        applyFilters(); // 调用联合过滤逻辑
     }
 
     private boolean isMouseOver(int mouseX, int mouseY, int x, int y, int width, int height) {
@@ -648,6 +652,59 @@ public class MarketScreen extends Screen {
     // 动态计算总页数
     private int getTotalPages() {
         return (int) Math.ceil((double) this.filteredItems.size() / itemsPerPage);
+    }
+
+    private void applyFilters() {
+        new Thread(() -> {
+            List<MarketItem> result = itemsSnapshot;
+
+            // 1. 应用过滤条件
+            switch (displayTypeIndex) {
+                case 1: // 仅显示自己的订单
+                    result = result.stream()
+                            .filter(item -> item.getSellerName().toLowerCase().contains(playerName.toLowerCase()))
+                            .collect(Collectors.toList());
+                    break;
+                case 2: // 仅显示非自己的订单
+                    result = result.stream()
+                            .filter(item -> !item.getSellerName().toLowerCase().contains(playerName.toLowerCase()))
+                            .collect(Collectors.toList());
+                    break;
+                case 3: // 仅显示出货单
+                    result = result.stream()
+                            .filter(MarketItem::isMarketItem)
+                            .collect(Collectors.toList());
+                    break;
+                case 4: // 仅显示订购单
+                    result = result.stream()
+                            .filter(item -> !item.isMarketItem())
+                            .collect(Collectors.toList());
+                    break;
+                // case 0: 无过滤条件
+            }
+
+            // 2. 应用搜索条件
+            if (searchBox != null && !searchBox.getValue().isEmpty()) {
+                result = result.stream()
+                        .filter(item -> itemMatchesSearch(item, searchBox.getValue()))
+                        .collect(Collectors.toList());
+            }
+
+            // 3. 更新UI
+            List<MarketItem> finalResult = result;
+            this.minecraft.execute(() -> {
+                this.filteredItems = finalResult;
+                this.currentPage = 0;
+                refreshItemButtons();
+                initializeRenderCache(); // 重新初始化渲染缓存
+            });
+        }).start();
+    }
+
+    private boolean itemMatchesSearch(MarketItem item, String searchText) {
+        return item.getItemID().toLowerCase().contains(searchText.toLowerCase()) ||
+                item.getSellerName().toLowerCase().contains(searchText.toLowerCase()) ||
+                item.getItemStack().getHoverName().getString().toLowerCase().contains(searchText.toLowerCase());
     }
 
     @FunctionalInterface
