@@ -49,6 +49,9 @@
   "message.shop.buy_successfully": "§a你成功花费 §6%s §a枚梦鱼币购买了 §7%s §a个 §8%s",
   "message.shop.buy_failed": "你没有足够的梦鱼币来购买此商品",
   "message.shop.shop_refresh": "商品价格已刷新",
+  "message.shop.invalid_item": "无效的商品",
+  "message.shop.buy_failed_inventory_full": "购买失败，库存已满",
+  "message.shop.buy_error": "购买错误",
 
   "screen.market.title": "市场",
   "text.market.hint": "输入商品任意信息(回车以确定)",

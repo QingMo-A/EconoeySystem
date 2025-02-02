@@ -60,7 +60,7 @@ public class ShopScreen extends Screen {
                 // 渲染物品图标
                 guiGraphics.renderItem(itemStack, startX, y);
 
-                int priceDifference = item.getCurrentPrice() - item.getBasePrice();
+                int priceDifference = item.getCurrentPrice() - item.getLastPrice();
                 String priceChangeText;
 
                 if (priceDifference > 0) {

@@ -11,12 +11,14 @@ public class ShopItem {
     private final String description; // 商品描述
     private final int basePrice;       // 初始价格
     private int currentPrice;          // 当前价格
+    private int lastPrice;             // 上次的价格
     private double fluctuationFactor; // 涨幅系数（用于动态调整价格）
 
     public ShopItem(String itemId, int basePrice, String description) {
         this.itemId = itemId;
         this.basePrice = basePrice;
         this.currentPrice = basePrice; // 初始化时当前价格等于基础价格
+        this.lastPrice = basePrice;   // 上次的价格初始化为基础价格
         this.description = description;
         this.fluctuationFactor = 1.0;  // 默认涨幅系数为 1.0（无变化）
     }
@@ -41,7 +43,12 @@ public class ShopItem {
         return fluctuationFactor;
     }
 
+    public int getLastPrice() {
+        return lastPrice;
+    }
+
     public void setCurrentPrice(int currentPrice) {
+        this.lastPrice = this.currentPrice; // 在更新当前价格之前，先将当前价格保存为上次的价格
         this.currentPrice = currentPrice;
     }
 
@@ -64,6 +71,7 @@ public class ShopItem {
         tag.putString("itemId", itemId);
         tag.putInt("basePrice", basePrice);
         tag.putInt("currentPrice", currentPrice);
+        tag.putInt("lastPrice", lastPrice);  // 保存上次的价格
         tag.putString("description", description);
         tag.putDouble("fluctuationFactor", fluctuationFactor);
         return tag;
@@ -77,6 +85,7 @@ public class ShopItem {
                 tag.getString("description")
         );
         shopItem.setCurrentPrice(tag.getInt("currentPrice"));
+        shopItem.lastPrice = tag.getInt("lastPrice"); // 从 NBT 中加载上次的价格
         shopItem.setFluctuationFactor(tag.getDouble("fluctuationFactor"));
         return shopItem;
     }

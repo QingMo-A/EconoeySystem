@@ -9,6 +9,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -57,10 +59,10 @@ public class ShopManager {
         items.add(new ShopItem("economy_system:recall_potion", 5, "回忆药水"));
         items.add(new ShopItem("economy_system:wormhole_potion", 10, "虫洞药水"));
 
-        items.add(new ShopItem("minecraft:dirt", 10, "泥土"));
-        items.add(new ShopItem("minecraft:grass_block", 15, "草方块"));
-        items.add(new ShopItem("minecraft:sand", 10, "沙子"));
-        items.add(new ShopItem("minecraft:stone", 20, "石头"));
+        items.add(new ShopItem("minecraft:dirt", 5, "泥土"));
+        items.add(new ShopItem("minecraft:grass_block", 5, "草方块"));
+        items.add(new ShopItem("minecraft:sand", 5, "沙子"));
+        items.add(new ShopItem("minecraft:stone", 5, "石头"));
 
         // 原木
         items.add(new ShopItem("minecraft:oak_log", 5, "橡木原木"));
@@ -151,14 +153,38 @@ public class ShopManager {
         saveToConfig();
     }
 
-    // 定期调整价格的方法
     public void adjustPrices() {
         for (ShopItem item : items) {
-            double randomFactor = 0.5 + (RANDOM.nextDouble() * (1.5 - 0.5)); // 随机生成 0.5 到 1.5 之间的浮动系数
-            item.setFluctuationFactor(randomFactor); // 更新涨幅系数
-            int newPrice = (int) Math.max(1, item.getBasePrice() * randomFactor); // 确保价格至少为 1
+            double basePrice = item.getBasePrice(); // 获取物品基础价格
+            double currentPrice = item.getCurrentPrice(); // 获取物品当前价格
+
+            // 计算当前价格与基础价格的差距百分比
+            double priceDifferencePercent = (currentPrice - basePrice) / basePrice;
+
+            // 生成浮动系数的范围
+            double randomFactor;
+
+            if (priceDifferencePercent > 0.30) {
+                // 如果当前价格大于基础价格的 30%，减少涨价的概率
+                randomFactor = 0.5 + (RANDOM.nextDouble() * (1.5 - 0.5)); // 较小的涨幅系数
+            } else if (priceDifferencePercent < -0.30) {
+                // 如果当前价格小于基础价格的 30%，减少降价的概率
+                randomFactor = 0.5 + (RANDOM.nextDouble() * (2.5 - 0.5)); // 较大的涨幅系数
+            } else {
+                // 否则维持普通的浮动范围
+                randomFactor = 0.5 + (RANDOM.nextDouble() * (2.0 - 0.5)); // 生成浮动系数
+            }
+
+            // 使用 BigDecimal 来确保浮动系数保留两位小数
+            BigDecimal fluctuationFactor = new BigDecimal(randomFactor).setScale(2, RoundingMode.HALF_UP);
+            item.setFluctuationFactor(fluctuationFactor.doubleValue()); // 更新涨幅系数
+
+            // 计算新的价格，确保价格至少为 1
+            int newPrice = (int) Math.max(1, currentPrice * randomFactor); // 确保价格至少为 1
             item.setCurrentPrice(newPrice);
         }
-        saveToConfig(); // 保存调整后的价格
+
+        // 保存调整后的价格
+        saveToConfig();
     }
 }

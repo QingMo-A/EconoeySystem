@@ -46,6 +46,9 @@ public class MessageKeys {
     public static final String SHOP_HINT_TEXT_KEY = "text.shop.hint";
     public static final String SHOP_BUY_SUCCESSFULLY_MESSAGE_KEY = "message.shop.buy_successfully";
     public static final String SHOP_BUY_FAILED_MESSAGE_KEY = "message.shop.buy_failed";
+    public static final String SHOP_INVALID_ITEM_MESSAGE_KEY = "message.shop.invalid_item";  // 无效的商品
+    public static final String SHOP_BUY_FAILED_INVENTORY_FULL_MESSAGE_KEY = "message.shop.buy_failed_inventory_full";  // 购买失败，库存已满
+    public static final String SHOP_BUY_ERROR_MESSAGE_KEY = "message.shop.buy_error";  // 购买错误
 
     public static final String LIST_TITLE_KEY = "screen.list.title";
     public static final String LIST_NO_ITEM_IN_HAND_TEXT_KEY = "text.list.no_item_in_hand";
