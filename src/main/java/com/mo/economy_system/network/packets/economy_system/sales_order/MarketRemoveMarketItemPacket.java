@@ -1,8 +1,9 @@
-package com.mo.economy_system.network.packets.economy_system;
+package com.mo.economy_system.network.packets.economy_system.sales_order;
 
-import com.mo.economy_system.network.EconomyNetwork;
+import com.mo.economy_system.network.packets.economy_system.MarketDataRequestPacket;
 import com.mo.economy_system.system.economy_system.market.MarketItem;
 import com.mo.economy_system.system.economy_system.market.MarketManager;
+import com.mo.economy_system.network.EconomyNetwork;
 import com.mo.economy_system.utils.MessageKeys;
 import com.mo.economy_system.utils.PlayerUtils;
 import net.minecraft.network.FriendlyByteBuf;
@@ -14,23 +15,23 @@ import net.minecraftforge.network.NetworkEvent;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-public class MarketClaimRequestItemPacket {
+public class MarketRemoveMarketItemPacket {
 
     private final UUID itemId;
 
-    public MarketClaimRequestItemPacket(UUID itemId) {
+    public MarketRemoveMarketItemPacket(UUID itemId) {
         this.itemId = itemId;
     }
 
-    public static void encode(MarketClaimRequestItemPacket msg, FriendlyByteBuf buf) {
+    public static void encode(MarketRemoveMarketItemPacket msg, FriendlyByteBuf buf) {
         buf.writeUUID(msg.itemId);
     }
 
-    public static MarketClaimRequestItemPacket decode(FriendlyByteBuf buf) {
-        return new MarketClaimRequestItemPacket(buf.readUUID());
+    public static MarketRemoveMarketItemPacket decode(FriendlyByteBuf buf) {
+        return new MarketRemoveMarketItemPacket(buf.readUUID());
     }
 
-    public static void handle(MarketClaimRequestItemPacket msg, Supplier<NetworkEvent.Context> contextSupplier) {
+    public static void handle(MarketRemoveMarketItemPacket msg, Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
@@ -43,10 +44,12 @@ public class MarketClaimRequestItemPacket {
                 return;
             }
 
+            System.out.println(!item.getSellerID().equals(player.getUUID()));
+            System.out.println(player.hasPermissions(2));
             // 验证是否是卖家
             if (!item.getSellerID().equals(player.getUUID())) {
                 if (!PlayerUtils.isOP(player)) {
-                    player.sendSystemMessage(Component.translatable(MessageKeys.CLAIM_NOT_OWNER_KEY));
+                    player.sendSystemMessage(Component.translatable(MessageKeys.MARKET_UNMATCHED_SELLER_MESSAGE_KEY));
                     return;
                 }
             }
@@ -63,7 +66,7 @@ public class MarketClaimRequestItemPacket {
             // 通知客户端刷新市场界面
             EconomyNetwork.INSTANCE.sendToServer(new MarketDataRequestPacket());
 
-            player.sendSystemMessage(Component.translatable(MessageKeys.CLAIM_SUCCESS_KEY, item.getItemStack().getHoverName(), item.getItemStack().getCount()));
+            player.sendSystemMessage(Component.translatable(MessageKeys.MARKET_ITEM_HAS_BEEN_RETURNED_MESSAGE_KEY));
         });
         context.setPacketHandled(true);
     }

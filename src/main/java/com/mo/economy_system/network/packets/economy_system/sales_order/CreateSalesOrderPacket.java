@@ -1,4 +1,4 @@
-package com.mo.economy_system.network.packets.economy_system;
+package com.mo.economy_system.network.packets.economy_system.sales_order;
 
 import com.mo.economy_system.system.economy_system.market.MarketItem;
 import com.mo.economy_system.system.economy_system.market.MarketManager;
@@ -11,23 +11,23 @@ import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class MarketListItemPacket {
+public class CreateSalesOrderPacket {
 
     private final MarketItem marketItem;
 
-    public MarketListItemPacket(MarketItem marketItem) {
+    public CreateSalesOrderPacket(MarketItem marketItem) {
         this.marketItem = marketItem;
     }
 
-    public static void encode(MarketListItemPacket msg, FriendlyByteBuf buf) {
+    public static void encode(CreateSalesOrderPacket msg, FriendlyByteBuf buf) {
         buf.writeNbt(msg.marketItem.toNBT());
     }
 
-    public static MarketListItemPacket decode(FriendlyByteBuf buf) {
-        return new MarketListItemPacket(MarketItem.fromNBT(buf.readNbt()));
+    public static CreateSalesOrderPacket decode(FriendlyByteBuf buf) {
+        return new CreateSalesOrderPacket(MarketItem.fromNBT(buf.readNbt()));
     }
 
-    public static void handle(MarketListItemPacket msg, Supplier<NetworkEvent.Context> contextSupplier) {
+    public static void handle(CreateSalesOrderPacket msg, Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender(); // 获取发送上架请求的玩家

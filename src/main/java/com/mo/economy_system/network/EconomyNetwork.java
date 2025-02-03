@@ -2,6 +2,13 @@ package com.mo.economy_system.network;
 
 import com.mo.economy_system.EconomySystem;
 import com.mo.economy_system.network.packets.economy_system.*;
+import com.mo.economy_system.network.packets.economy_system.demand_order.MarketClaimRequestItemPacket;
+import com.mo.economy_system.network.packets.economy_system.demand_order.MarketDeliverItemPacket;
+import com.mo.economy_system.network.packets.economy_system.demand_order.MarketRemoveRequestItemPacket;
+import com.mo.economy_system.network.packets.economy_system.demand_order.CreateDemandOrderPacket;
+import com.mo.economy_system.network.packets.economy_system.sales_order.CreateSalesOrderPacket;
+import com.mo.economy_system.network.packets.economy_system.sales_order.MarketPurchaseItemPacket;
+import com.mo.economy_system.network.packets.economy_system.sales_order.MarketRemoveMarketItemPacket;
 import com.mo.economy_system.network.packets.territory_system.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkRegistry;
@@ -26,8 +33,8 @@ public class EconomyNetwork {
         INSTANCE.registerMessage(packetId++, ShopRequestPacket.class, ShopRequestPacket::encode, ShopRequestPacket::decode, ShopRequestPacket::handle);
         INSTANCE.registerMessage(packetId++, ShopResponsePacket.class, ShopResponsePacket::encode, ShopResponsePacket::decode, ShopResponsePacket::handle);
         INSTANCE.registerMessage(packetId++, ShopBuyItemPacket.class, ShopBuyItemPacket::encode, ShopBuyItemPacket::decode, ShopBuyItemPacket::handle);
-        INSTANCE.registerMessage(packetId++, MarketListItemPacket.class, MarketListItemPacket::encode, MarketListItemPacket::decode, MarketListItemPacket::handle);
-        INSTANCE.registerMessage(packetId++, MarketRequestItemPacket.class, MarketRequestItemPacket::encode, MarketRequestItemPacket::decode, MarketRequestItemPacket::handle);
+        INSTANCE.registerMessage(packetId++, CreateSalesOrderPacket.class, CreateSalesOrderPacket::encode, CreateSalesOrderPacket::decode, CreateSalesOrderPacket::handle);
+        INSTANCE.registerMessage(packetId++, CreateDemandOrderPacket.class, CreateDemandOrderPacket::encode, CreateDemandOrderPacket::decode, CreateDemandOrderPacket::handle);
         INSTANCE.registerMessage(packetId++, MarketDataRequestPacket.class, MarketDataRequestPacket::encode, MarketDataRequestPacket::decode, MarketDataRequestPacket::handle);
         INSTANCE.registerMessage(packetId++, MarketDataResponsePacket.class, MarketDataResponsePacket::encode, MarketDataResponsePacket::decode, MarketDataResponsePacket::handle);
         INSTANCE.registerMessage(packetId++, MarketPurchaseItemPacket.class, MarketPurchaseItemPacket::encode, MarketPurchaseItemPacket::decode, MarketPurchaseItemPacket::handle);

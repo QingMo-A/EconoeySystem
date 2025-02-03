@@ -3,7 +3,8 @@ package com.mo.economy_system.screen.economy_system;
 import com.mo.economy_system.network.packets.economy_system.MarketDataRequestPacket;
 import com.mo.economy_system.system.economy_system.market.MarketItem;
 import com.mo.economy_system.network.EconomyNetwork;
-import com.mo.economy_system.network.packets.economy_system.MarketListItemPacket;
+import com.mo.economy_system.network.packets.economy_system.sales_order.CreateSalesOrderPacket;
+import com.mo.economy_system.system.economy_system.market.SalesOrder;
 import com.mo.economy_system.utils.MessageKeys;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -109,20 +110,18 @@ public class ListItemScreen extends Screen {
         }
 
         // 创建 MarketItem 对象时，自动生成唯一商品 ID
-        MarketItem marketItem = new MarketItem(
+        SalesOrder salesOrder = new SalesOrder(
                 UUID.randomUUID(),
                 heldItem.getItem().getDescriptionId(), // 物品描述 ID
                 heldItem.copy(), // 复制物品
                 price.get(),
                 player.getName().getString(),
                 player.getUUID(),
-                System.currentTimeMillis(),
-                true,
-                false
+                System.currentTimeMillis()
         );
 
         // 发送上架请求到服务端
-        EconomyNetwork.INSTANCE.sendToServer(new MarketListItemPacket(marketItem));
+        EconomyNetwork.INSTANCE.sendToServer(new CreateSalesOrderPacket(salesOrder));
 
         // 请求服务器数据
         EconomyNetwork.INSTANCE.sendToServer(new MarketDataRequestPacket());

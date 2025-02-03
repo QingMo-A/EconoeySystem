@@ -1,10 +1,10 @@
 package com.mo.economy_system.screen.economy_system;
 
 import com.mo.economy_system.network.packets.economy_system.MarketDataRequestPacket;
-import com.mo.economy_system.network.packets.economy_system.MarketRequestItemPacket;
+import com.mo.economy_system.network.packets.economy_system.demand_order.CreateDemandOrderPacket;
+import com.mo.economy_system.system.economy_system.market.DemandOrder;
 import com.mo.economy_system.system.economy_system.market.MarketItem;
 import com.mo.economy_system.network.EconomyNetwork;
-import com.mo.economy_system.network.packets.economy_system.MarketListItemPacket;
 import com.mo.economy_system.utils.MessageKeys;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -175,7 +175,7 @@ public class RequestItemScreen extends Screen {
             }
 
             // 创建 MarketItem 对象时，自动生成唯一商品 ID
-            MarketItem marketItem = new MarketItem(
+            DemandOrder marketItem = new DemandOrder(
                     UUID.randomUUID(),
                     itemStackToRequest.getItem().getDescriptionId(), // 物品描述 ID
                     itemStackToRequest.copy(), // 复制物品
@@ -183,12 +183,11 @@ public class RequestItemScreen extends Screen {
                     player.getName().getString(),
                     player.getUUID(),
                     System.currentTimeMillis(),
-                    false,
                     false
             );
 
             // 发送上架请求到服务端
-            EconomyNetwork.INSTANCE.sendToServer(new MarketRequestItemPacket(marketItem));
+            EconomyNetwork.INSTANCE.sendToServer(new CreateDemandOrderPacket(marketItem));
 
             // 请求服务器数据
             EconomyNetwork.INSTANCE.sendToServer(new MarketDataRequestPacket());

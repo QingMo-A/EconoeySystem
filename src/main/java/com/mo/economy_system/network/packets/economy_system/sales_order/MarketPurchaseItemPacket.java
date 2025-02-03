@@ -1,5 +1,6 @@
-package com.mo.economy_system.network.packets.economy_system;
+package com.mo.economy_system.network.packets.economy_system.sales_order;
 
+import com.mo.economy_system.network.packets.economy_system.MarketDataRequestPacket;
 import com.mo.economy_system.system.economy_system.market.MarketItem;
 import com.mo.economy_system.system.economy_system.market.MarketManager;
 import com.mo.economy_system.network.EconomyNetwork;
@@ -48,7 +49,7 @@ public class MarketPurchaseItemPacket {
             }
 
             // 验证买家是否有足够货币
-            int price = item.getPrice();
+            int price = item.getBasePrice();
             if (!savedData.hasEnoughBalance(buyer.getUUID(), price)) {
                 buyer.sendSystemMessage(Component.translatable(MessageKeys.MARKET_PURCHASE_FAILED_MESSAGE_KEY));
                 return;

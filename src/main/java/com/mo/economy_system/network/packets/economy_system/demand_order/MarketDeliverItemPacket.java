@@ -1,7 +1,9 @@
-package com.mo.economy_system.network.packets.economy_system;
+package com.mo.economy_system.network.packets.economy_system.demand_order;
 
 import com.mo.economy_system.network.EconomyNetwork;
+import com.mo.economy_system.network.packets.economy_system.MarketDataRequestPacket;
 import com.mo.economy_system.system.economy_system.EconomySavedData;
+import com.mo.economy_system.system.economy_system.market.DemandOrder;
 import com.mo.economy_system.system.economy_system.market.MarketItem;
 import com.mo.economy_system.system.economy_system.market.MarketManager;
 import com.mo.economy_system.utils.MessageKeys;
@@ -50,25 +52,27 @@ public class MarketDeliverItemPacket {
 
             // 验证买家是否有足够资源
             // 检测并移除物品
-            int price = item.getPrice();
+            int price = item.getBasePrice();
             if (consumeItem(buyer, item.getItemStack(), item.getItemStack().getCount())) {
-                // 扣除供货者资源并将货币发放给供货者
-                savedData.addBalance(buyer.getUUID(), price);
+                if (item instanceof DemandOrder demandOrder) {
+                    // 扣除供货者资源并将货币发放给供货者
+                    savedData.addBalance(buyer.getUUID(), price);
 
-                item.setDeliveredItem(true);
-                // 通知买家成功购买
-                buyer.sendSystemMessage(Component.translatable(MessageKeys.DELIVERY_SUCCESS_KEY, item.getItemStack().getHoverName().getString(), item.getItemStack().getCount()));
+                    demandOrder.setDelivered(true);
+                    // 通知买家成功购买
+                    buyer.sendSystemMessage(Component.translatable(MessageKeys.DELIVERY_SUCCESS_KEY, item.getItemStack().getHoverName().getString(), item.getItemStack().getCount()));
 
-                UUID sellerID = item.getSellerID();
-                // 通知卖家（如果在线）
-                ServerPlayer seller = serverLevel.getServer().getPlayerList().getPlayer(sellerID);
-                if (seller != null) {
-                    // 卖家在线，直接发送消息
-                    seller.sendSystemMessage(Component.translatable(MessageKeys.ORDER_DELIVERED_BY_PLAYER_KEY, item.getItemStack().getHoverName().getString(), item.getItemStack().getCount(), buyer.getName().getString()));
-                } else {
-                    // 卖家不在线，将通知存储到离线消息中
-                    String text = Component.translatable(MessageKeys.ORDER_DELIVERED_BY_PLAYER_KEY, item.getItemStack().getHoverName().getString(), item.getItemStack().getCount(), buyer.getName().getString()).getString();
-                    savedData.storeOfflineMessage(sellerID, text);
+                    UUID sellerID = item.getSellerID();
+                    // 通知卖家（如果在线）
+                    ServerPlayer seller = serverLevel.getServer().getPlayerList().getPlayer(sellerID);
+                    if (seller != null) {
+                        // 卖家在线，直接发送消息
+                        seller.sendSystemMessage(Component.translatable(MessageKeys.ORDER_DELIVERED_BY_PLAYER_KEY, item.getItemStack().getHoverName().getString(), item.getItemStack().getCount(), buyer.getName().getString()));
+                    } else {
+                        // 卖家不在线，将通知存储到离线消息中
+                        String text = Component.translatable(MessageKeys.ORDER_DELIVERED_BY_PLAYER_KEY, item.getItemStack().getHoverName().getString(), item.getItemStack().getCount(), buyer.getName().getString()).getString();
+                        savedData.storeOfflineMessage(sellerID, text);
+                    }
                 }
             } else {
                 buyer.sendSystemMessage(Component.translatable(MessageKeys.DELIVERY_NOT_ENOUGH_ITEMS_KEY));

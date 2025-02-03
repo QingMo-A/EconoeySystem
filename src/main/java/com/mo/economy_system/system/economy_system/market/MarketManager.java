@@ -2,7 +2,6 @@ package com.mo.economy_system.system.economy_system.market;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import java.util.UUID;
 
 public class MarketManager {
@@ -38,6 +37,3 @@ public class MarketManager {
         return null;
     }
 }
-
-
-

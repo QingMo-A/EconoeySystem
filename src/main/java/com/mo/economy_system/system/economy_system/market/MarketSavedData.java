@@ -9,33 +9,25 @@ import java.util.List;
 
 public class MarketSavedData extends SavedData {
     private static final String DATA_NAME = "market_data";
-
     private final List<MarketItem> marketItems = new ArrayList<>();
 
-    // 获取市场商品列表
-    public List<MarketItem> getMarketItems() {
-        return marketItems;
-    }
+    public List<MarketItem> getMarketItems() { return new ArrayList<>(marketItems); }
 
-    // 添加商品
     public void addMarketItem(MarketItem item) {
         marketItems.add(item);
-        setDirty(); // 标记为脏数据，表示需要保存
+        setDirty();
     }
 
-    // 移除商品
     public void removeMarketItem(MarketItem item) {
         marketItems.remove(item);
-        setDirty(); // 标记为脏数据，表示需要保存
+        setDirty();
     }
 
-    // 清空市场
     public void clearMarketItems() {
         marketItems.clear();
-        setDirty(); // 标记为脏数据，表示需要保存
+        setDirty();
     }
 
-    // 序列化到 NBT
     @Override
     public CompoundTag save(CompoundTag tag) {
         ListTag listTag = new ListTag();
@@ -46,20 +38,19 @@ public class MarketSavedData extends SavedData {
         return tag;
     }
 
-    // 从 NBT 反序列化
     public static MarketSavedData load(CompoundTag tag) {
         MarketSavedData data = new MarketSavedData();
         if (tag.contains("marketItems")) {
             ListTag listTag = tag.getList("marketItems", CompoundTag.TAG_COMPOUND);
             for (int i = 0; i < listTag.size(); i++) {
-                MarketItem item = MarketItem.fromNBT(listTag.getCompound(i));
-                data.addMarketItem(item);
+                CompoundTag itemTag = listTag.getCompound(i);
+                MarketItem item = MarketItem.fromNBT(itemTag); // 动态创建子类对象
+                data.marketItems.add(item);
             }
         }
         return data;
     }
 
-    // 获取实例
     public static MarketSavedData getInstance(net.minecraft.server.level.ServerLevel level) {
         return level.getDataStorage().computeIfAbsent(MarketSavedData::load, MarketSavedData::new, DATA_NAME);
     }

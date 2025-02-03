@@ -1,36 +1,38 @@
-package com.mo.economy_system.network.packets.economy_system;
+package com.mo.economy_system.network.packets.economy_system.demand_order;
 
+import com.mo.economy_system.network.EconomyNetwork;
+import com.mo.economy_system.network.packets.economy_system.MarketDataRequestPacket;
+import com.mo.economy_system.system.economy_system.EconomySavedData;
 import com.mo.economy_system.system.economy_system.market.MarketItem;
 import com.mo.economy_system.system.economy_system.market.MarketManager;
-import com.mo.economy_system.network.EconomyNetwork;
 import com.mo.economy_system.utils.MessageKeys;
 import com.mo.economy_system.utils.PlayerUtils;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.UUID;
 import java.util.function.Supplier;
 
-public class MarketRemoveMarketItemPacket {
+public class MarketRemoveRequestItemPacket {
 
     private final UUID itemId;
 
-    public MarketRemoveMarketItemPacket(UUID itemId) {
+    public MarketRemoveRequestItemPacket(UUID itemId) {
         this.itemId = itemId;
     }
 
-    public static void encode(MarketRemoveMarketItemPacket msg, FriendlyByteBuf buf) {
+    public static void encode(MarketRemoveRequestItemPacket msg, FriendlyByteBuf buf) {
         buf.writeUUID(msg.itemId);
     }
 
-    public static MarketRemoveMarketItemPacket decode(FriendlyByteBuf buf) {
-        return new MarketRemoveMarketItemPacket(buf.readUUID());
+    public static MarketRemoveRequestItemPacket decode(FriendlyByteBuf buf) {
+        return new MarketRemoveRequestItemPacket(buf.readUUID());
     }
 
-    public static void handle(MarketRemoveMarketItemPacket msg, Supplier<NetworkEvent.Context> contextSupplier) {
+    public static void handle(MarketRemoveRequestItemPacket msg, Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
@@ -43,8 +45,6 @@ public class MarketRemoveMarketItemPacket {
                 return;
             }
 
-            System.out.println(!item.getSellerID().equals(player.getUUID()));
-            System.out.println(player.hasPermissions(2));
             // 验证是否是卖家
             if (!item.getSellerID().equals(player.getUUID())) {
                 if (!PlayerUtils.isOP(player)) {
@@ -56,11 +56,11 @@ public class MarketRemoveMarketItemPacket {
             // 从市场中移除商品
             MarketManager.removeMarketItem(item);
 
-            // 将物品返回给卖家
-            ItemStack removedItem = item.getItemStack().copy();
-            if (!player.getInventory().add(removedItem)) {
-                player.drop(removedItem, false);
-            }
+            // 将钱返回给卖家
+            ServerLevel serverLevel = player.serverLevel();
+            EconomySavedData savedData = EconomySavedData.getInstance(serverLevel);
+
+            savedData.addBalance(item.getSellerID(), item.getBasePrice());
 
             // 通知客户端刷新市场界面
             EconomyNetwork.INSTANCE.sendToServer(new MarketDataRequestPacket());

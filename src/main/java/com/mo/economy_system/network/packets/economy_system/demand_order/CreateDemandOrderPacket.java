@@ -1,4 +1,4 @@
-package com.mo.economy_system.network.packets.economy_system;
+package com.mo.economy_system.network.packets.economy_system.demand_order;
 
 import com.mo.economy_system.system.economy_system.EconomySavedData;
 import com.mo.economy_system.system.economy_system.market.MarketItem;
@@ -8,30 +8,29 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class MarketRequestItemPacket {
+public class CreateDemandOrderPacket {
 
     private static final String LIST_SUCCESSFULLY_MESSAGE_KEY = "message.list.list_successfully";
 
     private final MarketItem marketItem;
 
-    public MarketRequestItemPacket(MarketItem marketItem) {
+    public CreateDemandOrderPacket(MarketItem marketItem) {
         this.marketItem = marketItem;
     }
 
-    public static void encode(MarketRequestItemPacket msg, FriendlyByteBuf buf) {
+    public static void encode(CreateDemandOrderPacket msg, FriendlyByteBuf buf) {
         buf.writeNbt(msg.marketItem.toNBT());
     }
 
-    public static MarketRequestItemPacket decode(FriendlyByteBuf buf) {
-        return new MarketRequestItemPacket(MarketItem.fromNBT(buf.readNbt()));
+    public static CreateDemandOrderPacket decode(FriendlyByteBuf buf) {
+        return new CreateDemandOrderPacket(MarketItem.fromNBT(buf.readNbt()));
     }
 
-    public static void handle(MarketRequestItemPacket msg, Supplier<NetworkEvent.Context> contextSupplier) {
+    public static void handle(CreateDemandOrderPacket msg, Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender(); // 获取发送上架请求的玩家
@@ -41,7 +40,7 @@ public class MarketRequestItemPacket {
             EconomySavedData savedData = EconomySavedData.getInstance(serverLevel);
 
             // 验证买家是否有足够货币
-            int price = msg.marketItem.getPrice();
+            int price = msg.marketItem.getBasePrice();
             if (!savedData.hasEnoughBalance(player.getUUID(), price)) {
                 player.sendSystemMessage(Component.translatable(MessageKeys.MARKET_PURCHASE_FAILED_MESSAGE_KEY));
                 return;
