@@ -37,7 +37,7 @@ public class StarterKitCommand {
             // 检查是否已经领取过
             if (persistentData.getBoolean(TAG_KEY)) {
                 player.displayClientMessage(Component.literal("§c你已经领取过新手礼包，无法再次领取！"), false);
-                broadcastClaimResultMessage(player, true);
+                broadcastClaimResultMessage(player, false);
             } else {
                 EconomySavedData data = EconomySavedData.getInstance(player.serverLevel());
                 data.addBalance(player.getUUID(), 10000);
@@ -45,7 +45,7 @@ public class StarterKitCommand {
                 // 成功领取，记录状态
                 persistentData.putBoolean(TAG_KEY, true);
                 player.displayClientMessage(Component.literal("§a成功领取新手礼包！你获得了 10000 枚梦鱼币！"), false);
-                broadcastClaimResultMessage(player, false);
+                broadcastClaimResultMessage(player, true);
             }
         } else {
             source.sendFailure(Component.literal("§c该指令只能由玩家使用！"));
@@ -63,7 +63,7 @@ public class StarterKitCommand {
 
         // 向所有其他玩家发送消息
         claimer.getServer().getPlayerList().getPlayers().forEach(player -> {
-            if (!player.getUUID().equals(claimer.getUUID())) { // 排除抢红包的玩家
+            if (player.getUUID().equals(claimer.getUUID())) { // 排除抢红包的玩家
                 player.sendSystemMessage(message);
             }
         });
@@ -86,7 +86,7 @@ public class StarterKitCommand {
 
         // 向所有其他玩家发送消息
         claimer.getServer().getPlayerList().getPlayers().forEach(player -> {
-            if (!player.getUUID().equals(claimer.getUUID())) { // 排除抢红包的玩家
+            if (player.getUUID().equals(claimer.getUUID())) { // 排除抢红包的玩家
                 player.sendSystemMessage(message);
             }
         });

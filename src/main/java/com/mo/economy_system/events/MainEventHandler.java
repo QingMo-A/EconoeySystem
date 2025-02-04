@@ -46,7 +46,7 @@ public class MainEventHandler {
         TerritoryClaimCommand.register(event.getServer().getCommands().getDispatcher());
         TerritoryCommand.register(event.getServer().getCommands().getDispatcher());
         InfoCommand.register(event.getServer().getCommands().getDispatcher());
-        StarterKitCommand.register(event.getServer().getCommands().getDispatcher());
+        // StarterKitCommand.register(event.getServer().getCommands().getDispatcher());
 
         // 获取服务器主世界
         ServerLevel overworld = event.getServer().overworld();
