@@ -32,21 +32,23 @@ public class EconomyCommand {
                 .then(Commands.literal("add")
                         .requires(source -> source.hasPermission(2)) // 设置需要权限等级 2
                         .then(Commands.argument("amount", IntegerArgumentType.integer(1))
-                                .executes(context -> {
-                                    ServerPlayer player = context.getSource().getPlayerOrException();
-                                    int amount = IntegerArgumentType.getInteger(context, "amount");
-                                    ServerLevel serverLevel = player.serverLevel(); // 获取服务器世界实例
-                                    EconomySavedData data = EconomySavedData.getInstance(serverLevel);
-                                    data.addBalance(player.getUUID(), amount);
-                                    context.getSource().sendSuccess(() -> Component.translatable(MessageKeys.COIN_COMMAND_ADD, amount), false);
-                                    return 1;
-                                })))
+                                .then(Commands.argument("target", EntityArgument.player())
+                                        .executes(context -> {
+                                            ServerPlayer player = EntityArgument.getPlayer(context, "target");
+                                            int amount = IntegerArgumentType.getInteger(context, "amount");
+                                            ServerLevel serverLevel = player.serverLevel(); // 获取服务器世界实例
+                                            EconomySavedData data = EconomySavedData.getInstance(serverLevel);
+                                            data.addBalance(player.getUUID(), amount);
+                                            context.getSource().sendSuccess(() -> Component.translatable(MessageKeys.COIN_COMMAND_ADD, amount), false);
+                                            return 1;
+                                        }))))
                 // 减少余额
                 .then(Commands.literal("min")
                         .requires(source -> source.hasPermission(2)) // 设置需要权限等级 2
                         .then(Commands.argument("amount", IntegerArgumentType.integer(1))
+                                .then(Commands.argument("target", EntityArgument.player())
                                 .executes(context -> {
-                                    ServerPlayer player = context.getSource().getPlayerOrException();
+                                    ServerPlayer player = EntityArgument.getPlayer(context, "target");
                                     int amount = IntegerArgumentType.getInteger(context, "amount");
                                     ServerLevel serverLevel = player.serverLevel(); // 获取服务器世界实例
                                     EconomySavedData data = EconomySavedData.getInstance(serverLevel);
@@ -56,20 +58,21 @@ public class EconomyCommand {
                                         context.getSource().sendFailure(Component.translatable(MessageKeys.COIN_COMMAND_INSUFFICIENT_BALANCE));
                                     }
                                     return 1;
-                                })))
+                                }))))
                 // 设置余额
                 .then(Commands.literal("set")
                         .requires(source -> source.hasPermission(2)) // 设置需要权限等级 2
                         .then(Commands.argument("amount", IntegerArgumentType.integer(0))
+                                .then(Commands.argument("target", EntityArgument.player())
                                 .executes(context -> {
-                                    ServerPlayer player = context.getSource().getPlayerOrException();
+                                    ServerPlayer player = EntityArgument.getPlayer(context, "target");
                                     int amount = IntegerArgumentType.getInteger(context, "amount");
                                     ServerLevel serverLevel = player.serverLevel(); // 获取服务器世界实例
                                     EconomySavedData data = EconomySavedData.getInstance(serverLevel);
                                     data.setBalance(player.getUUID(), amount);
                                     context.getSource().sendSuccess(() -> Component.translatable(MessageKeys.COIN_COMMAND_SET, amount), false);
                                     return 1;
-                                })))
+                                }))))
                 // 转账功能
                 .then(Commands.literal("transfer")
                         .then(Commands.argument("target", EntityArgument.player())
