@@ -166,10 +166,10 @@ public class ShopManager {
 
             if (priceDifferencePercent > 0.30) {
                 // 如果当前价格大于基础价格的 30%，减少涨价的概率
-                randomFactor = 0.5 + (RANDOM.nextDouble() * (1.5 - 0.5)); // 较小的涨幅系数
+                randomFactor = 0.1 + (RANDOM.nextDouble() * (1.5 - 0.1)); // 较小的涨幅系数
             } else if (priceDifferencePercent < -0.30) {
                 // 如果当前价格小于基础价格的 30%，减少降价的概率
-                randomFactor = 0.5 + (RANDOM.nextDouble() * (2.5 - 0.5)); // 较大的涨幅系数
+                randomFactor = 0.5 + (RANDOM.nextDouble() * (3.0 - 0.5)); // 较大的涨幅系数
             } else {
                 // 否则维持普通的浮动范围
                 randomFactor = 0.5 + (RANDOM.nextDouble() * (2.0 - 0.5)); // 生成浮动系数

@@ -1,5 +1,6 @@
 package com.mo.economy_system.utils;
 
+import com.mojang.authlib.GameProfile;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.server.MinecraftServer;
@@ -35,5 +36,22 @@ public class PlayerUtils {
 
     public static boolean isOP(ServerPlayer player) {
         return player.hasPermissions(2) || player.hasPermissions(3) || player.hasPermissions(4);
+    }
+
+    /**
+     * 通过UUID获取玩家名称，支持离线玩家。
+     * @param server MinecraftServer 实例
+     * @param uuid 玩家 UUID
+     * @return 玩家名称
+     */
+    public static String getPlayerNameFromUUID(MinecraftServer server, UUID uuid) {
+        // 获取玩家的 GameProfileCache
+        GameProfile profile = server.getProfileCache().get(uuid).orElse(null);
+        if (profile != null) {
+            return profile.getName(); // 离线玩家通过 GameProfile 获取名称
+        }
+
+        // 如果没有找到玩家信息，返回 "Unknown"
+        return "Unknown";
     }
 }

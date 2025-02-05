@@ -14,9 +14,16 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 public class HomeScreen extends Screen {
 
     private int balance = -1; // 用于存储玩家余额，默认值为 -1 表示未获取
+    private List<Map.Entry<String, Integer>> accounts;
 
     public HomeScreen() {
         super(Component.translatable(MessageKeys.HOME_TITLE_KEY));
@@ -108,11 +115,50 @@ public class HomeScreen extends Screen {
 
         // 绘制自定义文本
         guiGraphics.drawCenteredString(this.font, "Hello, World!", this.width / 2, this.height / 2 - 50, 0xFFFFFF);
+
+        // 渲染玩家账户列表
+        int startX = Math.max((this.width / 2) - 450, 30);
+        int startY = Math.max((this.height - 400) / 4, 40);
+        int index = -1;
+        if (accounts != null) {
+            int i = 1;
+            for (Map.Entry<String, Integer> entry : accounts) {
+                if (i > 10) {
+                    break;
+                }
+                String playerName = entry.getKey();
+                Integer playerBalance = entry.getValue();
+
+                // 拼接文本 "玩家名称: 余额"
+                String accountText = "[" + i + "] " + playerName + " 拥有 " + playerBalance + " 枚梦鱼币";
+
+                // 渲染文本
+                guiGraphics.drawString(this.font, accountText, startX, startY, 0xFFFFFF);
+
+                // 增加 y 坐标，确保下一行文本显示在下方
+                startY += this.font.lineHeight + 2;  // 增加行高和一些间距
+                i++;
+            }
+            index = getIndexOfPlayer(accounts, this.minecraft.player.getName().getString()) + 1;
+        }
+
+        if (index != -1) {
+            // 渲染“富豪榜”文本，在账户列表之后
+            String leaderboardText = "[" + index + "] 你 拥有 " + balance + " 枚梦鱼币";
+            int leaderboardTextWidth = this.font.width(leaderboardText);
+            int leaderboardX = 20;  // 居中显示
+            // 将富豪榜文本的 y 坐标设置为最后一个账户条目下方
+            int leaderboardY = startY + 10;  // 在最后一行账户文本之后加一点间隔
+
+            // 渲染“富豪榜”文本
+            guiGraphics.drawString(this.font, leaderboardText, startX, leaderboardY, 0xFFFFFF);
+        }
     }
 
     // 更新余额的方法（供数据包调用）
-    public void updateBalance(int balance) {
+    public void updateBalance(int balance, List<Map.Entry<String, Integer>> accounts) {
         this.balance = balance;
+        this.accounts = accounts;
     }
 
     @Override
@@ -120,4 +166,14 @@ public class HomeScreen extends Screen {
         return false; // 返回 false 表示游戏不会暂停
     }
 
+    // 获取指定 String (玩家名称) 的索引
+    public static int getIndexOfPlayer(List<Map.Entry<String, Integer>> accounts, String targetName) {
+        for (int i = 0; i < accounts.size(); i++) {
+            Map.Entry<String, Integer> entry = accounts.get(i);
+            if (entry.getKey().equals(targetName)) {
+                return i;  // 返回索引
+            }
+        }
+        return -1;  // 如果没有找到，返回 -1
+    }
 }

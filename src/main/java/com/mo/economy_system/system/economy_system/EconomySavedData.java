@@ -6,6 +6,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class EconomySavedData extends SavedData {
     private static final String DATA_NAME = "economy_data";
@@ -55,6 +56,26 @@ public class EconomySavedData extends SavedData {
         this.setDirty(); // 标记数据已更改
         return messages != null ? messages : new ArrayList<>();
     }
+
+    // 返回一个只读的账户视图（防止外部修改原始数据）
+    public List<Map.Entry<UUID, Integer>> getAllAccounts() {
+        List<Map.Entry<UUID, Integer>> allAccounts = accounts.entrySet()
+                .stream()
+                .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue())) // 按值降序排序
+                .collect(Collectors.toList());
+        return allAccounts;
+    }
+
+    // 返回一个只读的账户视图（防止外部修改原始数据）
+    public List<Map.Entry<UUID, Integer>> getTenTopAccounts() {
+        List<Map.Entry<UUID, Integer>> topTen = accounts.entrySet()
+                .stream()
+                .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue())) // 按值降序排序
+                .limit(10) // 限制为前十
+                .collect(Collectors.toList());
+        return topTen;
+    }
+
 
     // 保存数据到 NBT
     @Override
