@@ -47,10 +47,12 @@ public class MainEventHandler {
         TerritoryCommand.register(event.getServer().getCommands().getDispatcher());
         InfoCommand.register(event.getServer().getCommands().getDispatcher());
         // StarterKitCommand.register(event.getServer().getCommands().getDispatcher());
+        CheckCommand.register(event.getServer().getCommands().getDispatcher());
 
         // 获取服务器主世界
         ServerLevel overworld = event.getServer().overworld();
 
+        EconomySystem.createResultDirectory();
         EconomySavedData.getInstance(overworld);
         // 初始化 ShopManager
         shopManager = new ShopManager();

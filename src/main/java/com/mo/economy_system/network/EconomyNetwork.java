@@ -1,6 +1,7 @@
 package com.mo.economy_system.network;
 
 import com.mo.economy_system.EconomySystem;
+import com.mo.economy_system.network.packets.check_system.*;
 import com.mo.economy_system.network.packets.economy_system.*;
 import com.mo.economy_system.network.packets.economy_system.demand_order.MarketClaimRequestItemPacket;
 import com.mo.economy_system.network.packets.economy_system.demand_order.MarketDeliverItemPacket;
@@ -48,5 +49,13 @@ public class EconomyNetwork {
         INSTANCE.registerMessage(packetId++, TerrirotyInvitePlayerPacket.class, TerrirotyInvitePlayerPacket::encode, TerrirotyInvitePlayerPacket::decode, TerrirotyInvitePlayerPacket::handle);
         INSTANCE.registerMessage(packetId++, TerritoryRemovePacket.class, TerritoryRemovePacket::encode, TerritoryRemovePacket::decode, TerritoryRemovePacket::handle);
         INSTANCE.registerMessage(packetId++, TerritoryRemovePlayerFromTerritoryPacket.class, TerritoryRemovePlayerFromTerritoryPacket::encode, TerritoryRemovePlayerFromTerritoryPacket::decode, TerritoryRemovePlayerFromTerritoryPacket::handle);
+        INSTANCE.registerMessage(packetId++, CheckPacket.class, CheckPacket::encode, CheckPacket::decode, CheckPacket::handle);
+        INSTANCE.registerMessage(packetId++, CheckResultRequestPacket.class, CheckResultRequestPacket::encode, CheckResultRequestPacket::decode, CheckResultRequestPacket::handle);
+        INSTANCE.registerMessage(packetId++, CheckResultResponsePacket.class, CheckResultResponsePacket::encode, CheckResultResponsePacket::decode, CheckResultResponsePacket::handle);
+        INSTANCE.registerMessage(packetId++, GetPacket.class, GetPacket::encode, GetPacket::decode, GetPacket::handle);
+        INSTANCE.registerMessage(packetId++, GetResultRequestPacket.class, GetResultRequestPacket::encode, GetResultRequestPacket::decode, GetResultRequestPacket::handle);
+        INSTANCE.registerMessage(packetId++, GetResultResponsePacket.class, GetResultResponsePacket::encode, GetResultResponsePacket::decode, GetResultResponsePacket::handle);
+        INSTANCE.registerMessage(packetId++, ChunkPacket.class, ChunkPacket::encode, ChunkPacket::decode, ChunkPacket::handle);
+        INSTANCE.registerMessage(packetId++, ChunkResponsePacket.class, ChunkResponsePacket::encode, ChunkResponsePacket::decode, ChunkResponsePacket::handle);
     }
 }

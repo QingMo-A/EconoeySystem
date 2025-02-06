@@ -155,36 +155,64 @@ public class ShopManager {
 
     public void adjustPrices() {
         for (ShopItem item : items) {
-            double basePrice = item.getBasePrice(); // 获取物品基础价格
-            double currentPrice = item.getCurrentPrice(); // 获取物品当前价格
+            int basePrice = item.getBasePrice(); // 基础价格应为整数
+            int currentPrice = item.getCurrentPrice();
 
-            // 计算当前价格与基础价格的差距百分比
-            double priceDifferencePercent = (currentPrice - basePrice) / basePrice;
+            // 计算价格偏离比例（使用浮点计算，最终结果转为int）
+            double deviation = (currentPrice - (double)basePrice) / basePrice;
 
-            // 生成浮动系数的范围
-            double randomFactor;
+            // 定义波动参数
+            double minFactor = 0.5;  // 最小波动系数
+            double maxFactor = 3.0;  // 最大波动系数
+            double baseFluctuation = 0.1; // 基础波动幅度
 
-            if (priceDifferencePercent > 0.30) {
-                // 如果当前价格大于基础价格的 30%，减少涨价的概率
-                randomFactor = 0.1 + (RANDOM.nextDouble() * (1.5 - 0.1)); // 较小的涨幅系数
-            } else if (priceDifferencePercent < -0.30) {
-                // 如果当前价格小于基础价格的 30%，减少降价的概率
-                randomFactor = 0.5 + (RANDOM.nextDouble() * (3.0 - 0.5)); // 较大的涨幅系数
-            } else {
-                // 否则维持普通的浮动范围
-                randomFactor = 0.5 + (RANDOM.nextDouble() * (2.0 - 0.5)); // 生成浮动系数
+            // 根据偏离程度细分波动区间
+            if (deviation >= 0.5) {          // 溢价50%以上
+                minFactor = 0.3;             // 强抑制上涨
+                maxFactor = 0.8;
+                baseFluctuation = -0.05;     // 允许小幅回落
+            } else if (deviation >= 0.3) {   // 溢价30%-50%
+                minFactor = 0.6;
+                maxFactor = 1.2;
+            } else if (deviation <= -0.5) {  // 折价50%以上
+                minFactor = 1.5;             // 强刺激回升
+                maxFactor = 2.5;
+                baseFluctuation = 0.15;      // 增加回升概率
+            } else if (deviation <= -0.3) {  // 折价30%-50%
+                minFactor = 1.2;
+                maxFactor = 1.8;
+            } else {                         // 正常波动区间（-30% ~ +30%）
+                minFactor = 0.8;
+                maxFactor = 1.2;
             }
 
-            // 使用 BigDecimal 来确保浮动系数保留两位小数
-            BigDecimal fluctuationFactor = new BigDecimal(randomFactor).setScale(2, RoundingMode.HALF_UP);
-            item.setFluctuationFactor(fluctuationFactor.doubleValue()); // 更新涨幅系数
+            // 生成带趋势的随机因子
+            double randomFactor = baseFluctuation +
+                    (minFactor + (maxFactor - minFactor) * RANDOM.nextDouble());
 
-            // 计算新的价格，确保价格至少为 1
-            int newPrice = (int) Math.max(1, currentPrice * randomFactor); // 确保价格至少为 1
+            // 应用衰减函数控制极端波动
+            randomFactor = 1 + (randomFactor - 1) *
+                    Math.exp(-Math.abs(deviation));
+
+            // 计算新价格（保证整数）
+            int newPrice = (int) Math.round(currentPrice * randomFactor);
+
+            // 设置价格边界保护
+            newPrice = Math.max(1, Math.min(newPrice, basePrice * 5)); // 最高不超过5倍
+
+            // 当接近基础价格时增加稳定性
+            if (Math.abs(newPrice - basePrice) <= basePrice * 0.1) {
+                newPrice = basePrice + (int)((newPrice - basePrice) * 0.5);
+            }
+
             item.setCurrentPrice(newPrice);
+
+            // 记录波动系数（保留两位小数）
+            BigDecimal fluctuation = new BigDecimal(randomFactor - 1)
+                    .setScale(2, RoundingMode.HALF_UP);
+            item.setFluctuationFactor(fluctuation.doubleValue());
         }
 
-        // 保存调整后的价格
         saveToConfig();
     }
 }
