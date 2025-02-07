@@ -207,5 +207,10 @@
   "item.economy_system.guitar": "吉他",
   "item.economy_system.wormhole_potion": "虫洞药水",
   "item.economy_system.recall_potion": "回忆药水",
-  "item.economy_system.claim_wand": "圈地杖"
+  "item.economy_system.claim_wand": "圈地杖",
+
+  "enchantment.economy_system.carefully": "细心",
+  "enchantment.economy_system.carefully.desc": "增加从尸体中搜寻的货币数量",
+  "enchantment.economy_system.bounty_hunter": "赏金猎人",
+  "enchantment.economy_system.bounty_hunter.desc": "增加从尸体中搜寻到货币的概率"
 }

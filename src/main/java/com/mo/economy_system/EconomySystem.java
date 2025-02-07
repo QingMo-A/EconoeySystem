@@ -1,5 +1,6 @@
 package com.mo.economy_system;
 
+import com.mo.economy_system.enchant.EconomySystemEnchants;
 import com.mo.economy_system.item.ModItems;
 import com.mo.economy_system.system.economy_system.reward.RewardConfigWatcher;
 import com.mo.economy_system.system.economy_system.reward.RewardManager;
@@ -35,7 +36,9 @@ public class EconomySystem {
         // 注册客户端事件
         modEventBus.addListener(this::onClientSetup);
         // 注册物品
-        ModItems.ITEMS.register(modEventBus);
+        ModItems.register(modEventBus);
+        // 注册附魔
+        EconomySystemEnchants.register(modEventBus);
 
         EconomyNetwork.register();
 
@@ -54,7 +57,8 @@ public class EconomySystem {
         // 注册客户端事件
         modEventBus.addListener(this::onClientSetup);
         // 注册物品
-        ModItems.ITEMS.register(modEventBus);
+        ModItems.register(modEventBus);
+        EconomySystemEnchants.register(modEventBus);
 
         EconomyNetwork.register();
 

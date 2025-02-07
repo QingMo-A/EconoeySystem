@@ -185,7 +185,7 @@ public class ShopScreen extends Screen {
             // 添加 Buy x1 按钮
             this.addRenderableWidget(
                     Button.builder(Component.translatable(MessageKeys.SHOP_BUY_BUTTON_KEY, 1), button -> {
-                                EconomyNetwork.INSTANCE.sendToServer(new ShopBuyItemPacket(item.getItemId(), item.getCurrentPrice(), 1));
+                                EconomyNetwork.INSTANCE.sendToServer(new ShopBuyItemPacket(item.getItemId(), item.getNbt(), item.getCurrentPrice(), 1));
                             })
                             .pos(startX - 210, y)
                             .size(60, 20)
@@ -195,7 +195,7 @@ public class ShopScreen extends Screen {
             // 添加 Buy x32 按钮
             this.addRenderableWidget(
                     Button.builder(Component.translatable(MessageKeys.SHOP_BUY_BUTTON_KEY, 32), button -> {
-                                EconomyNetwork.INSTANCE.sendToServer(new ShopBuyItemPacket(item.getItemId(), item.getCurrentPrice(), 32));
+                                EconomyNetwork.INSTANCE.sendToServer(new ShopBuyItemPacket(item.getItemId(), item.getNbt(), item.getCurrentPrice(), 32));
                             })
                             .pos(startX - 140, y)
                             .size(60, 20)
@@ -205,7 +205,7 @@ public class ShopScreen extends Screen {
             // 添加 Buy x64 按钮
             this.addRenderableWidget(
                     Button.builder(Component.translatable(MessageKeys.SHOP_BUY_BUTTON_KEY, 64), button -> {
-                                EconomyNetwork.INSTANCE.sendToServer(new ShopBuyItemPacket(item.getItemId(), item.getCurrentPrice(), 64));
+                                EconomyNetwork.INSTANCE.sendToServer(new ShopBuyItemPacket(item.getItemId(), item.getNbt(), item.getCurrentPrice(), 64));
                             })
                             .pos(startX - 70, y)
                             .size(60, 20)

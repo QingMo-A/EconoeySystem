@@ -59,6 +59,9 @@ public class ShopManager {
         items.add(new ShopItem("economy_system:recall_potion", 5, "回忆药水"));
         items.add(new ShopItem("economy_system:wormhole_potion", 10, "虫洞药水"));
 
+        items.add(new ShopItem("minecraft:enchanted_book", 100, "细心 I", "{StoredEnchantments:[{id:\"economy_system:carefully\", lvl:1}]}"));
+        items.add(new ShopItem("minecraft:enchanted_book", 200, "赏金猎人 I", "{StoredEnchantments:[{id:\"economy_system:bounty_hunter\", lvl:1}]}"));
+
         items.add(new ShopItem("minecraft:dirt", 5, "泥土"));
         items.add(new ShopItem("minecraft:grass_block", 5, "草方块"));
         items.add(new ShopItem("minecraft:sand", 5, "沙子"));

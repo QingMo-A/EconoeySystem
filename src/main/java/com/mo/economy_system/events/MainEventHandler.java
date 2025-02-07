@@ -2,6 +2,7 @@ package com.mo.economy_system.events;
 
 import com.mo.economy_system.EconomySystem;
 import com.mo.economy_system.commands.*;
+import com.mo.economy_system.enchant.EconomySystemEnchants;
 import com.mo.economy_system.system.economy_system.market.MarketItem;
 import com.mo.economy_system.system.economy_system.market.MarketManager;
 import com.mo.economy_system.system.economy_system.market.MarketSavedData;
@@ -16,6 +17,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -122,15 +125,37 @@ public class MainEventHandler {
         DamageSource source = event.getSource();
         if (!(source.getEntity() instanceof ServerPlayer player)) return;
 
+        ItemStack weapon = player.getMainHandItem();
+
+        int level_carefully = EnchantmentHelper.getItemEnchantmentLevel(EconomySystemEnchants.CAREFULLY.get(), weapon);
+
+        int level_bounty_hunter = EnchantmentHelper.getItemEnchantmentLevel(EconomySystemEnchants.BOUNTY_HUNTER.get(), weapon);
+
         RewardManager.RewardEntry rewardEntry = EconomySystem.REWARD_MANAGER
                 .getRewardForEntity(mob.getType().builtInRegistryHolder().key().location())
                 .orElse(null);
 
-        if (rewardEntry != null && RANDOM.nextDouble() < rewardEntry.dropChance) {
-            int reward = RANDOM.nextInt(rewardEntry.dropMax - rewardEntry.dropMin + 1) + rewardEntry.dropMin;
-            EconomySavedData economy = EconomySavedData.getInstance(player.serverLevel());
-            economy.addBalance(player.getUUID(), reward);
-            player.sendSystemMessage(Component.translatable(MOB_REWARD_MESSAGE_KEY, event.getEntity().getName().getString(), reward));
+        if (rewardEntry != null) {
+            // 基础掉落概率
+            double chance = rewardEntry.dropChance;
+
+            // 如果携带“赏金猎人”附魔 -> 增加掉落概率
+            // 示例：每一级 +5% 掉率，累加并上限为 100%
+            if (level_bounty_hunter > 0) {
+                double bonus = 0.25 * level_bounty_hunter;  // 每级 +5%
+                chance = Math.min(1.0, chance + bonus);   // 不超过 100% (1.0)
+            }
+
+            if (RANDOM.nextDouble() < chance) {
+                // System.out.println("I'm here!!!");
+                int reward = RANDOM.nextInt(rewardEntry.dropMax - rewardEntry.dropMin + 1) + rewardEntry.dropMin;
+                if (level_carefully > 0) {
+                    reward = (int) Math.round(reward * (0.3 * level_carefully + 1));
+                }
+                EconomySavedData economy = EconomySavedData.getInstance(player.serverLevel());
+                economy.addBalance(player.getUUID(), reward);
+                player.sendSystemMessage(Component.translatable(MOB_REWARD_MESSAGE_KEY, event.getEntity().getName().getString(), reward));
+            }
         }
     }
 
