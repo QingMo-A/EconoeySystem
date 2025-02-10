@@ -1,6 +1,6 @@
 package com.mo.economy_system;
 
-import com.mo.economy_system.screen.HomeScreen;
+import com.mo.economy_system.screen.Screen_Home;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
@@ -10,7 +10,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.lwjgl.glfw.GLFW;
 
-@Mod.EventBusSubscriber(modid = "economy_system", bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = EconomySystem.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class KeybindHandler {
 
     // 创建按键映射，绑定到 "I" 键
@@ -34,7 +34,7 @@ public class KeybindHandler {
             // 检测按下 "I" 键
             if (OPEN_SCREEN_KEY.isDown()) {
                 // 打开自定义界面
-                Minecraft.getInstance().setScreen(new HomeScreen());
+                Minecraft.getInstance().setScreen(new Screen_Home());
             }
         }
     }

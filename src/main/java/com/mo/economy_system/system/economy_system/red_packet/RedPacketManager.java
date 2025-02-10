@@ -1,7 +1,7 @@
 package com.mo.economy_system.system.economy_system.red_packet;
 
 import com.mo.economy_system.system.economy_system.EconomySavedData;
-import com.mo.economy_system.utils.MessageKeys;
+import com.mo.economy_system.utils.Util_MessageKeys;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -83,13 +83,13 @@ public class RedPacketManager {
             EconomySavedData data = EconomySavedData.getInstance(sender.serverLevel());
             data.addBalance(redPacket.senderUUID, remainingAmount);
 
-            sender.sendSystemMessage(Component.translatable(MessageKeys.RED_PACKET_EXPIRED_REFUNDED, remainingAmount));
+            sender.sendSystemMessage(Component.translatable(Util_MessageKeys.RED_PACKET_EXPIRED_REFUNDED, remainingAmount));
         }
 
         // 广播全服红包过期消息
         if (sender != null) {
             sender.getServer().getPlayerList().broadcastSystemMessage(
-                    Component.translatable(MessageKeys.RED_PACKET_EXPIRED_BROADCAST, redPacket.senderName), false);
+                    Component.translatable(Util_MessageKeys.RED_PACKET_EXPIRED_BROADCAST, redPacket.senderName), false);
         }
     }
 

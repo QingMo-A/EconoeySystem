@@ -1,6 +1,6 @@
 package com.mo.economy_system.system.territory_system;
 
-import com.mo.economy_system.utils.ServerMessageUtil;
+import com.mo.economy_system.utils.Util_Message;
 import net.minecraft.server.level.ServerLevel;
 
 import java.util.*;
@@ -162,6 +162,6 @@ public class TerritoryManager {
         territoryByID.clear();
         territoriesByOwner.clear();
         quadTree.clear();
-        ServerMessageUtil.log("TerritoryManager has been reset.");
+        Util_Message.log("TerritoryManager has been reset.");
     }
 }

@@ -1,13 +1,8 @@
 package com.mo.economy_system.enchant.enchants;
 
-import com.mo.economy_system.enchant.EconomySystemEnchants;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
 
 public class CarefullyEnchantment extends Enchantment {
     public CarefullyEnchantment(Rarity rarityIn, EnchantmentCategory categoryIn, EquipmentSlot... slots) {
