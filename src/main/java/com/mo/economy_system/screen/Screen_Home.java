@@ -17,37 +17,48 @@ import net.minecraft.network.chat.Component;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Screen_Home 类用于创建和管理主界面屏幕，包含多个按钮以导航到不同的子界面，并显示玩家余额和其他相关信息。
+ */
 public class Screen_Home extends Screen {
 
-    private int balance = -1; // 用于存储玩家余额，默认值为 -1 表示未获取
+    /**
+     * 用于存储玩家余额，默认值为 -1 表示未获取。
+     */
+    private int balance = -1;
+
+    /**
+     * 存储玩家账户列表，键为玩家名称，值为余额。
+     */
     private List<Map.Entry<String, Integer>> accounts;
 
+    /**
+     * 构造函数，初始化主界面标题。
+     */
     public Screen_Home() {
         super(Component.translatable(Util_MessageKeys.HOME_TITLE_KEY));
     }
 
+    /**
+     * 初始化屏幕组件，包括添加按钮和请求玩家余额。
+     */
     @Override
     protected void init() {
-        // 添加一个按钮示例
+        // 添加商店按钮
         this.addRenderableWidget(
                 Button.builder(Component.translatable(Util_MessageKeys.HOME_SHOP_BUTTON_KEY), button -> {
-                            // 请求服务器的商店数据
-                            EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_ShopDataRequest());
-                            // 打开 ShopScreen
+                            // 请求服务器的商店数据并打开 ShopScreen
                             this.minecraft.setScreen(new Screen_Shop());
-
                         })
                         .pos(this.width / 2 - 50, this.height / 2 - 30)  // 设置按钮位置
                         .size(100, 20)  // 设置按钮大小
                         .build()
         );
 
-        // 添加按钮以打开 MarketScreen
+        // 添加市场按钮
         this.addRenderableWidget(
                 Button.builder(Component.translatable(Util_MessageKeys.HOME_MARKET_BUTTON_KEY), button -> {
-                            // 请求服务器数据
-                            EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_MarketDataRequest());
-                            // 打开 MarketScreen（初始化为空列表）
+                            // 请求服务器的市场数据并打开 MarketScreen
                             this.minecraft.setScreen(new Screen_Market());
                         })
                         .pos(this.width / 2 - 50, this.height / 2)  // 设置按钮位置
@@ -55,11 +66,10 @@ public class Screen_Home extends Screen {
                         .build()
         );
 
-        // 添加按钮
+        // 添加领地按钮
         this.addRenderableWidget(
                 Button.builder(Component.translatable(Util_MessageKeys.HOME_TERRITORY_BUTTON_KEY), button -> {
-                            // 请求服务器数据
-                            EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_TerritoryDataRequest());
+                            // 请求服务器的领地数据并打开 TerritoryScreen
                             this.minecraft.setScreen(new Screen_Territory());
                         })
                         .pos(this.width / 2 - 50, this.height / 2 + 30)  // 设置按钮位置
@@ -67,9 +77,10 @@ public class Screen_Home extends Screen {
                         .build()
         );
 
-        // 添加按钮以打开
+        // 添加关于按钮
         this.addRenderableWidget(
                 Button.builder(Component.translatable(Util_MessageKeys.HOME_ABOUT_BUTTON_KEY), button -> {
+                            // 打开 AboutScreen
                             this.minecraft.setScreen(new Screen_About());
                         })
                         .pos(this.width / 2 - 50, this.height / 2 + 60)  // 设置按钮位置
@@ -77,14 +88,20 @@ public class Screen_Home extends Screen {
                         .build()
         );
 
-
         // 请求服务器获取余额
         if (this.minecraft.player != null) {
-            // EconomyNetwork.INSTANCE.sendToServer(new ShopRequestPacket());
             EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_BalanceRequest());
         }
     }
 
+    /**
+     * 渲染屏幕内容，包括背景、按钮、玩家余额和账户列表。
+     *
+     * @param guiGraphics GUI 图形对象
+     * @param mouseX      鼠标 X 坐标
+     * @param mouseY      鼠标 Y 坐标
+     * @param partialTicks 部分刻数
+     */
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         // 绘制背景
@@ -110,12 +127,12 @@ public class Screen_Home extends Screen {
         // 绘制文本
         guiGraphics.drawString(this.font, balanceText, xPosition, this.height / 2 - 70, 0xFFFFFF);
 
-        // 绘制自定义文本
+        // 绘制自定义文本（可选）
         guiGraphics.drawCenteredString(this.font, "Hello, World!", this.width / 2, this.height / 2 - 50, 0xFFFFFF);
 
         // 渲染玩家账户列表
         int startX = Math.max((this.width / 2) - 450, 30);
-        int startY = Math.max((this.height - 400) / 4, 40);
+        int startY = this.height / 2 - 70;
         int index = -1;
         if (accounts != null) {
             int i = 1;
@@ -152,18 +169,34 @@ public class Screen_Home extends Screen {
         }
     }
 
-    // 更新余额的方法（供数据包调用）
+    /**
+     * 更新玩家余额和账户列表的方法，供数据包调用。
+     *
+     * @param balance 玩家余额
+     * @param accounts 玩家账户列表
+     */
     public void updateBalance(int balance, List<Map.Entry<String, Integer>> accounts) {
         this.balance = balance;
         this.accounts = accounts;
     }
 
+    /**
+     * 判断是否暂停游戏，返回 false 表示游戏不会暂停。
+     *
+     * @return 是否暂停游戏
+     */
     @Override
     public boolean isPauseScreen() {
-        return false; // 返回 false 表示游戏不会暂停
+        return false;
     }
 
-    // 获取指定 String (玩家名称) 的索引
+    /**
+     * 获取指定玩家名称在账户列表中的索引。
+     *
+     * @param accounts 账户列表
+     * @param targetName 目标玩家名称
+     * @return 索引，如果未找到则返回 -1
+     */
     public static int getIndexOfPlayer(List<Map.Entry<String, Integer>> accounts, String targetName) {
         for (int i = 0; i < accounts.size(); i++) {
             Map.Entry<String, Integer> entry = accounts.get(i);

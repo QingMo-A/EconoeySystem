@@ -85,14 +85,6 @@ public class Packet_TeleportToTerritory {
                 );
             }
 
-
-            // 传送粒子效果
-            targetLevel.sendParticles(
-                    ParticleTypes.PORTAL,
-                    backPoint.getX() + 0.5, backPoint.getY() + 1, backPoint.getZ() + 0.5,
-                    50, 1, 1, 1, 0.1
-            );
-
             if (potionStack != null) {
                 // 执行传送
                 try {
@@ -103,6 +95,13 @@ public class Packet_TeleportToTerritory {
                             backPoint.getZ() + 0.5,
                             player.getYRot(),
                             player.getXRot()
+                    );
+
+                    // 传送粒子效果
+                    targetLevel.sendParticles(
+                            ParticleTypes.PORTAL,
+                            backPoint.getX() + 0.5, backPoint.getY() + 1, backPoint.getZ() + 0.5,
+                            50, 1, 1, 1, 0.1
                     );
 
                     // 消耗物品

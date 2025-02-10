@@ -6,11 +6,13 @@ import com.mo.economy_system.network.packets.economy_system.demand_order.Packet_
 import com.mo.economy_system.network.packets.economy_system.demand_order.Packet_RemoveDemandOrder;
 import com.mo.economy_system.network.packets.economy_system.sales_order.Packet_PurchaseSalesOrder;
 import com.mo.economy_system.network.packets.economy_system.sales_order.Packet_RemoveSalesOrder;
+import com.mo.economy_system.screen.Screen_Home;
 import com.mo.economy_system.system.economy_system.market.DemandOrder;
 import com.mo.economy_system.system.economy_system.market.MarketItem;
 import com.mo.economy_system.network.EconomySystem_NetworkManager;
 import com.mo.economy_system.system.economy_system.market.SalesOrder;
 import com.mo.economy_system.utils.Util_MessageKeys;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -93,6 +95,10 @@ public class Screen_Market extends Screen {
 
         // 初始化渲染缓存（在所有按钮添加后调用）
         initializeRenderCache();
+
+        if (this.minecraft.player != null) {
+            EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_MarketDataRequest());
+        }
     }
 
     // 渲染(一帧一更新)
@@ -333,86 +339,6 @@ public class Screen_Market extends Screen {
 
     // 处理与显示类型相关的操作
     private void handleDisplayTypeAction(int displayTypeIndex) {
-        /*switch (displayTypeIndex) {
-            case 0: // 无显示类型
-                new Thread(() -> {
-                    List<MarketItem> result;
-                    result = new ArrayList<>(itemsSnapshot); // 如果没有搜索内容，显示全部商品
-
-                    this.minecraft.execute(() -> {
-                        this.filteredItems = result;
-                        this.currentPage = 0;
-                        refreshItemButtons();
-                        initializeRenderCache(); // 重新初始化渲染缓存
-                    });
-                }).start();
-
-                break;
-            case 1: // 仅显示自己的订单
-                new Thread(() -> {
-                    List<MarketItem> result;
-                    result = itemsSnapshot.stream()
-                            .filter(item -> item.getSellerName().toLowerCase().contains(playerName.toLowerCase()))
-                            .collect(Collectors.toList());
-
-                    this.minecraft.execute(() -> {
-                        this.filteredItems = result;
-                        this.currentPage = 0;
-                        refreshItemButtons();
-                        initializeRenderCache(); // 重新初始化渲染缓存
-                    });
-                }).start();
-
-                break;
-            case 2: // 仅显示非自己的订单
-                new Thread(() -> {
-                    List<MarketItem> result;
-                    result = itemsSnapshot.stream()
-                            .filter(item -> !(item.getSellerName().toLowerCase().contains(playerName.toLowerCase())))
-                            .collect(Collectors.toList());
-
-                    this.minecraft.execute(() -> {
-                        this.filteredItems = result;
-                        this.currentPage = 0;
-                        refreshItemButtons();
-                        initializeRenderCache(); // 重新初始化渲染缓存
-                    });
-                }).start();
-
-                break;
-            case 3: // 仅显示出货单
-                new Thread(() -> {
-                    List<MarketItem> result;
-                    result = itemsSnapshot.stream()
-                            .filter(item -> item.isMarketItem())
-                            .collect(Collectors.toList());
-
-                    this.minecraft.execute(() -> {
-                        this.filteredItems = result;
-                        this.currentPage = 0;
-                        refreshItemButtons();
-                        initializeRenderCache(); // 重新初始化渲染缓存
-                    });
-                }).start();
-
-                break;
-            case 4: // 仅显示订购单
-                new Thread(() -> {
-                    List<MarketItem> result;
-                    result = itemsSnapshot.stream()
-                            .filter(item -> !(item.isMarketItem()))
-                            .collect(Collectors.toList());
-
-                    this.minecraft.execute(() -> {
-                        this.filteredItems = result;
-                        this.currentPage = 0;
-                        refreshItemButtons();
-                        initializeRenderCache(); // 重新初始化渲染缓存
-                    });
-                }).start();
-
-                break;
-        }*/
         this.displayTypeIndex = displayTypeIndex; // 保存过滤条件
         applyFilters(); // 调用联合过滤逻辑
     }
@@ -421,7 +347,6 @@ public class Screen_Market extends Screen {
     private void addPurchaseOrRemoveButton(MarketItem item, int buttonX, int buttonY, UUID playerUUID) {
         // 如果是出货单
         if (item instanceof SalesOrder salesOrder) {
-            System.out.println("111111111111111111111111111");
             // 如果玩家ID等于商品的卖家ID (卖家)
             if (salesOrder.getSellerID().equals(playerUUID)) {
                 Button removeButton = Button.builder(Component.translatable(Util_MessageKeys.MARKET_REMOVE_BUTTON_KEY), btn -> {
@@ -479,7 +404,6 @@ public class Screen_Market extends Screen {
             }
             // 如果是订购单
         } else if (item instanceof DemandOrder demandOrder){
-            System.out.println("222222222222222222222222222222222222222222");
             // 如果玩家ID等于商品的卖家ID (卖家)
             if (demandOrder.getSellerID().equals(playerUUID)) {
                 // 如果已交付
@@ -597,7 +521,6 @@ public class Screen_Market extends Screen {
                 }
             }
         } else {
-            System.out.println("3333333333333333333");
         }
     }
 
@@ -618,31 +541,14 @@ public class Screen_Market extends Screen {
             String searchText = this.searchBox.getValue();
             applySearch(searchText);
             return true; // 防止事件进一步传播
+        } else if (keyCode == 256 && this.shouldCloseOnEsc()) {
+            Minecraft.getInstance().setScreen(new Screen_Home());
+            return true;
         }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return false;
     }
 
     private void applySearch(String searchText) {
-        // List<MarketItem> itemsSnapshot = new ArrayList<>(this.items); // 深拷贝当前的 items 列表
-        /*new Thread(() -> {
-            List<MarketItem> result;
-            if (searchText.isEmpty()) {
-                result = new ArrayList<>(itemsSnapshot); // 如果没有搜索内容，显示全部商品
-            } else {
-                result = itemsSnapshot.stream()
-                        .filter(item -> item.getItemID().toLowerCase().contains(searchText.toLowerCase()) ||
-                                item.getSellerName().toLowerCase().contains(searchText.toLowerCase()) ||
-                                item.getItemStack().getHoverName().getString().toLowerCase().contains(searchText.toLowerCase()))
-                        .collect(Collectors.toList());
-            }
-
-            this.minecraft.execute(() -> {
-                this.filteredItems = result;
-                this.currentPage = 0;
-                refreshItemButtons();
-                initializeRenderCache(); // 重新初始化渲染缓存
-            });
-        }).start();*/
         applyFilters(); // 调用联合过滤逻辑
     }
 

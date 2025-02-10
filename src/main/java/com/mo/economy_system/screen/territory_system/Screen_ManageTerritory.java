@@ -158,4 +158,13 @@ public class Screen_ManageTerritory extends Screen {
     private interface RunnableWithGraphics {
         void run(GuiGraphics guiGraphics);
     }
+
+    @Override
+    public boolean keyPressed(int p_96552_, int p_96553_, int p_96554_) {
+        if (p_96552_ == 256 && this.shouldCloseOnEsc()) {
+            Minecraft.getInstance().setScreen(new Screen_Territory());
+            return true;
+        }
+        return  false;
+    }
 }

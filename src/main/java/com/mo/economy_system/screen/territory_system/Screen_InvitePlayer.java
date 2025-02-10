@@ -5,6 +5,7 @@ import com.mo.economy_system.network.packets.territory_system.Packet_InvitePlaye
 import com.mo.economy_system.network.packets.territory_system.Packet_TerritoryDataRequest;
 import com.mo.economy_system.system.territory_system.Territory;
 import com.mo.economy_system.utils.Util_MessageKeys;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -49,8 +50,6 @@ public class Screen_InvitePlayer extends Screen {
         // 返回按钮
         this.addRenderableWidget(
                 Button.builder(Component.translatable(Util_MessageKeys.INVITE_BACK_BUTTON), button -> {
-                            // 请求服务器数据
-                            EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_TerritoryDataRequest());
                             this.minecraft.setScreen(new Screen_Territory());
                 })
                         .pos(centerX - 50, centerY + 50)
@@ -69,5 +68,14 @@ public class Screen_InvitePlayer extends Screen {
     @Override
     public boolean isPauseScreen() {
         return false;
+    }
+
+    @Override
+    public boolean keyPressed(int p_96552_, int p_96553_, int p_96554_) {
+        if (p_96552_ == 256 && this.shouldCloseOnEsc()) {
+            Minecraft.getInstance().setScreen(new Screen_Territory());
+            return true;
+        }
+        return  false;
     }
 }

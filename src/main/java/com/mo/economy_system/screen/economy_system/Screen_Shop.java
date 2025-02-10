@@ -1,13 +1,19 @@
 package com.mo.economy_system.screen.economy_system;
 
+import com.mo.economy_system.network.packets.economy_system.Packet_MarketDataRequest;
+import com.mo.economy_system.screen.Screen_Home;
 import com.mo.economy_system.system.economy_system.shop.ShopItem;
 import com.mo.economy_system.network.EconomySystem_NetworkManager;
 import com.mo.economy_system.network.packets.economy_system.Packet_ShopDataRequest;
 import com.mo.economy_system.network.packets.economy_system.Packet_ShopBuyItem;
 import com.mo.economy_system.utils.Util_MessageKeys;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.navigation.FocusNavigationEvent;
+import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -118,6 +124,10 @@ public class Screen_Shop extends Screen {
 
         // 添加翻页按钮
         addPageButtons();
+
+        if (this.minecraft.player != null) {
+            EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_ShopDataRequest());
+        }
     }
 
     @Override
@@ -214,5 +224,14 @@ public class Screen_Shop extends Screen {
 
             y += ITEM_SPACING;
         }
+    }
+
+    @Override
+    public boolean keyPressed(int p_96552_, int p_96553_, int p_96554_) {
+        if (p_96552_ == 256 && this.shouldCloseOnEsc()) {
+            Minecraft.getInstance().setScreen(new Screen_Home());
+            return true;
+        }
+        return  false;
     }
 }

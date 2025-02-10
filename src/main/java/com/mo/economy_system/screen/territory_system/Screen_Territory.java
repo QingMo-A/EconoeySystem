@@ -2,6 +2,8 @@ package com.mo.economy_system.screen.territory_system;
 
 import com.mo.economy_system.network.EconomySystem_NetworkManager;
 import com.mo.economy_system.network.packets.territory_system.Packet_TeleportToTerritory;
+import com.mo.economy_system.network.packets.territory_system.Packet_TerritoryDataRequest;
+import com.mo.economy_system.screen.Screen_Home;
 import com.mo.economy_system.system.territory_system.Territory;
 import com.mo.economy_system.utils.Util_MessageKeys;
 import net.minecraft.client.Minecraft;
@@ -41,6 +43,10 @@ public class Screen_Territory extends Screen {
 
         // 初始化渲染缓存（在所有按钮添加后调用）
         initializeRenderCache();
+
+        if (this.minecraft.player != null) {
+            EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_TerritoryDataRequest());
+        }
     }
 
     @Override
@@ -252,5 +258,14 @@ public class Screen_Territory extends Screen {
     @FunctionalInterface
     private interface RunnableWithGraphics {
         void run(GuiGraphics guiGraphics);
+    }
+
+    @Override
+    public boolean keyPressed(int p_96552_, int p_96553_, int p_96554_) {
+        if (p_96552_ == 256 && this.shouldCloseOnEsc()) {
+            Minecraft.getInstance().setScreen(new Screen_Home());
+            return true;
+        }
+        return  false;
     }
 }

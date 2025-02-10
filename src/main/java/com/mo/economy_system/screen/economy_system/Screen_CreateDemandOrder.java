@@ -5,6 +5,7 @@ import com.mo.economy_system.network.packets.economy_system.demand_order.Packet_
 import com.mo.economy_system.system.economy_system.market.DemandOrder;
 import com.mo.economy_system.network.EconomySystem_NetworkManager;
 import com.mo.economy_system.utils.Util_MessageKeys;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -92,7 +93,12 @@ public class Screen_CreateDemandOrder extends Screen {
             checkItemID(itemID, itemCount, itemPrice);
             return true; // 防止事件进一步传播
         }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+
+        if (keyCode == 256 && this.shouldCloseOnEsc()) {
+            Minecraft.getInstance().setScreen(new Screen_Market());
+            return true;
+        }
+        return false;
     }
 
     private void checkItemID(String itemID, String itemCount, String itemPrice) {

@@ -3,7 +3,7 @@ name: Auto Release on Push
 on:
   push:
     branches:
-      - master
+      - 1.20.1
 
 jobs:
   release:

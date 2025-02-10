@@ -107,4 +107,13 @@ public class Screen_About extends Screen {
     public boolean isPauseScreen() {
         return false; // 打开关于页面时游戏不暂停
     }
+
+    @Override
+    public boolean keyPressed(int p_96552_, int p_96553_, int p_96554_) {
+        if (p_96552_ == 256 && this.shouldCloseOnEsc()) {
+            Minecraft.getInstance().setScreen(new Screen_Home());
+            return true;
+        }
+        return  false;
+    }
 }
