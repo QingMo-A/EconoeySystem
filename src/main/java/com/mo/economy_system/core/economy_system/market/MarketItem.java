@@ -1,4 +1,4 @@
-package com.mo.economy_system.system.economy_system.market;
+package com.mo.economy_system.core.economy_system.market;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
@@ -44,8 +44,8 @@ public abstract class MarketItem {
         String type = tag.getString("type");
         try {
             return switch (type) { // 根据类型分发到子类
-                case "com.mo.economy_system.system.economy_system.market.SalesOrder" -> SalesOrder.fromNBT(tag);
-                case "com.mo.economy_system.system.economy_system.market.DemandOrder" -> DemandOrder.fromNBT(tag);
+                case "com.mo.economy_system.core.economy_system.market.SalesOrder" -> SalesOrder.fromNBT(tag);
+                case "com.mo.economy_system.core.economy_system.market.DemandOrder" -> DemandOrder.fromNBT(tag);
                 default -> throw new IllegalArgumentException("未知的 MarketItem 类型: " + type);
             };
         } catch (Exception e) {

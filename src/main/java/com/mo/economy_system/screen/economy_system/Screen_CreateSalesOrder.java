@@ -3,7 +3,7 @@ package com.mo.economy_system.screen.economy_system;
 import com.mo.economy_system.network.packets.economy_system.Packet_MarketDataRequest;
 import com.mo.economy_system.network.EconomySystem_NetworkManager;
 import com.mo.economy_system.network.packets.economy_system.sales_order.Packet_CreateSalesOrder;
-import com.mo.economy_system.system.economy_system.market.SalesOrder;
+import com.mo.economy_system.core.economy_system.market.SalesOrder;
 import com.mo.economy_system.utils.Util_MessageKeys;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;

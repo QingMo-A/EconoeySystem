@@ -1,4 +1,4 @@
-package com.mo.economy_system.system.territory_system;
+package com.mo.economy_system.core.territory_system;
 
 import java.util.ArrayList;
 import java.util.List;

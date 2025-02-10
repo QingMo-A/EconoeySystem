@@ -1,4 +1,4 @@
-package com.mo.economy_system.system.economy_system.market;
+package com.mo.economy_system.core.economy_system.market;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;

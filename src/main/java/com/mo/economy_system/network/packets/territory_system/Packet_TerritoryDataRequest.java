@@ -1,7 +1,7 @@
 package com.mo.economy_system.network.packets.territory_system;
 
 import com.mo.economy_system.network.EconomySystem_NetworkManager;
-import com.mo.economy_system.system.territory_system.TerritoryManager;
+import com.mo.economy_system.core.territory_system.TerritoryManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;

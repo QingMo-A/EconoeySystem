@@ -1,11 +1,12 @@
 package com.mo.economy_system;
 
 import com.mo.economy_system.enchant.EconomySystem_Enchants;
+import com.mo.economy_system.item.EconomySystem_CreativeTabs;
 import com.mo.economy_system.item.EconomySystem_Items;
-import com.mo.economy_system.system.economy_system.reward.RewardConfigWatcher;
-import com.mo.economy_system.system.economy_system.reward.RewardManager;
-import com.mo.economy_system.system.economy_system.shop.ConfigWatcher;
-import com.mo.economy_system.system.economy_system.shop.ShopManager;
+import com.mo.economy_system.core.economy_system.reward.RewardConfigWatcher;
+import com.mo.economy_system.core.economy_system.reward.RewardManager;
+import com.mo.economy_system.core.economy_system.shop.ConfigWatcher;
+import com.mo.economy_system.core.economy_system.shop.ShopManager;
 import com.mo.economy_system.network.EconomySystem_NetworkManager;
 import com.mojang.logging.LogUtils;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -34,6 +35,8 @@ public class EconomySystem {
         EconomySystem_Enchants.register(modEventBus);
         // 注册网络包
         EconomySystem_NetworkManager.register();
+        // 注册创造物品栏
+        EconomySystem_CreativeTabs.CREATIVE_TABS.register(modEventBus);
 
         // 启动文件监听器
         new ConfigWatcher(SHOP_MANAGER).watchConfigFile();
@@ -55,6 +58,8 @@ public class EconomySystem {
         EconomySystem_Enchants.register(modEventBus);
         // 注册网络包
         EconomySystem_NetworkManager.register();
+        // 注册创造物品栏
+        EconomySystem_CreativeTabs.CREATIVE_TABS.register(modEventBus);
 
         // 启动文件监听器
         new ConfigWatcher(SHOP_MANAGER).watchConfigFile();

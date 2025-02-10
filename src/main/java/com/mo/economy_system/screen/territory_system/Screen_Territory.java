@@ -4,7 +4,7 @@ import com.mo.economy_system.network.EconomySystem_NetworkManager;
 import com.mo.economy_system.network.packets.territory_system.Packet_TeleportToTerritory;
 import com.mo.economy_system.network.packets.territory_system.Packet_TerritoryDataRequest;
 import com.mo.economy_system.screen.Screen_Home;
-import com.mo.economy_system.system.territory_system.Territory;
+import com.mo.economy_system.core.territory_system.Territory;
 import com.mo.economy_system.utils.Util_MessageKeys;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;

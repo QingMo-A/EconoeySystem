@@ -1,4 +1,4 @@
-package com.mo.economy_system.system.update_checker_system;
+package com.mo.economy_system.core.update_checker_system;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;

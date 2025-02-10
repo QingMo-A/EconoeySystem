@@ -1,6 +1,6 @@
 package com.mo.economy_system.network.packets.economy_system;
 
-import com.mo.economy_system.system.economy_system.EconomySavedData;
+import com.mo.economy_system.core.economy_system.EconomySavedData;
 import com.mo.economy_system.utils.Util_MessageKeys;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -62,32 +62,13 @@ public class Packet_ShopBuyItem {
             }
 
             // 2. 检查物品是否有效
-            ItemStack itemStack = getItemStack(msg.itemID, msg.itemNbt);
-            /*// 获取物品的 NBT 数据
-            CompoundTag nbt = itemStack.getTag();
-
-            if (nbt != null) {
-                // 遍历 NBT 中的所有键
-                for (String key : nbt.getAllKeys()) {
-                    // 获取键对应的值（支持不同类型的值）
-                    if (nbt.contains(key)) {
-                        System.out.println("键名: " + key);
-
-                        // 打印不同类型的值
-                        if (nbt.contains(key, 8)) { // 8 表示字符串类型
-                            System.out.println("值 (String): " + nbt.getString(key));
-                        } else if (nbt.contains(key, 3)) { // 3 表示整数类型
-                            System.out.println("值 (Integer): " + nbt.getInt(key));
-                        } else if (nbt.contains(key, 10)) { // 10 表示 CompoundTag 类型
-                            System.out.println("值 (Compound): " + nbt.getCompound(key));
-                        } else if (nbt.contains(key, 9)) { // 9 表示 ListTag 类型
-                            System.out.println("值 (List): " + nbt.getList(key, 10));  // 假设 List 是由 CompoundTag 组成
-                        }
-                    }
-                }
+            ItemStack itemStack = null;
+            if (msg.itemNbt != null || msg.itemNbt != "null") {
+                itemStack = getItemStack(msg.itemID, msg.itemNbt);
             } else {
-                System.out.println("该物品没有 NBT 数据");
-            }*/
+                itemStack = getItemStack(msg.itemID);
+            }
+
             Item item = itemStack.getItem();
 
             if (item == null) {
@@ -233,10 +214,17 @@ public class Packet_ShopBuyItem {
 
         // 如果有自定义 NBT，则解析并写入
         if (nbt != null && !nbt.isEmpty()) {
-            System.out.println("nbt not null !!!");
             stack = applyEnchantmentNBT(stack, nbt);
         }
         return stack;
+    }
+
+    public static ItemStack getItemStack(String itemId) {
+        Item item = BuiltInRegistries.ITEM.get(new ResourceLocation(itemId));
+        if (item == null) {
+            return ItemStack.EMPTY;
+        }
+        return item.getDefaultInstance();
     }
 
     public static ItemStack applyEnchantmentNBT(ItemStack itemStack, String nbtString) {
@@ -244,7 +232,6 @@ public class Packet_ShopBuyItem {
         CompoundTag userNbt;
         try {
             userNbt = TagParser.parseTag(nbtString);
-            System.out.println("OK1");
         } catch (CommandSyntaxException e) {
             System.err.println("NBT格式错误: " + e.getMessage());
             return null;
@@ -253,7 +240,6 @@ public class Packet_ShopBuyItem {
         // 应用NBT
         if (userNbt != null) {
             itemStack.setTag(userNbt);
-            System.out.println("OK2");
         }
 
         return itemStack;

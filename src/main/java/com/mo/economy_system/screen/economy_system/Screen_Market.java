@@ -7,10 +7,10 @@ import com.mo.economy_system.network.packets.economy_system.demand_order.Packet_
 import com.mo.economy_system.network.packets.economy_system.sales_order.Packet_PurchaseSalesOrder;
 import com.mo.economy_system.network.packets.economy_system.sales_order.Packet_RemoveSalesOrder;
 import com.mo.economy_system.screen.Screen_Home;
-import com.mo.economy_system.system.economy_system.market.DemandOrder;
-import com.mo.economy_system.system.economy_system.market.MarketItem;
+import com.mo.economy_system.core.economy_system.market.DemandOrder;
+import com.mo.economy_system.core.economy_system.market.MarketItem;
 import com.mo.economy_system.network.EconomySystem_NetworkManager;
-import com.mo.economy_system.system.economy_system.market.SalesOrder;
+import com.mo.economy_system.core.economy_system.market.SalesOrder;
 import com.mo.economy_system.utils.Util_MessageKeys;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;

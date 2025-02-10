@@ -1,4 +1,4 @@
-package com.mo.economy_system.system.economy_system.red_packet;
+package com.mo.economy_system.core.economy_system.red_packet;
 
 import java.util.HashSet;
 import java.util.Set;

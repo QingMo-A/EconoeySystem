@@ -1,4 +1,4 @@
-package com.mo.economy_system.system.economy_system.shop;
+package com.mo.economy_system.core.economy_system.shop;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;

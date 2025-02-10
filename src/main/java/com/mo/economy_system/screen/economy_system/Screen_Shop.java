@@ -1,19 +1,15 @@
 package com.mo.economy_system.screen.economy_system;
 
-import com.mo.economy_system.network.packets.economy_system.Packet_MarketDataRequest;
 import com.mo.economy_system.screen.Screen_Home;
-import com.mo.economy_system.system.economy_system.shop.ShopItem;
+import com.mo.economy_system.core.economy_system.shop.ShopItem;
 import com.mo.economy_system.network.EconomySystem_NetworkManager;
 import com.mo.economy_system.network.packets.economy_system.Packet_ShopDataRequest;
 import com.mo.economy_system.network.packets.economy_system.Packet_ShopBuyItem;
 import com.mo.economy_system.utils.Util_MessageKeys;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.navigation.FocusNavigationEvent;
-import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -115,9 +111,6 @@ public class Screen_Shop extends Screen {
 
         // 清除现有按钮
         this.clearWidgets();
-
-        // 请求商店数据
-        EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_ShopDataRequest());
 
         // 动态添加商品购买按钮
         addItemButtons();

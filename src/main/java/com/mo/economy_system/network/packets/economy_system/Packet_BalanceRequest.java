@@ -1,7 +1,7 @@
 package com.mo.economy_system.network.packets.economy_system;
 
 import com.mo.economy_system.network.EconomySystem_NetworkManager;
-import com.mo.economy_system.system.economy_system.EconomySavedData;
+import com.mo.economy_system.core.economy_system.EconomySavedData;
 import com.mo.economy_system.utils.Util_Player;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;

@@ -1,8 +1,8 @@
 package com.mo.economy_system.commands.economy_system;
 
-import com.mo.economy_system.system.economy_system.red_packet.RedPacket;
-import com.mo.economy_system.system.economy_system.red_packet.RedPacketManager;
-import com.mo.economy_system.system.economy_system.EconomySavedData;
+import com.mo.economy_system.core.economy_system.red_packet.RedPacket;
+import com.mo.economy_system.core.economy_system.red_packet.RedPacketManager;
+import com.mo.economy_system.core.economy_system.EconomySavedData;
 import com.mo.economy_system.utils.Util_MessageKeys;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;

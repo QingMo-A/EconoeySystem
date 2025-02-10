@@ -1,4 +1,4 @@
-package com.mo.economy_system.system.territory_system;
+package com.mo.economy_system.core.territory_system;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;

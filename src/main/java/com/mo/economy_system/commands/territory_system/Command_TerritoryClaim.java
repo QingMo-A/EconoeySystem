@@ -1,9 +1,9 @@
 package com.mo.economy_system.commands.territory_system;
 
 import com.mo.economy_system.item.items.Item_ClaimWand;
-import com.mo.economy_system.system.territory_system.Territory;
-import com.mo.economy_system.system.territory_system.TerritoryManager;
-import com.mo.economy_system.system.economy_system.EconomySavedData;
+import com.mo.economy_system.core.territory_system.Territory;
+import com.mo.economy_system.core.territory_system.TerritoryManager;
+import com.mo.economy_system.core.economy_system.EconomySavedData;
 import com.mo.economy_system.utils.Util_MessageKeys;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;

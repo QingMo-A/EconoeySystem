@@ -1,4 +1,4 @@
-package com.mo.economy_system.system.economy_system.shop;
+package com.mo.economy_system.core.economy_system.shop;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -7,7 +7,6 @@ import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 
 public class ShopItem {
     private final String itemId;       // 物品 ID
@@ -82,7 +81,7 @@ public class ShopItem {
         ItemStack stack = new ItemStack(item);
 
         // 如果有自定义 NBT，则解析并写入
-        if (nbt != null && !nbt.isEmpty()) {
+        if (nbt != null && !nbt.isEmpty() && nbt != "null") {
             stack = applyEnchantmentNBT(stack, nbt);
         }
         return stack;

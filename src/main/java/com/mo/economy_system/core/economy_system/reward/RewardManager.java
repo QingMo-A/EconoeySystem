@@ -1,4 +1,4 @@
-package com.mo.economy_system.system.economy_system.reward;
+package com.mo.economy_system.core.economy_system.reward;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;

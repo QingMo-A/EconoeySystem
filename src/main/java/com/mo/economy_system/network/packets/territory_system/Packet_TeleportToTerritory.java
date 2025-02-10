@@ -1,7 +1,7 @@
 package com.mo.economy_system.network.packets.territory_system;
 
 import com.mo.economy_system.item.EconomySystem_Items;
-import com.mo.economy_system.system.territory_system.TerritoryManager;
+import com.mo.economy_system.core.territory_system.TerritoryManager;
 import com.mo.economy_system.utils.Util_MessageKeys;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;

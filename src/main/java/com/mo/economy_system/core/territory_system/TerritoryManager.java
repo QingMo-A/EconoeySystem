@@ -1,4 +1,4 @@
-package com.mo.economy_system.system.territory_system;
+package com.mo.economy_system.core.territory_system;
 
 import com.mo.economy_system.utils.Util_Message;
 import net.minecraft.server.level.ServerLevel;

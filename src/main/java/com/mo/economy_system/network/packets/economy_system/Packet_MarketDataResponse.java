@@ -1,6 +1,6 @@
 package com.mo.economy_system.network.packets.economy_system;
 
-import com.mo.economy_system.system.economy_system.market.MarketItem;
+import com.mo.economy_system.core.economy_system.market.MarketItem;
 import com.mo.economy_system.screen.economy_system.Screen_Market;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;

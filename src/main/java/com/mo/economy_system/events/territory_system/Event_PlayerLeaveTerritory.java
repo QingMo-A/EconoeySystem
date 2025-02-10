@@ -1,6 +1,6 @@
 package com.mo.economy_system.events.territory_system;
 
-import com.mo.economy_system.system.territory_system.Territory;
+import com.mo.economy_system.core.territory_system.Territory;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.eventbus.api.Event;
 

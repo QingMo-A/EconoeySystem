@@ -46,18 +46,6 @@ public class EconomySystem_Items {
                     .stacksTo(1) // 限制每堆只能有一个
             ));
 
-    // 注册物品到默认创造模式标签（如工具或装饰标签）
-    @SubscribeEvent
-    public static void addToCreativeTabs(BuildCreativeModeTabContentsEvent event) {
-        if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) { // 将吉他添加到工具标签中
-            event.accept(GUITAR.get());
-            event.accept(CLAIM_WAND.get());
-        } else if (event.getTabKey() == CreativeModeTabs.FOOD_AND_DRINKS) {
-            event.accept(WORMHOLE_POTION.get());
-            event.accept(RECALL_POTION.get());
-        }
-    }
-
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus); // 注册物品
     }

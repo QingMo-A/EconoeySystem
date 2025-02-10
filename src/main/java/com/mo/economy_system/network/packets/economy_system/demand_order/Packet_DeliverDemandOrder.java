@@ -2,10 +2,10 @@ package com.mo.economy_system.network.packets.economy_system.demand_order;
 
 import com.mo.economy_system.network.EconomySystem_NetworkManager;
 import com.mo.economy_system.network.packets.economy_system.Packet_MarketDataRequest;
-import com.mo.economy_system.system.economy_system.EconomySavedData;
-import com.mo.economy_system.system.economy_system.market.DemandOrder;
-import com.mo.economy_system.system.economy_system.market.MarketItem;
-import com.mo.economy_system.system.economy_system.market.MarketManager;
+import com.mo.economy_system.core.economy_system.EconomySavedData;
+import com.mo.economy_system.core.economy_system.market.DemandOrder;
+import com.mo.economy_system.core.economy_system.market.MarketItem;
+import com.mo.economy_system.core.economy_system.market.MarketManager;
 import com.mo.economy_system.utils.Util_MessageKeys;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;

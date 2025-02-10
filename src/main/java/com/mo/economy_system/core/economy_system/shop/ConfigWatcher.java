@@ -1,4 +1,4 @@
-package com.mo.economy_system.system.economy_system.shop;
+package com.mo.economy_system.core.economy_system.shop;
 
 import java.io.IOException;
 import java.nio.file.*;

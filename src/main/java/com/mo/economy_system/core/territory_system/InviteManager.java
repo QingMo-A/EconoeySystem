@@ -1,4 +1,4 @@
-package com.mo.economy_system.system.territory_system;
+package com.mo.economy_system.core.territory_system;
 
 import java.util.HashMap;
 import java.util.Map;

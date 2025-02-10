@@ -1,4 +1,4 @@
-package com.mo.economy_system.system.economy_system;
+package com.mo.economy_system.core.economy_system;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -65,17 +65,6 @@ public class EconomySavedData extends SavedData {
                 .collect(Collectors.toList());
         return allAccounts;
     }
-
-    // 返回一个只读的账户视图（防止外部修改原始数据）
-    public List<Map.Entry<UUID, Integer>> getTenTopAccounts() {
-        List<Map.Entry<UUID, Integer>> topTen = accounts.entrySet()
-                .stream()
-                .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue())) // 按值降序排序
-                .limit(10) // 限制为前十
-                .collect(Collectors.toList());
-        return topTen;
-    }
-
 
     // 保存数据到 NBT
     @Override

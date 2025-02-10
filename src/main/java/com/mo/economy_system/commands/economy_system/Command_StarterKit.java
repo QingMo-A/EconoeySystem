@@ -1,6 +1,6 @@
 package com.mo.economy_system.commands.economy_system;
 
-import com.mo.economy_system.system.economy_system.EconomySavedData;
+import com.mo.economy_system.core.economy_system.EconomySavedData;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;

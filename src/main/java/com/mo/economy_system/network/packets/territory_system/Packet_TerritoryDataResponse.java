@@ -1,6 +1,6 @@
 package com.mo.economy_system.network.packets.territory_system;
 
-import com.mo.economy_system.system.territory_system.Territory;
+import com.mo.economy_system.core.territory_system.Territory;
 import com.mo.economy_system.screen.territory_system.Screen_Territory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
