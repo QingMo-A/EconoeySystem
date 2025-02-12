@@ -37,6 +37,7 @@ public class Screen_Home extends Screen {
      */
     public Screen_Home() {
         super(Component.translatable(Util_MessageKeys.HOME_TITLE_KEY));
+        EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_BalanceRequest());
     }
 
     /**
@@ -87,11 +88,6 @@ public class Screen_Home extends Screen {
                         .size(100, 20)  // 设置按钮大小
                         .build()
         );
-
-        // 请求服务器获取余额
-        if (this.minecraft.player != null) {
-            EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_BalanceRequest());
-        }
     }
 
     /**

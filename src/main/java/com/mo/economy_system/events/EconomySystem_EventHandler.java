@@ -100,6 +100,12 @@ public class EconomySystem_EventHandler {
                     player.sendSystemMessage(Component.translatable(Util_MessageKeys.SHOP_REFRESH_MESSAGE_KEY));
                 }
             }
+
+            MarketSavedData marketData = MarketSavedData.getInstance(event.getServer().overworld());
+            marketData.clearMarketItems(); // 清空原有数据
+            for (MarketItem item : MarketManager.getMarketItems()) {
+                marketData.addMarketItem(item); // 保存当前市场商品
+            }
         }
 
         // 定时检查红包

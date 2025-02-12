@@ -194,8 +194,6 @@ public class Screen_CreateDemandOrder extends Screen {
             // 发送上架请求到服务端
             EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_CreateDemandOrder(marketItem));
 
-            // 请求服务器数据
-            EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_MarketDataRequest());
             this.minecraft.setScreen(new Screen_Market()); // 关闭界面
         }
     }

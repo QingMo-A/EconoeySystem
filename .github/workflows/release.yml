@@ -58,9 +58,7 @@ jobs:
         with:
           name: Release ${{ env.VERSION }}
           tag_name: v${{ env.VERSION }}
-          body: |
-            Automated release for version ${{ env.VERSION }}.
-            This release was created and uploaded by GitHub Actions.
+          body: ${{ github.event.head_commit.message }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

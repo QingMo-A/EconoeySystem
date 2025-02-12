@@ -56,6 +56,7 @@ public class Screen_Market extends Screen {
     // 构造方法
     public Screen_Market() {
         super(Component.translatable(Util_MessageKeys.MARKET_TITLE_KEY));
+        EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_MarketDataRequest());
     }
 
     // 初始化
@@ -95,10 +96,6 @@ public class Screen_Market extends Screen {
 
         // 初始化渲染缓存（在所有按钮添加后调用）
         initializeRenderCache();
-
-        if (this.minecraft.player != null) {
-            EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_MarketDataRequest());
-        }
     }
 
     // 渲染(一帧一更新)
@@ -169,7 +166,7 @@ public class Screen_Market extends Screen {
                     Component.translatable(Util_MessageKeys.MARKET_ITEM_PRICE_KEY, item.getBasePrice()), startX, currentY + 18, 0xAAAAAA, false));
 
             // 添加购买或下架按钮（确保在初始化时添加按钮）
-            addPurchaseOrRemoveButton(item, this.width - startX, currentY, playerUUID);
+            addActionButton(item, this.width - startX, currentY, playerUUID);
 
             y += ITEM_SPACING; // 调整下一件商品的位置
         }
@@ -201,25 +198,6 @@ public class Screen_Market extends Screen {
         }
     }
 
-    // 移除购买按钮
-    private void clearItemButtons() {
-        // 遍历所有已渲染的控件并移除与商品相关的按钮
-        this.renderables.removeIf(widget -> widget instanceof Button && isItemButton((Button) widget));
-        this.children().removeIf(widget -> widget instanceof Button && isItemButton((Button) widget));
-    }
-
-    // 判断是否为购买按钮
-    private boolean isItemButton(Button button) {
-        // 判断按钮是否为 "Buy" 或 "Remove" 按钮
-        Component buttonMessage = button.getMessage();
-        return buttonMessage.equals(Component.translatable(Util_MessageKeys.MARKET_BUY_BUTTON_KEY)) ||
-                buttonMessage.equals(Component.translatable(Util_MessageKeys.MARKET_REMOVE_BUTTON_KEY)) ||
-                buttonMessage.equals(Component.translatable(Util_MessageKeys.REQUEST_DELIVER_BUTTON_KEY)) ||
-                buttonMessage.equals(Component.translatable(Util_MessageKeys.REQUEST_DELIVERED_STATUS_KEY)) ||
-                buttonMessage.equals(Component.translatable(Util_MessageKeys.REQUEST_CLAIM_BUTTON_KEY)) ||
-                buttonMessage.equals(Component.translatable(Util_MessageKeys.REQUEST_CANCEL_KEY));
-    }
-
     // 添加购买按钮
     private void addItemButtons() {
         // 动态计算每页可显示的商品数和间距
@@ -240,7 +218,7 @@ public class Screen_Market extends Screen {
             MarketItem item = filteredItems.get(i);
 
             // 添加购买或下架按钮
-            this.addPurchaseOrRemoveButton(item, this.width - startX, y, playerUUID);
+            this.addActionButton(item, this.width - startX, y, playerUUID);
 
             y += ITEM_SPACING;
         }
@@ -343,185 +321,123 @@ public class Screen_Market extends Screen {
         applyFilters(); // 调用联合过滤逻辑
     }
 
-    // 添加购买或下架按钮方法
-    private void addPurchaseOrRemoveButton(MarketItem item, int buttonX, int buttonY, UUID playerUUID) {
-        // 如果是出货单
+    // 重构后的主方法，根据订单类型与玩家权限添加相应按钮
+    private void addActionButton(MarketItem item, int buttonX, int buttonY, UUID playerUUID) {
+        // 判断玩家是否拥有OP权限
+        boolean isOP = this.minecraft.player.hasPermissions(2);
+
         if (item instanceof SalesOrder salesOrder) {
-            // 如果玩家ID等于商品的卖家ID (卖家)
+            // 出货单：卖家只显示下架按钮，买家显示购买按钮；OP买家还可以看到下架按钮
             if (salesOrder.getSellerID().equals(playerUUID)) {
-                Button removeButton = Button.builder(Component.translatable(Util_MessageKeys.MARKET_REMOVE_BUTTON_KEY), btn -> {
-                            // 发送下架请求到服务器
+                addButton(Util_MessageKeys.MARKET_REMOVE_BUTTON_KEY, buttonX - 60, buttonY, 60, 20,
+                        () -> {
                             EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_RemoveSalesOrder(salesOrder.getTradeID()));
-                            refreshItemButtons(); // 局部更新商品按钮
-                            // 立即请求更新商品列表
-                            requestMarketUpdate();
-                        })
-                        .pos(buttonX - 60, buttonY)
-                        .size(60, 20)
-                        .build();
-                this.addRenderableWidget(removeButton);
-                // 如果玩家ID不等于商品的卖家ID (买家)
-            } else if (!(salesOrder.getSellerID().equals(playerUUID))) {
-                // 如果是OP
-                if (this.minecraft.player.hasPermissions(2)) {
-                    Button removeButton = Button.builder(Component.translatable(Util_MessageKeys.MARKET_REMOVE_BUTTON_KEY), btn -> {
-                                // 发送下架请求到服务器
+                            refresh();
+                        });
+            } else {
+                if (isOP) {
+                    addButton(Util_MessageKeys.MARKET_REMOVE_BUTTON_KEY, buttonX - 60, buttonY, 60, 20,
+                            () -> {
                                 EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_RemoveSalesOrder(salesOrder.getTradeID()));
-                                refreshItemButtons(); // 局部更新商品按钮
-                                // 立即请求更新商品列表
-                                requestMarketUpdate();
-                            })
-                            .pos(buttonX - 60, buttonY)
-                            .size(60, 20)
-                            .build();
-                    this.addRenderableWidget(removeButton);
-
-                    Button buyButton = Button.builder(Component.translatable(Util_MessageKeys.MARKET_BUY_BUTTON_KEY), btn -> {
-                                // 发送下架请求到服务器
+                                refresh();
+                            });
+                    addButton(Util_MessageKeys.MARKET_BUY_BUTTON_KEY, buttonX - 130, buttonY, 60, 20,
+                            () -> {
                                 EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_PurchaseSalesOrder(salesOrder.getTradeID()));
-                                refreshItemButtons(); // 局部更新商品按钮
-                                // 立即请求更新商品列表
-                                requestMarketUpdate();
-                            })
-                            .pos(buttonX - 130, buttonY)
-                            .size(60, 20)
-                            .build();
-                    this.addRenderableWidget(buyButton);
-                    // 如果不是OP
+                                refresh();
+                            });
                 } else {
-                    Button buyButton = Button.builder(Component.translatable(Util_MessageKeys.MARKET_BUY_BUTTON_KEY), btn -> {
-                                // 发送购买请求到服务器
+                    addButton(Util_MessageKeys.MARKET_BUY_BUTTON_KEY, buttonX - 60, buttonY, 60, 20,
+                            () -> {
                                 EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_PurchaseSalesOrder(salesOrder.getTradeID()));
-                                refreshItemButtons(); // 局部更新商品按钮
-                                // 立即请求更新商品列表
-                                requestMarketUpdate();
-                            })
-                            .pos(buttonX - 60, buttonY)
-                            .size(60, 20)
-                            .build();
-                    this.addRenderableWidget(buyButton);
+                                refresh();
+                            });
                 }
             }
-            // 如果是订购单
-        } else if (item instanceof DemandOrder demandOrder){
-            // 如果玩家ID等于商品的卖家ID (卖家)
+        } else if (item instanceof DemandOrder demandOrder) {
+            // 订购单：区分卖家与买家的按钮显示，并根据交付状态及权限做进一步区分
             if (demandOrder.getSellerID().equals(playerUUID)) {
-                // 如果已交付
                 if (demandOrder.isDelivered()) {
-                    Button claimButton = Button.builder(Component.translatable(Util_MessageKeys.REQUEST_CLAIM_BUTTON_KEY), btn -> {
-                                // 发送下架请求到服务器
+                    addButton(Util_MessageKeys.REQUEST_CLAIM_BUTTON_KEY, buttonX - 60, buttonY, 60, 20,
+                            () -> {
                                 EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_ConfirmDemandOrder(demandOrder.getTradeID()));
-                                refreshItemButtons(); // 局部更新商品按钮
-                                // 立即请求更新商品列表
-                                requestMarketUpdate();
-                            })
-                            .pos(buttonX - 60, buttonY)
-                            .size(60, 20)
-                            .build();
-                    this.addRenderableWidget(claimButton);
+                                refresh();
+                            });
                 } else {
-                    Button removeButton = Button.builder(Component.translatable(Util_MessageKeys.REQUEST_CANCEL_KEY), btn -> {
-                                // 发送下架请求到服务器
+                    addButton(Util_MessageKeys.REQUEST_CANCEL_KEY, buttonX - 60, buttonY, 60, 20,
+                            () -> {
                                 EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_RemoveDemandOrder(demandOrder.getTradeID()));
-                                refreshItemButtons(); // 局部更新商品按钮
-                                // 立即请求更新商品列表
-                                requestMarketUpdate();
-                            })
-                            .pos(buttonX - 60, buttonY)
-                            .size(60, 20)
-                            .build();
-                    this.addRenderableWidget(removeButton);
+                                refresh();
+                            });
                 }
-                // 如果玩家ID不等于商品的卖家ID (买家)
-            } else if (!(demandOrder.getSellerID().equals(playerUUID))) {
-                // 如果是OP
-                if (this.minecraft.player.hasPermissions(2)) {
-                    // 如果已经交付
+            } else {
+                if (isOP) {
                     if (demandOrder.isDelivered()) {
-                        Button claimButton = Button.builder(Component.translatable(Util_MessageKeys.REQUEST_CLAIM_BUTTON_KEY), btn -> {
-                                    // 发送下架请求到服务器
+                        addButton(Util_MessageKeys.REQUEST_CLAIM_BUTTON_KEY, buttonX - 60, buttonY, 60, 20,
+                                () -> {
                                     EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_ConfirmDemandOrder(demandOrder.getTradeID()));
-                                    refreshItemButtons(); // 局部更新商品按钮
-                                    // 立即请求更新商品列表
-                                    requestMarketUpdate();
-                                })
-                                .pos(buttonX - 60, buttonY)
-                                .size(60, 20)
-                                .build();
-                        this.addRenderableWidget(claimButton);
-
-                        Button deliverButton = Button.builder(Component.translatable(Util_MessageKeys.REQUEST_DELIVERED_STATUS_KEY), btn -> {
-                                    // 发送下架请求到服务器
+                                    refresh();
+                                });
+                        addDisabledButton(Util_MessageKeys.REQUEST_DELIVERED_STATUS_KEY, buttonX - 130, buttonY, 60, 20,
+                                () -> {
                                     EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_DeliverDemandOrder(demandOrder.getTradeID()));
-                                    refreshItemButtons(); // 局部更新商品按钮
-                                    // 立即请求更新商品列表
-                                    requestMarketUpdate();
-                                })
-                                .pos(buttonX - 130, buttonY)
-                                .size(60, 20)
-                                .build();
-                        this.addRenderableWidget(deliverButton);
-                        deliverButton.active = false;
-                        // 如果没有交付
+                                    refresh();
+                                });
                     } else {
-                        Button removeButton = Button.builder(Component.translatable(Util_MessageKeys.REQUEST_CANCEL_KEY), btn -> {
-                                    // 发送下架请求到服务器
+                        addButton(Util_MessageKeys.REQUEST_CANCEL_KEY, buttonX - 60, buttonY, 60, 20,
+                                () -> {
                                     EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_RemoveDemandOrder(demandOrder.getTradeID()));
-                                    refreshItemButtons(); // 局部更新商品按钮
-                                    // 立即请求更新商品列表
-                                    requestMarketUpdate();
-                                })
-                                .pos(buttonX - 60, buttonY)
-                                .size(60, 20)
-                                .build();
-                        this.addRenderableWidget(removeButton);
-
-                        Button deliverButton = Button.builder(Component.translatable(Util_MessageKeys.REQUEST_DELIVER_BUTTON_KEY), btn -> {
-                                    // 发送下架请求到服务器
+                                    refresh();
+                                });
+                        addButton(Util_MessageKeys.REQUEST_DELIVER_BUTTON_KEY, buttonX - 130, buttonY, 60, 20,
+                                () -> {
                                     EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_DeliverDemandOrder(demandOrder.getTradeID()));
-                                    refreshItemButtons(); // 局部更新商品按钮
-                                    // 立即请求更新商品列表
-                                    requestMarketUpdate();
-                                })
-                                .pos(buttonX - 130, buttonY)
-                                .size(60, 20)
-                                .build();
-                        this.addRenderableWidget(deliverButton);
+                                    refresh();
+                                });
                     }
-                    // 如果不是OP
                 } else {
-                    // 如果已经交付
                     if (demandOrder.isDelivered()) {
-                        Button deliverButton = Button.builder(Component.translatable(Util_MessageKeys.REQUEST_DELIVERED_STATUS_KEY), btn -> {
-                                    // 发送购买请求到服务器
+                        addDisabledButton(Util_MessageKeys.REQUEST_DELIVERED_STATUS_KEY, buttonX - 60, buttonY, 60, 20,
+                                () -> {
                                     EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_PurchaseSalesOrder(demandOrder.getTradeID()));
-                                    refreshItemButtons(); // 局部更新商品按钮
-                                    // 立即请求更新商品列表
-                                    requestMarketUpdate();
-                                })
-                                .pos(buttonX - 60, buttonY)
-                                .size(60, 20)
-                                .build();
-                        this.addRenderableWidget(deliverButton);
-                        deliverButton.active = false;
-                        // 如果没有交付
+                                    refresh();
+                                });
                     } else {
-                        Button deliverButton = Button.builder(Component.translatable(Util_MessageKeys.REQUEST_DELIVER_BUTTON_KEY), btn -> {
-                                    // 发送购买请求到服务器
+                        addButton(Util_MessageKeys.REQUEST_DELIVER_BUTTON_KEY, buttonX - 60, buttonY, 60, 20,
+                                () -> {
                                     EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_DeliverDemandOrder(demandOrder.getTradeID()));
-                                    refreshItemButtons(); // 局部更新商品按钮
-                                    // 立即请求更新商品列表
-                                    requestMarketUpdate();
-                                })
-                                .pos(buttonX - 60, buttonY)
-                                .size(60, 20)
-                                .build();
-                        this.addRenderableWidget(deliverButton);
+                                    refresh();
+                                });
                     }
                 }
             }
-        } else {
         }
+        // 其它类型暂不处理
+    }
+
+    // 辅助方法：发送刷新界面
+    private void refresh() {
+        refreshItemButtons();
+        requestMarketUpdate();
+    }
+
+    // 辅助方法：创建并添加一个按钮
+    private void addButton(String translationKey, int posX, int posY, int width, int height, Runnable onClick) {
+        Button button = Button.builder(Component.translatable(translationKey), btn -> onClick.run())
+                .pos(posX, posY)
+                .size(width, height)
+                .build();
+        this.addRenderableWidget(button);
+    }
+
+    // 辅助方法：创建一个按钮并将其设为不可用（disabled）
+    private void addDisabledButton(String translationKey, int posX, int posY, int width, int height, Runnable onClick) {
+        Button button = Button.builder(Component.translatable(translationKey), btn -> onClick.run())
+                .pos(posX, posY)
+                .size(width, height)
+                .build();
+        button.active = false;
+        this.addRenderableWidget(button);
     }
 
     private void requestMarketUpdate() {
@@ -535,6 +451,25 @@ public class Screen_Market extends Screen {
         addItemButtons();   // 添加新的商品按钮
     }
 
+    // 移除购买按钮
+    private void clearItemButtons() {
+        // 遍历所有已渲染的控件并移除与商品相关的按钮
+        this.renderables.removeIf(widget -> widget instanceof Button && isItemButton((Button) widget));
+        this.children().removeIf(widget -> widget instanceof Button && isItemButton((Button) widget));
+    }
+
+    // 判断是否为购买按钮
+    private boolean isItemButton(Button button) {
+        // 判断按钮是否为 "Buy" 或 "Remove" 按钮
+        Component buttonMessage = button.getMessage();
+        return buttonMessage.equals(Component.translatable(Util_MessageKeys.MARKET_BUY_BUTTON_KEY)) ||
+                buttonMessage.equals(Component.translatable(Util_MessageKeys.MARKET_REMOVE_BUTTON_KEY)) ||
+                buttonMessage.equals(Component.translatable(Util_MessageKeys.REQUEST_DELIVER_BUTTON_KEY)) ||
+                buttonMessage.equals(Component.translatable(Util_MessageKeys.REQUEST_DELIVERED_STATUS_KEY)) ||
+                buttonMessage.equals(Component.translatable(Util_MessageKeys.REQUEST_CLAIM_BUTTON_KEY)) ||
+                buttonMessage.equals(Component.translatable(Util_MessageKeys.REQUEST_CANCEL_KEY));
+    }
+
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (this.searchBox.isFocused() && keyCode == 257) { // 检测回车键（keyCode 257）
@@ -545,7 +480,7 @@ public class Screen_Market extends Screen {
             Minecraft.getInstance().setScreen(new Screen_Home());
             return true;
         }
-        return false;
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     private void applySearch(String searchText) {
@@ -580,21 +515,25 @@ public class Screen_Market extends Screen {
             // 1. 应用过滤条件
             switch (displayTypeIndex) {
                 case 1: // 仅显示自己的订单
+                    System.out.println("1");
                     result = result.stream()
                             .filter(item -> item.getSellerName().toLowerCase().contains(playerName.toLowerCase()))
                             .collect(Collectors.toList());
                     break;
                 case 2: // 仅显示非自己的订单
+                    System.out.println("2");
                     result = result.stream()
                             .filter(item -> !item.getSellerName().toLowerCase().contains(playerName.toLowerCase()))
                             .collect(Collectors.toList());
                     break;
                 case 3: // 仅显示出货单
+                    System.out.println("3");
                     result = result.stream()
                             .filter(SalesOrder.class::isInstance)
                             .collect(Collectors.toList());
                     break;
                 case 4: // 仅显示订购单
+                    System.out.println("4");
                     result = result.stream()
                             .filter(DemandOrder.class::isInstance)
                             .collect(Collectors.toList());
@@ -608,6 +547,7 @@ public class Screen_Market extends Screen {
                         .filter(item -> itemMatchesSearch(item, searchBox.getValue()))
                         .collect(Collectors.toList());
             }
+            System.out.println(result.size());
 
             // 3. 更新UI
             List<MarketItem> finalResult = result;
