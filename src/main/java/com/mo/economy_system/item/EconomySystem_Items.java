@@ -1,12 +1,17 @@
 package com.mo.economy_system.item;
 
 import com.mo.economy_system.EconomySystem;
+import com.mo.economy_system.armor.EconomySystem_ArmorMaterials;
+import com.mo.economy_system.armor.armors.SupporterHat;
 import com.mo.economy_system.item.items.Item_ClaimWand;
 import com.mo.economy_system.item.items.Item_Guitar;
 import com.mo.economy_system.item.items.Potion_Recall;
 import com.mo.economy_system.item.items.Potion_Wormhole;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -45,6 +50,11 @@ public class EconomySystem_Items {
             () -> new Item_ClaimWand(new Item.Properties()
                     .stacksTo(1) // 限制每堆只能有一个
             ));
+
+    // 注册赞助者帽子
+    public static final RegistryObject<Item> SUPPORTER_HAT = ITEMS.register("supporter_hat", () -> new SupporterHat(
+            EconomySystem_ArmorMaterials.SUPPORTER, ArmorItem.Type.HELMET, new Item.Properties()));
+
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus); // 注册物品
