@@ -1,6 +1,6 @@
 # EconomySystem (经济系统)
 
-![Version](https://img.shields.io/badge/version-v1.0-blue)
+![Version](https://img.shields.io/badge/version-v1.1.6-blue)
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 
 ### 作者 (Author): [QingMo](https://github.com/QingMo)
@@ -35,4 +35,4 @@
 
 ## 许可证 (License)
 
-MIT License - 查看 [LICENSE](LICENSE) 文件
+GPL-3.0 License - 查看 [LICENSE](LICENSE) 文件
