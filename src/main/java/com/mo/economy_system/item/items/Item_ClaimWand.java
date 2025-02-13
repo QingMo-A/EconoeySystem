@@ -47,7 +47,6 @@ public class Item_ClaimWand extends Item {
         } else if (!secondPositions.containsKey(playerUUID)) {
             // 玩家未选定第二个点
             secondPositions.put(playerUUID, clickedPos);
-            player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_SECOND_POSITION_SET, clickedPos.getX(), clickedPos.getY(), clickedPos.getZ()));
 
             // 检查新圈地是否包含已有领地
             BlockPos firstPos = firstPositions.get(playerUUID);
@@ -57,6 +56,17 @@ public class Item_ClaimWand extends Item {
                 secondPositions.remove(playerUUID);
                 return InteractionResult.FAIL;
             }
+
+            BlockPos secondPos = secondPositions.get(playerUUID);
+            // 检查两点是否水平
+            if (!(firstPos.getY() == secondPos.getY())) {
+                player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_Y_MISMATCH_ERROR));
+                firstPositions.remove(playerUUID);
+                secondPositions.remove(playerUUID);
+                return InteractionResult.FAIL;
+            }
+
+            player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_SECOND_POSITION_SET, clickedPos.getX(), clickedPos.getY(), clickedPos.getZ()));
 
             // 计算范围和价格
             int volume = calculateVolume(firstPos, clickedPos);

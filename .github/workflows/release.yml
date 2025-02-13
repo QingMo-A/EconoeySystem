@@ -34,7 +34,7 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git tag -a "v${{ env.VERSION }}" -m "Release version ${{ env.VERSION }}"
-          git push https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/QingMo-A/EconoeySystem.git "v${{ env.VERSION }}"
+          git push https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/QingMo-A/EconomySystem.git "v${{ env.VERSION }}"
 
       # 5. 等待 Tag 同步
       - name: Wait for Tag Synchronization

@@ -43,13 +43,6 @@ public class EventHandler_Territory {
         // 向玩家发送离开领地的消息
         player.sendSystemMessage(Component.literal("你离开了领地: " + territory.getName())
                 .withStyle(ChatFormatting.RED));
-
-        /*// 设置主标题
-        player.connection.send(new ClientboundSetTitleTextPacket(
-                Component.literal("再见，" + territory.getName()).withStyle(ChatFormatting.GRAY))
-        );
-        // 设置动画效果（淡入、停留、淡出）
-        player.connection.send(new ClientboundSetTitlesAnimationPacket(10, 70, 20)); // 10 ticks 淡入，70 ticks 显示，20 ticks 淡出*/
     }
 }
 

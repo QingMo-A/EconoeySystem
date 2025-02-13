@@ -184,6 +184,7 @@
   "message.claim_wand.first_position_set": "§a第一个点已确定 §r坐标: §b%s %s %s",
   "message.claim_wand.second_position_set": "§a第二个点已确定 §r坐标: §b%s %s %s",
   "message.claim_wand.overlap_error": "§c圈地失败！新领地与现有领地重叠，请重新选择点位",
+  "message.claim_wand.y_mismatch_error": "§c圈地失败！圈地两点y轴坐标不一致",
   "message.claim_wand.volume": "领地大小:§b %s 格",
   "message.claim_wand.price": "圈地所需价格:§b %s 枚梦鱼币",
   "message.claim_wand.instruction": "§b如果不满意，第三次右键即可取消。§e如果满意，请执行指令 §b/confirm_claim <领地名称> §e来确认购买！",

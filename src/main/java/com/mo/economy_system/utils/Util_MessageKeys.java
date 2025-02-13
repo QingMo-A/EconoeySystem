@@ -187,6 +187,7 @@ public class Util_MessageKeys {
     public static final String CLAIM_WAND_FIRST_POSITION_SET = "message.claim_wand.first_position_set";
     public static final String CLAIM_WAND_SECOND_POSITION_SET = "message.claim_wand.second_position_set";
     public static final String CLAIM_WAND_OVERLAP_ERROR = "message.claim_wand.overlap_error";
+    public static final String CLAIM_WAND_Y_MISMATCH_ERROR = "message.claim_wand.y_mismatch_error";
     public static final String CLAIM_WAND_VOLUME = "message.claim_wand.volume";
     public static final String CLAIM_WAND_PRICE = "message.claim_wand.price";
     public static final String CLAIM_WAND_INSTRUCTION = "message.claim_wand.instruction";
