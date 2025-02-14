@@ -1,6 +1,6 @@
 package com.mo.economy_system.network.packets.economy_system;
 
-import com.mo.economy_system.screen.economy_system.Screen_Shop;
+import com.mo.economy_system.screen.economy_system.shop.Screen_Shop;
 import com.mo.economy_system.core.economy_system.shop.ShopItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;

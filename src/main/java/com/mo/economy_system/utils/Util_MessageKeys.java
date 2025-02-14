@@ -52,6 +52,14 @@ public class Util_MessageKeys {
     public static final String SHOP_REFRESH_MESSAGE_KEY = "message.shop.shop_refresh";
     public static final String MOB_REWARD_MESSAGE_KEY = "message.mob_reward";
 
+    public static final String SHOP_BUY_TITLE_KEY = "screen.shop_buy.title";
+    public static final String SHOP_BUY_HINT_TEXT_KEY = "text.shop_buy.hint";
+    public static final String SHOP_BUY_BUY_BUTTON_KEY = "button.shop_buy.buy";
+    public static final String SHOP_BUY_NO_ITEM_TEXT_KEY = "text.shop_buy.no_item";
+    public static final String SHOP_BUY_NO_ITEM_MESSAGE_KEY = "message.shop_buy.no_item";
+    public static final String SHOP_BUY_INVALID_COUNT_MESSAGE_KEY = "message.shop_buy.invalid_count";
+    public static final String SHOP_BUY_COUNT_TEXT_KEY = "text.shop_buy.count";
+
     public static final String LIST_TITLE_KEY = "screen.list.title";
     public static final String LIST_NO_ITEM_IN_HAND_TEXT_KEY = "text.list.no_item_in_hand";
     public static final String LIST_PRICE_TEXT_KEY = "text.list.price";

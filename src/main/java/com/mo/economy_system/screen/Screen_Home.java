@@ -2,11 +2,8 @@ package com.mo.economy_system.screen;
 
 import com.mo.economy_system.network.EconomySystem_NetworkManager;
 import com.mo.economy_system.network.packets.economy_system.Packet_BalanceRequest;
-import com.mo.economy_system.network.packets.economy_system.Packet_MarketDataRequest;
-import com.mo.economy_system.network.packets.economy_system.Packet_ShopDataRequest;
-import com.mo.economy_system.network.packets.territory_system.Packet_TerritoryDataRequest;
-import com.mo.economy_system.screen.economy_system.Screen_Market;
-import com.mo.economy_system.screen.economy_system.Screen_Shop;
+import com.mo.economy_system.screen.economy_system.market.Screen_Market;
+import com.mo.economy_system.screen.economy_system.shop.Screen_Shop;
 import com.mo.economy_system.screen.territory_system.Screen_Territory;
 import com.mo.economy_system.utils.Util_MessageKeys;
 import net.minecraft.client.gui.GuiGraphics;

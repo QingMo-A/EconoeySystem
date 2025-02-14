@@ -1,9 +1,9 @@
-package com.mo.economy_system.screen.economy_system;
+package com.mo.economy_system.screen.economy_system.market;
 
-import com.mo.economy_system.network.packets.economy_system.Packet_MarketDataRequest;
 import com.mo.economy_system.network.EconomySystem_NetworkManager;
 import com.mo.economy_system.network.packets.economy_system.sales_order.Packet_CreateSalesOrder;
 import com.mo.economy_system.core.economy_system.market.SalesOrder;
+import com.mo.economy_system.screen.EconomySystem_Screen;
 import com.mo.economy_system.utils.Util_MessageKeys;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -17,7 +17,7 @@ import net.minecraft.world.item.ItemStack;
 import java.util.Optional;
 import java.util.UUID;
 
-public class Screen_CreateSalesOrder extends Screen {
+public class Screen_CreateSalesOrder extends EconomySystem_Screen {
 
     private final Player player;
     private EditBox priceInput; // 输入框用于设置价格
@@ -88,11 +88,6 @@ public class Screen_CreateSalesOrder extends Screen {
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
     }
 
-    @Override
-    public boolean isPauseScreen() {
-        return false; // 界面打开时不暂停游戏
-    }
-
     private void listItem() {
         ItemStack heldItem = player.getMainHandItem(); // 获取玩家手中的物品
 
@@ -123,7 +118,7 @@ public class Screen_CreateSalesOrder extends Screen {
         // 发送上架请求到服务端
         EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_CreateSalesOrder(salesOrder));
 
-        this.minecraft.setScreen(new Screen_Market()); // 关闭界面
+        this.minecraft.setScreen(new Screen_Market());
     }
 
 
@@ -136,11 +131,11 @@ public class Screen_CreateSalesOrder extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int p_96552_, int p_96553_, int p_96554_) {
-        if (p_96552_ == 256 && this.shouldCloseOnEsc()) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256 && this.shouldCloseOnEsc()) {
             Minecraft.getInstance().setScreen(new Screen_Market());
             return true;
         }
-        return  false;
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 }

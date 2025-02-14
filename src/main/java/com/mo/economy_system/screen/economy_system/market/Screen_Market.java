@@ -1,4 +1,4 @@
-package com.mo.economy_system.screen.economy_system;
+package com.mo.economy_system.screen.economy_system.market;
 
 import com.mo.economy_system.network.packets.economy_system.*;
 import com.mo.economy_system.network.packets.economy_system.demand_order.Packet_ConfirmDemandOrder;
@@ -6,6 +6,7 @@ import com.mo.economy_system.network.packets.economy_system.demand_order.Packet_
 import com.mo.economy_system.network.packets.economy_system.demand_order.Packet_RemoveDemandOrder;
 import com.mo.economy_system.network.packets.economy_system.sales_order.Packet_PurchaseSalesOrder;
 import com.mo.economy_system.network.packets.economy_system.sales_order.Packet_RemoveSalesOrder;
+import com.mo.economy_system.screen.EconomySystem_Screen;
 import com.mo.economy_system.screen.Screen_Home;
 import com.mo.economy_system.core.economy_system.market.DemandOrder;
 import com.mo.economy_system.core.economy_system.market.MarketItem;
@@ -16,7 +17,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
@@ -26,14 +26,10 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class Screen_Market extends Screen {
+public class Screen_Market extends EconomySystem_Screen {
     private List<MarketItem> items = new ArrayList<>(); // 市场商品列表
     private List<MarketItem> filteredItems = new ArrayList<>(); // 根据搜索过滤后的商品列表
     private List<MarketItem> itemsSnapshot = new ArrayList<>();
-    private int currentPage = 0; // 当前页码
-    private static final int BOTTOM_MARGIN = 30; // 距离底部的最小空白高度
-    private int itemsPerPage; // 动态计算的每页商品数
-    private final int ITEM_SPACING = 35; // 动态调整的垂直间距
     // 计数器变量，初始为 0
     private int displayTypeIndex = 0;
     // 定义按钮显示的文本数组
@@ -46,12 +42,9 @@ public class Screen_Market extends Screen {
     };
 
     private EditBox searchBox; // 搜索框
-    private boolean isUserTyping = false; // 标记用户是否正在输入
 
     private UUID playerUUID;
     private String playerName;
-
-    private List<RunnableWithGraphics> renderCache = new ArrayList<>();
 
     // 构造方法
     public Screen_Market() {
@@ -63,6 +56,7 @@ public class Screen_Market extends Screen {
     @Override
     protected void init() {
         super.init();
+        initPosition();
 
         if (this.minecraft != null && this.minecraft.player != null) {
             this.playerUUID = this.minecraft.player.getUUID();
@@ -77,7 +71,6 @@ public class Screen_Market extends Screen {
         this.addRenderableWidget(searchBox);
 
         // 设置搜索框的键盘监听器
-        this.searchBox.setResponder(text -> isUserTyping = true); // 标记用户正在输入
         this.searchBox.setFocused(false); // 默认不聚焦
         this.searchBox.setMaxLength(50); // 限制输入长度
         this.searchBox.setHint(Component.translatable(Util_MessageKeys.MARKET_HINT_TEXT_KEY)); // 提示文本
@@ -120,8 +113,8 @@ public class Screen_Market extends Screen {
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
     }
 
-    // 初始化渲染缓存
-    private void initializeRenderCache() {
+    @Override
+    protected void initializeRenderCache() {
         renderCache.clear(); // 清空旧的缓存
 
         if (filteredItems.isEmpty()) {
@@ -133,16 +126,6 @@ public class Screen_Market extends Screen {
             });
             return;
         }
-
-        // 动态计算每页可显示的商品数和间距
-        int availableHeight = this.height - 100; // 减去顶部和底部的空白区域
-        itemsPerPage = Math.max(1, availableHeight / ITEM_SPACING); // 至少显示 1 件商品
-
-        int startIndex = currentPage * itemsPerPage;
-        int endIndex = Math.min(startIndex + itemsPerPage, filteredItems.size());
-
-        int startX = Math.max((this.width / 2) - 300, 60);
-        int startY = Math.max((this.height - 400) / 4, 40);
 
         int y = startY;
 
@@ -168,18 +151,14 @@ public class Screen_Market extends Screen {
             // 添加购买或下架按钮（确保在初始化时添加按钮）
             addActionButton(item, this.width - startX, currentY, playerUUID);
 
-            y += ITEM_SPACING; // 调整下一件商品的位置
+            y += THING_SPACING; // 调整下一件商品的位置
         }
     }
 
-    private void detectMouseHoverAndRenderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        int startX = Math.max((this.width / 2) - 300, 60);
-        int startY = Math.max((this.height - 400) / 4, 40);
-
+    @Override
+    protected void detectMouseHoverAndRenderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        initPosition();
         int y = startY;
-
-        int startIndex = currentPage * itemsPerPage;
-        int endIndex = Math.min(startIndex + itemsPerPage, filteredItems.size());
 
         for (int i = startIndex; i < endIndex; i++) {
             MarketItem item = filteredItems.get(i);
@@ -194,41 +173,31 @@ public class Screen_Market extends Screen {
                 guiGraphics.renderTooltip(this.font, tooltip, Optional.empty(), mouseX, mouseY);
             }
 
-            y += ITEM_SPACING;
+            y += THING_SPACING;
         }
     }
 
     // 添加购买按钮
     private void addItemButtons() {
-        // 动态计算每页可显示的商品数和间距
-        int availableHeight = this.height - 100; // 减去顶部和底部的空白区域
-        itemsPerPage = Math.max(1, availableHeight / ITEM_SPACING); // 至少显示 1 件商品
-
-        // 计算当前页的起始和结束索引
-        int startIndex = currentPage * itemsPerPage;
-        int endIndex = Math.min(startIndex + itemsPerPage, filteredItems.size());
-
-        int startX = Math.max((this.width / 2) - 300, 60);
-        int startY = Math.max((this.height - 400) / 4, 40);
+        initPosition();
 
         int y = startY;
         UUID playerUUID = this.minecraft.player.getUUID();
 
         for (int i = startIndex; i < endIndex; i++) {
+            System.out.println(i);
             MarketItem item = filteredItems.get(i);
 
             // 添加购买或下架按钮
             this.addActionButton(item, this.width - startX, y, playerUUID);
 
-            y += ITEM_SPACING;
+            y += THING_SPACING;
         }
     }
 
     // 添加翻页按钮
     private void addPageButtons() {
-        int startX = Math.max((this.width / 2 - 150), 60);
-        int buttonWidth = 40;
-        int buttonHeight = 20;
+        initPosition();
         int buttonY = this.height - 40;
 
         // 上一页按钮
@@ -240,7 +209,7 @@ public class Screen_Market extends Screen {
                             }
                         })
                         .pos(startX, buttonY)
-                        .size(buttonWidth, buttonHeight)
+                        .size(PAGE_BUTTON_WIDTH, PAGE_BUTTON_HEIGHT)
                         .build()
         );
 
@@ -252,8 +221,8 @@ public class Screen_Market extends Screen {
                                 this.init(); // 刷新页面
                             }
                         })
-                        .pos(this.width - startX - buttonWidth, buttonY)
-                        .size(buttonWidth, buttonHeight)
+                        .pos(this.width - startX - PAGE_BUTTON_WIDTH, buttonY)
+                        .size(PAGE_BUTTON_WIDTH, PAGE_BUTTON_HEIGHT)
                         .build()
         );
     }
@@ -313,6 +282,25 @@ public class Screen_Market extends Screen {
 
         // 添加到界面
         this.addRenderableWidget(switchDisplayButton);
+    }
+
+    // 辅助方法：创建并添加一个按钮
+    private void addButton(String translationKey, int posX, int posY, int width, int height, Runnable onClick) {
+        Button button = Button.builder(Component.translatable(translationKey), btn -> onClick.run())
+                .pos(posX, posY)
+                .size(width, height)
+                .build();
+        this.addRenderableWidget(button);
+    }
+
+    // 辅助方法：创建一个按钮并将其设为不可用（disabled）
+    private void addDisabledButton(String translationKey, int posX, int posY, int width, int height, Runnable onClick) {
+        Button button = Button.builder(Component.translatable(translationKey), btn -> onClick.run())
+                .pos(posX, posY)
+                .size(width, height)
+                .build();
+        button.active = false;
+        this.addRenderableWidget(button);
     }
 
     // 处理与显示类型相关的操作
@@ -421,29 +409,78 @@ public class Screen_Market extends Screen {
         requestMarketUpdate();
     }
 
-    // 辅助方法：创建并添加一个按钮
-    private void addButton(String translationKey, int posX, int posY, int width, int height, Runnable onClick) {
-        Button button = Button.builder(Component.translatable(translationKey), btn -> onClick.run())
-                .pos(posX, posY)
-                .size(width, height)
-                .build();
-        this.addRenderableWidget(button);
-    }
-
-    // 辅助方法：创建一个按钮并将其设为不可用（disabled）
-    private void addDisabledButton(String translationKey, int posX, int posY, int width, int height, Runnable onClick) {
-        Button button = Button.builder(Component.translatable(translationKey), btn -> onClick.run())
-                .pos(posX, posY)
-                .size(width, height)
-                .build();
-        button.active = false;
-        this.addRenderableWidget(button);
-    }
-
     private void requestMarketUpdate() {
         EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_MarketDataRequest());
     }
 
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (this.searchBox.isFocused() && keyCode == 257) { // 检测回车键（keyCode 257）
+            applySearch();
+            return true; // 防止事件进一步传播
+        } else if (keyCode == 256 && this.shouldCloseOnEsc()) {
+            Minecraft.getInstance().setScreen(new Screen_Home());
+            return true;
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    private void applySearch() {
+        applyFilters(); // 调用联合过滤逻辑
+    }
+
+    private void applyFilters() {
+        new Thread(() -> {
+            List<MarketItem> result = itemsSnapshot;
+
+            // 1. 应用过滤条件
+            switch (displayTypeIndex) {
+                case 1: // 仅显示自己的订单
+                    result = result.stream()
+                            .filter(item -> item.getSellerName().toLowerCase().contains(playerName.toLowerCase()))
+                            .collect(Collectors.toList());
+                    break;
+                case 2: // 仅显示非自己的订单
+                    result = result.stream()
+                            .filter(item -> !item.getSellerName().toLowerCase().contains(playerName.toLowerCase()))
+                            .collect(Collectors.toList());
+                    break;
+                case 3: // 仅显示出货单
+                    result = result.stream()
+                            .filter(SalesOrder.class::isInstance)
+                            .collect(Collectors.toList());
+                    break;
+                case 4: // 仅显示订购单
+                    result = result.stream()
+                            .filter(DemandOrder.class::isInstance)
+                            .collect(Collectors.toList());
+                    break;
+                // case 0: 无过滤条件
+            }
+
+            // 2. 应用搜索条件
+            if (searchBox != null && !searchBox.getValue().isEmpty()) {
+                result = result.stream()
+                        .filter(item -> itemMatchesSearch(item, searchBox.getValue()))
+                        .collect(Collectors.toList());
+            }
+
+            // 3. 更新UI
+            List<MarketItem> finalResult = result;
+            this.minecraft.execute(() -> {
+                this.filteredItems = finalResult;
+                this.currentPage = 0;
+                refreshItemButtons();
+                initializeRenderCache(); // 重新初始化渲染缓存
+            });
+        }).start();
+    }
+
+    private boolean itemMatchesSearch(MarketItem item, String searchText) {
+        return item.getItemID().toLowerCase().contains(searchText.toLowerCase()) ||
+                item.getSellerName().toLowerCase().contains(searchText.toLowerCase()) ||
+                item.getItemStack().getHoverName().getString().toLowerCase().contains(searchText.toLowerCase());
+    }
 
     // 刷新购买按钮
     private void refreshItemButtons() {
@@ -470,27 +507,6 @@ public class Screen_Market extends Screen {
                 buttonMessage.equals(Component.translatable(Util_MessageKeys.REQUEST_CANCEL_KEY));
     }
 
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (this.searchBox.isFocused() && keyCode == 257) { // 检测回车键（keyCode 257）
-            String searchText = this.searchBox.getValue();
-            applySearch(searchText);
-            return true; // 防止事件进一步传播
-        } else if (keyCode == 256 && this.shouldCloseOnEsc()) {
-            Minecraft.getInstance().setScreen(new Screen_Home());
-            return true;
-        }
-        return super.keyPressed(keyCode, scanCode, modifiers);
-    }
-
-    private void applySearch(String searchText) {
-        applyFilters(); // 调用联合过滤逻辑
-    }
-
-    private boolean isMouseOver(int mouseX, int mouseY, int x, int y, int width, int height) {
-        return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
-    }
-
     public void updateMarketItems(List<MarketItem> items) {
         this.items = items;
         this.filteredItems = new ArrayList<>(items); // 初始化过滤后的列表
@@ -498,76 +514,20 @@ public class Screen_Market extends Screen {
         this.init(); // 每次更新市场物品后重新初始化界面
     }
 
-    @Override
-    public boolean isPauseScreen() {
-        return false; // 界面打开时不暂停游戏
-    }
-
     // 动态计算总页数
     private int getTotalPages() {
-        return (int) Math.ceil((double) this.filteredItems.size() / itemsPerPage);
+        return (int) Math.ceil((double) this.filteredItems.size() / thingsPerPage);
     }
 
-    private void applyFilters() {
-        new Thread(() -> {
-            List<MarketItem> result = itemsSnapshot;
+    @Override
+    protected void initPosition(){
+        TOP_MARGIN = this.height - 100;
+        thingsPerPage = Math.max(1, TOP_MARGIN / THING_SPACING);
 
-            // 1. 应用过滤条件
-            switch (displayTypeIndex) {
-                case 1: // 仅显示自己的订单
-                    System.out.println("1");
-                    result = result.stream()
-                            .filter(item -> item.getSellerName().toLowerCase().contains(playerName.toLowerCase()))
-                            .collect(Collectors.toList());
-                    break;
-                case 2: // 仅显示非自己的订单
-                    System.out.println("2");
-                    result = result.stream()
-                            .filter(item -> !item.getSellerName().toLowerCase().contains(playerName.toLowerCase()))
-                            .collect(Collectors.toList());
-                    break;
-                case 3: // 仅显示出货单
-                    System.out.println("3");
-                    result = result.stream()
-                            .filter(SalesOrder.class::isInstance)
-                            .collect(Collectors.toList());
-                    break;
-                case 4: // 仅显示订购单
-                    System.out.println("4");
-                    result = result.stream()
-                            .filter(DemandOrder.class::isInstance)
-                            .collect(Collectors.toList());
-                    break;
-                // case 0: 无过滤条件
-            }
+        startIndex = currentPage * thingsPerPage;
+        endIndex = Math.min(startIndex + thingsPerPage, filteredItems.size());
 
-            // 2. 应用搜索条件
-            if (searchBox != null && !searchBox.getValue().isEmpty()) {
-                result = result.stream()
-                        .filter(item -> itemMatchesSearch(item, searchBox.getValue()))
-                        .collect(Collectors.toList());
-            }
-            System.out.println(result.size());
-
-            // 3. 更新UI
-            List<MarketItem> finalResult = result;
-            this.minecraft.execute(() -> {
-                this.filteredItems = finalResult;
-                this.currentPage = 0;
-                refreshItemButtons();
-                initializeRenderCache(); // 重新初始化渲染缓存
-            });
-        }).start();
-    }
-
-    private boolean itemMatchesSearch(MarketItem item, String searchText) {
-        return item.getItemID().toLowerCase().contains(searchText.toLowerCase()) ||
-                item.getSellerName().toLowerCase().contains(searchText.toLowerCase()) ||
-                item.getItemStack().getHoverName().getString().toLowerCase().contains(searchText.toLowerCase());
-    }
-
-    @FunctionalInterface
-    private interface RunnableWithGraphics {
-        void run(GuiGraphics guiGraphics);
+        startX = Math.max((this.width / 2) - 300, 60);
+        startY = Math.max((this.height - 400) / 4, 40);
     }
 }

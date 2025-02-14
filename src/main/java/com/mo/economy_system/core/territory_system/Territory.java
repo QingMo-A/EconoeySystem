@@ -24,6 +24,7 @@ public class Territory {
     private final Set<PlayerInfo> authorizedPlayers; // 保存有权限玩家的列表
     private BlockPos backpoint; // 回城点
     private final ResourceKey<Level> dimension; // 所在维度
+    private int territoryOrder;
 
     // 用于新建领地的构造方法（生成新 UUID）
     public Territory(String name, UUID ownerUUID, String ownerName, int x1, int y1, int z1, int x2, int y2, int z2, BlockPos backpoint, ResourceKey<Level> dimension) {
