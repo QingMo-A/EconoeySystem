@@ -31,6 +31,7 @@ public class Util_MessageKeys {
     public static final String HOME_BALANCE_TEXT_KEY = "text.home.balance";
     public static final String HOME_SHOP_BUTTON_KEY = "button.home.shop";
     public static final String HOME_MARKET_BUTTON_KEY = "button.home.market";
+    public static final String HOME_DELIVERY_BOX_BUTTON_KEY = "button.home.delivery_box";
     public static final String HOME_TERRITORY_BUTTON_KEY = "button.home.territory";
     public static final String HOME_ABOUT_BUTTON_KEY = "button.home.about";
 
@@ -70,6 +71,7 @@ public class Util_MessageKeys {
     public static final String LIST_SUCCESSFULLY_MESSAGE_KEY = "message.list.list_successfully";
     public static final String LIST_INSUFFICIENT_ITEM_MESSAGE_KEY = "message.list.list_insufficient_item";
     public static final String LIST_UNMATCHED_ITEM_MESSAGE_KEY = "message.list.list_unmatched_item";
+    public static final String LIST_ITEM_TAX_PAYMENT_FAILED_MESSAGE_KEY = "message.list.list_item_tax_payment_failed";
 
     public static final String REQUEST_TITLE_KEY = "screen.request.title";
     public static final String REQUEST_PRICE_TEXT_KEY = "text.request.price";

@@ -8,6 +8,8 @@ import com.mo.economy_system.commands.economy_system.Command_RedPacket;
 import com.mo.economy_system.commands.territory_system.Command_Territory;
 import com.mo.economy_system.commands.territory_system.Command_TerritoryClaim;
 import com.mo.economy_system.commands.tpa_system.Command_Tpa;
+import com.mo.economy_system.core.economy_system.delivery_box.DeliveryBoxSavedData;
+import com.mo.economy_system.core.economy_system.delivery_box.DeliveryItem;
 import com.mo.economy_system.enchant.EconomySystem_Enchants;
 import com.mo.economy_system.core.economy_system.market.MarketItem;
 import com.mo.economy_system.core.economy_system.market.MarketManager;
@@ -36,6 +38,7 @@ import net.minecraftforge.fml.common.Mod;
 
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 @Mod.EventBusSubscriber(modid = EconomySystem.MODID)
 public class EconomySystem_EventHandler {
@@ -101,11 +104,29 @@ public class EconomySystem_EventHandler {
                 }
             }
 
-            MarketSavedData marketData = MarketSavedData.getInstance(event.getServer().overworld());
+            EconomySavedData economySavedData = EconomySavedData.getInstance(overworld);
+            MarketSavedData marketData = MarketSavedData.getInstance(overworld);
+            DeliveryBoxSavedData deliveryBoxSavedData = DeliveryBoxSavedData.getInstance(overworld);
             marketData.clearMarketItems(); // 清空原有数据
             for (MarketItem item : MarketManager.getMarketItems()) {
-                marketData.addMarketItem(item); // 保存当前市场商品
+                if (item.isExpired()) {
+                    // 通知卖家（如果在线）
+                    ServerPlayer seller = event.getServer().getPlayerList().getPlayer(item.getSellerID());
+                    deliveryBoxSavedData.addItem(item.getSellerID(), new DeliveryItem(UUID.randomUUID(), item.getItemID(), item.getItemStack(), "Market"));
+                    if (seller != null) {
+                        // 卖家在线，直接发送消息
+                        seller.sendSystemMessage(Component.literal("你的物品 " + item.getItemStack().getHoverName().getString() + " 已经过期, 请前往收货箱领取"));
+                    } else {
+                        // 卖家不在线，将通知存储到离线消息中
+                        String text = Component.literal("你的物品 " + item.getItemStack().getHoverName().getString() + " 已经过期, 请前往收货箱领取").getString();
+
+                        economySavedData.storeOfflineMessage(item.getSellerID(), text);
+                    }
+                } else {
+                    marketData.addMarketItem(item); // 保存当前市场商品
+                }
             }
+            MarketManager.setMarketItems(marketData.getMarketItems()); // 将数据加载到 MarketManager
         }
 
         // 定时检查红包

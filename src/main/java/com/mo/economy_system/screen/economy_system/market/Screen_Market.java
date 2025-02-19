@@ -169,6 +169,8 @@ public class Screen_Market extends EconomySystem_Screen {
                 tooltip.add(Component.translatable(Util_MessageKeys.MARKET_SELLER_UUID_KEY, item.getSellerID()));
                 tooltip.add(Component.translatable(Util_MessageKeys.MARKET_TRADE_ID_KEY, item.getTradeID()));
                 tooltip.add(Component.translatable(Util_MessageKeys.MARKET_ITEM_ID_KEY, item.getItemID()));
+                tooltip.add(Component.literal(""));
+                tooltip.add(Component.literal(String.valueOf(item.getListingTime())));
 
                 guiGraphics.renderTooltip(this.font, tooltip, Optional.empty(), mouseX, mouseY);
             }

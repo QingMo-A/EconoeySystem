@@ -1,51 +1,50 @@
-package com.mo.economy_system.screen.economy_system.shop;
+package com.mo.economy_system.screen.economy_system.deliver_box;
 
-import com.mo.economy_system.core.economy_system.market.DemandOrder;
-import com.mo.economy_system.core.economy_system.market.MarketItem;
-import com.mo.economy_system.core.economy_system.market.SalesOrder;
+import com.mo.economy_system.core.economy_system.delivery_box.DeliveryItem;
+import com.mo.economy_system.network.EconomySystem_NetworkManager;
+import com.mo.economy_system.network.packets.economy_system.Packet_DeliveryBoxClaimItem;
+import com.mo.economy_system.network.packets.economy_system.Packet_DeliveryBoxDataRequest;
+import com.mo.economy_system.network.packets.economy_system.sales_order.Packet_RemoveSalesOrder;
 import com.mo.economy_system.screen.EconomySystem_Screen;
 import com.mo.economy_system.screen.Screen_Home;
-import com.mo.economy_system.core.economy_system.shop.ShopItem;
-import com.mo.economy_system.network.EconomySystem_NetworkManager;
-import com.mo.economy_system.network.packets.economy_system.Packet_ShopDataRequest;
-import com.mo.economy_system.network.packets.economy_system.Packet_ShopBuyItem;
 import com.mo.economy_system.utils.Util_MessageKeys;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class Screen_Shop extends EconomySystem_Screen {
-
-    private List<ShopItem> items = new ArrayList<>(); // 商品列表
-    private List<ShopItem> itemsSnapshot = new ArrayList<>();
+public class Screen_DeliveryBox extends EconomySystem_Screen {
+    private List<DeliveryItem> items = new ArrayList<>(); // 物品列表
+    private List<DeliveryItem> filteredItems = new ArrayList<>(); // 根据搜索过滤后的物品列表
+    private List<DeliveryItem> itemsSnapshot = new ArrayList<>();
 
     private EditBox searchBox; // 搜索框
 
-    public Screen_Shop() {
-        super(Component.translatable(Util_MessageKeys.SHOP_TITLE_KEY));
-        EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_ShopDataRequest());
-    }
+    private UUID playerUUID;
+    private String playerName;
 
-    public void updateShopItems(List<ShopItem> items) {
-        this.items = items;
-        this.itemsSnapshot = new ArrayList<>(items);
-        this.init(); // 每次更新商店物品后重新初始化界面
+    public Screen_DeliveryBox() {
+        super(Component.literal("test"));
+        EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_DeliveryBoxDataRequest());
     }
 
     @Override
     protected void init() {
         super.init();
-
         initPosition();
+
+        if (this.minecraft != null && this.minecraft.player != null) {
+            this.playerUUID = this.minecraft.player.getUUID();
+            this.playerName = this.minecraft.player.getName().getString();
+        }
 
         // 清除现有按钮
         this.clearWidgets();
@@ -57,7 +56,7 @@ public class Screen_Shop extends EconomySystem_Screen {
         // 设置搜索框的键盘监听器
         this.searchBox.setFocused(false); // 默认不聚焦
         this.searchBox.setMaxLength(50); // 限制输入长度
-        this.searchBox.setHint(Component.translatable(Util_MessageKeys.SHOP_HINT_TEXT_KEY)); // 提示文本
+        this.searchBox.setHint(Component.translatable(Util_MessageKeys.MARKET_HINT_TEXT_KEY)); // 提示文本
 
         // 动态添加商品购买按钮
         addItemButtons();
@@ -79,11 +78,11 @@ public class Screen_Shop extends EconomySystem_Screen {
         }
 
         // 如果有商品，进行鼠标悬停检测并显示 Tooltip
-        if (!items.isEmpty()) {
+        if (!filteredItems.isEmpty()) {
             detectMouseHoverAndRenderTooltip(guiGraphics, mouseX, mouseY);
         }
 
-        // 显示当前页数
+        // 渲染当前页数
         guiGraphics.drawCenteredString(this.font, (currentPage + 1) + " / " + getTotalPages(),
                 this.width / 2, this.height - 33, 0xFFFFFF);
 
@@ -94,13 +93,12 @@ public class Screen_Shop extends EconomySystem_Screen {
     protected void initializeRenderCache() {
         renderCache.clear(); // 清空旧的缓存
 
-        if (items.isEmpty()) {
+        if (filteredItems.isEmpty()) {
             // 如果没有商品，添加无商品提示的渲染任务
             renderCache.add((guiGraphics) -> {
-                // 动态计算文字居中的位置
-                int textWidth = this.font.width(Component.translatable(Util_MessageKeys.SHOP_LOADING_SHOP_DATA_TEXT_KEY));
+                int textWidth = this.font.width(Component.literal("你的收货箱是空的~"));
                 int xPosition = (this.width - textWidth) / 2;
-                guiGraphics.drawString(this.font, Component.translatable(Util_MessageKeys.SHOP_LOADING_SHOP_DATA_TEXT_KEY), xPosition, this.height / 2 - 10, 0xFFFFFF);
+                guiGraphics.drawString(this.font, Component.literal("你的收货箱是空的~"), xPosition, this.height / 2 - 10, 0xFFFFFF, false);
             });
             return;
         }
@@ -108,58 +106,44 @@ public class Screen_Shop extends EconomySystem_Screen {
         int y = startY;
 
         for (int i = startIndex; i < endIndex; i++) {
-            ShopItem item = items.get(i);
+            DeliveryItem item = filteredItems.get(i);
             ItemStack itemStack = item.getItemStack();
 
             final int currentY = y; // 使用最终变量供 Lambda 表达式使用
 
-            // 渲染物品图标
+            // 添加图标渲染任务
             renderCache.add((guiGraphics) -> guiGraphics.renderItem(itemStack, startX, currentY));
 
-            int priceDifference = item.getCurrentPrice() - item.getLastPrice();
-            String priceChangeText;
+            // 添加物品名称渲染任务
+            renderCache.add((guiGraphics) -> guiGraphics.drawString(this.font,
+                    Component.translatable(Util_MessageKeys.MARKET_ITEM_NAME_AND_COUNT_KEY,
+                            itemStack.getHoverName().getString(),
+                            itemStack.getCount()), startX + 20, currentY + 5, 0xFFFFFF, false));
 
-            if (priceDifference > 0) {
-                priceChangeText = "+" + priceDifference; // 正数显示 "+ xxx"
-            } else {
-                priceChangeText = String.valueOf(priceDifference); // 负数直接显示 "- xxx"
-            }
+            // 添加价格渲染任务
+            renderCache.add((guiGraphics) -> guiGraphics.drawString(this.font,
+                    Component.literal("来源: " + item.getSource()), startX, currentY + 18, 0xAAAAAA, false));
 
-            // 渲染物品价格
-            renderCache.add((guiGraphics -> guiGraphics.drawString(this.font, Component.translatable(Util_MessageKeys.SHOP_ITEM_PRICE_KEY, item.getCurrentPrice()), startX + 20, currentY + 5, 0xFFFFFF)));
+            addItemButtons();
 
-            // 渲染物品描述
-            renderCache.add((guiGraphics -> guiGraphics.drawString(this.font, item.getDescription(), startX, currentY + 18, 0xAAAAAA)));
-
-            y += THING_SPACING;
+            y += THING_SPACING; // 调整下一件商品的位置
         }
+
+        super.initializeRenderCache();
     }
 
     @Override
     protected void detectMouseHoverAndRenderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         initPosition();
-
         int y = startY;
 
         for (int i = startIndex; i < endIndex; i++) {
-            ShopItem item = items.get(i);
-
-            int priceDifference = item.getCurrentPrice() - item.getLastPrice();
-            String priceChangeText;
-
-            if (priceDifference > 0) {
-                priceChangeText = "+" + priceDifference; // 正数显示 "+ xxx"
-            } else {
-                priceChangeText = String.valueOf(priceDifference); // 负数直接显示 "- xxx"
-            }
+            DeliveryItem item = filteredItems.get(i);
 
             if (isMouseOver(mouseX, mouseY, startX, y, 16, 16)) {
                 List<Component> tooltip = new ArrayList<>();
-                tooltip.add(Component.translatable(Util_MessageKeys.SHOP_ITEM_CHANGE_PRICE_KEY, priceChangeText));
-                tooltip.add(Component.translatable(Util_MessageKeys.SHOP_ITEM_BASIC_PRICE_KEY, item.getBasePrice()));
-                tooltip.add(Component.translatable(Util_MessageKeys.SHOP_ITEM_CURRENT_PRICE_KEY, item.getCurrentPrice()));
-                tooltip.add(Component.translatable(Util_MessageKeys.SHOP_ITEM_FLUCTUATION_FACTOR_KEY, item.getFluctuationFactor()));
-                tooltip.add(Component.translatable(Util_MessageKeys.SHOP_ITEM_ID_KEY, item.getItemId()));
+                tooltip.add(Component.literal("数据ID: " + item.getDataID()));
+                tooltip.add(Component.translatable(Util_MessageKeys.MARKET_ITEM_ID_KEY, item.getItemID()));
 
                 guiGraphics.renderTooltip(this.font, tooltip, Optional.empty(), mouseX, mouseY);
             }
@@ -168,18 +152,18 @@ public class Screen_Shop extends EconomySystem_Screen {
         }
     }
 
-    // 动态为每个商品添加按钮
+    // 添加购买按钮
     private void addItemButtons() {
         initPosition();
 
         int y = startY;
         for (int i = startIndex; i < endIndex; i++) {
-            ShopItem item = items.get(i);
+            DeliveryItem item = filteredItems.get(i);
 
             // 添加 购买 按钮
             this.addRenderableWidget(
-                    Button.builder(Component.translatable(Util_MessageKeys.SHOP_BUY_BUTTON_KEY), button -> {
-                                this.minecraft.setScreen(new Screen_BuyItem(item));
+                    Button.builder(Component.literal("领取"), button -> {
+                                EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_DeliveryBoxClaimItem(item.getDataID()));
                             })
                             .pos( this.width - startX - 60, y)
                             .size(60, 20)
@@ -190,8 +174,9 @@ public class Screen_Shop extends EconomySystem_Screen {
         }
     }
 
-    // 添加分页按钮
+    // 添加翻页按钮
     private void addPageButtons() {
+        initPosition();
         int buttonY = this.height - 40;
 
         // 上一页按钮
@@ -221,9 +206,16 @@ public class Screen_Shop extends EconomySystem_Screen {
         );
     }
 
+    public void updateDeliveryBoxItems(List<DeliveryItem> deliveryItems) {
+        this.items = deliveryItems;
+        this.filteredItems = new ArrayList<>(items); // 初始化过滤后的列表
+        this.itemsSnapshot = new ArrayList<>(items); // 初始化过滤后的列表
+        this.init(); // 每次更新物品后重新初始化界面
+    }
+
     // 动态计算总页数
     private int getTotalPages() {
-        return (int) Math.ceil((double) items.size() / thingsPerPage);
+        return (int) Math.ceil((double) this.filteredItems.size() / thingsPerPage);
     }
 
     @Override
@@ -244,7 +236,7 @@ public class Screen_Shop extends EconomySystem_Screen {
 
     private void applyFilters() {
         new Thread(() -> {
-            List<ShopItem> result = itemsSnapshot;
+            List<DeliveryItem> result = itemsSnapshot;
 
             // 2. 应用搜索条件
             if (searchBox != null && !searchBox.getValue().isEmpty()) {
@@ -254,9 +246,9 @@ public class Screen_Shop extends EconomySystem_Screen {
             }
 
             // 3. 更新UI
-            List<ShopItem> finalResult = result;
+            List<DeliveryItem> finalResult = result;
             this.minecraft.execute(() -> {
-                this.items = finalResult;
+                this.filteredItems = finalResult;
                 this.currentPage = 0;
                 refreshItemButtons();
                 initializeRenderCache(); // 重新初始化渲染缓存
@@ -264,9 +256,9 @@ public class Screen_Shop extends EconomySystem_Screen {
         }).start();
     }
 
-    private boolean itemMatchesSearch(ShopItem item, String searchText) {
-        return item.getItemId().toLowerCase().contains(searchText.toLowerCase()) ||
-                item.getDescription().toLowerCase().contains(searchText.toLowerCase()) ||
+    private boolean itemMatchesSearch(DeliveryItem item, String searchText) {
+        return item.getItemID().toLowerCase().contains(searchText.toLowerCase()) ||
+                item.getSource().toLowerCase().contains(searchText.toLowerCase()) ||
                 item.getItemStack().getHoverName().getString().toLowerCase().contains(searchText.toLowerCase());
     }
 
@@ -286,7 +278,7 @@ public class Screen_Shop extends EconomySystem_Screen {
     // 判断是否为购买按钮
     private boolean isItemButton(Button button) {
         Component buttonMessage = button.getMessage();
-        return buttonMessage.equals(Component.translatable(Util_MessageKeys.SHOP_BUY_BUTTON_KEY));
+        return buttonMessage.equals(Component.literal("领取"));
     }
 
     @Override
@@ -295,7 +287,7 @@ public class Screen_Shop extends EconomySystem_Screen {
         thingsPerPage = Math.max(1, TOP_MARGIN / THING_SPACING);
 
         startIndex = currentPage * thingsPerPage;
-        endIndex = Math.min(startIndex + thingsPerPage, items.size());
+        endIndex = Math.min(startIndex + thingsPerPage, filteredItems.size());
 
         startX = Math.max((this.width / 2) - 300, 60);
         startY = Math.max((this.height - 400) / 4, 40);

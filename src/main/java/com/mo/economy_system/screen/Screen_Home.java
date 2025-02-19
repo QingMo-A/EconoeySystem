@@ -2,6 +2,7 @@ package com.mo.economy_system.screen;
 
 import com.mo.economy_system.network.EconomySystem_NetworkManager;
 import com.mo.economy_system.network.packets.economy_system.Packet_BalanceRequest;
+import com.mo.economy_system.screen.economy_system.deliver_box.Screen_DeliveryBox;
 import com.mo.economy_system.screen.economy_system.market.Screen_Market;
 import com.mo.economy_system.screen.economy_system.shop.Screen_Shop;
 import com.mo.economy_system.screen.territory_system.Screen_Territory;
@@ -17,7 +18,7 @@ import java.util.Map;
 /**
  * Screen_Home 类用于创建和管理主界面屏幕，包含多个按钮以导航到不同的子界面，并显示玩家余额和其他相关信息。
  */
-public class Screen_Home extends Screen {
+public class Screen_Home extends EconomySystem_Screen {
 
     /**
      * 用于存储玩家余额，默认值为 -1 表示未获取。
@@ -42,13 +43,14 @@ public class Screen_Home extends Screen {
      */
     @Override
     protected void init() {
+        initPosition();
         // 添加商店按钮
         this.addRenderableWidget(
                 Button.builder(Component.translatable(Util_MessageKeys.HOME_SHOP_BUTTON_KEY), button -> {
                             // 请求服务器的商店数据并打开 ShopScreen
                             this.minecraft.setScreen(new Screen_Shop());
                         })
-                        .pos(this.width / 2 - 50, this.height / 2 - 30)  // 设置按钮位置
+                        .pos(startX, startY)  // 设置按钮位置
                         .size(100, 20)  // 设置按钮大小
                         .build()
         );
@@ -59,7 +61,18 @@ public class Screen_Home extends Screen {
                             // 请求服务器的市场数据并打开 MarketScreen
                             this.minecraft.setScreen(new Screen_Market());
                         })
-                        .pos(this.width / 2 - 50, this.height / 2)  // 设置按钮位置
+                        .pos(startX, startY + 30)  // 设置按钮位置
+                        .size(100, 20)  // 设置按钮大小
+                        .build()
+        );
+
+        // 添加物资箱按钮
+        this.addRenderableWidget(
+                Button.builder(Component.translatable(Util_MessageKeys.HOME_DELIVERY_BOX_BUTTON_KEY), button -> {
+                            // 请求服务器的市场数据并打开 DeliveryBoxScreen
+                            this.minecraft.setScreen(new Screen_DeliveryBox());
+                        })
+                        .pos(startX, startY + 60)  // 设置按钮位置
                         .size(100, 20)  // 设置按钮大小
                         .build()
         );
@@ -70,7 +83,7 @@ public class Screen_Home extends Screen {
                             // 请求服务器的领地数据并打开 TerritoryScreen
                             this.minecraft.setScreen(new Screen_Territory());
                         })
-                        .pos(this.width / 2 - 50, this.height / 2 + 30)  // 设置按钮位置
+                        .pos(startX, startY + 90)  // 设置按钮位置
                         .size(100, 20)  // 设置按钮大小
                         .build()
         );
@@ -81,7 +94,7 @@ public class Screen_Home extends Screen {
                             // 打开 AboutScreen
                             this.minecraft.setScreen(new Screen_About());
                         })
-                        .pos(this.width / 2 - 50, this.height / 2 + 60)  // 设置按钮位置
+                        .pos(startX, startY + 120)  // 设置按钮位置
                         .size(100, 20)  // 设置按钮大小
                         .build()
         );
@@ -115,17 +128,13 @@ public class Screen_Home extends Screen {
 
         // 计算文本居中位置
         int textWidth = this.font.width(balanceText);
-        int xPosition = (this.width - textWidth) / 2;
+        int xPosition = startX + textWidth / 2;
 
         // 绘制文本
-        guiGraphics.drawString(this.font, balanceText, xPosition, this.height / 2 - 70, 0xFFFFFF);
-
-        // 绘制自定义文本（可选）
-        guiGraphics.drawCenteredString(this.font, "Hello, World!", this.width / 2, this.height / 2 - 50, 0xFFFFFF);
+        guiGraphics.drawString(this.font, balanceText, xPosition, startY - 20, 0xFFFFFF);
 
         // 渲染玩家账户列表
-        int startX = Math.max((this.width / 2) - 450, 30);
-        int startY = this.height / 2 - 70;
+        int startY = this.startY - 20;
         int index = -1;
         if (accounts != null) {
             int i = 1;
@@ -140,7 +149,7 @@ public class Screen_Home extends Screen {
                 String accountText = "[" + i + "] " + playerName + " 拥有 " + playerBalance + " 枚梦鱼币";
 
                 // 渲染文本
-                guiGraphics.drawString(this.font, accountText, startX, startY, 0xFFFFFF);
+                guiGraphics.drawString(this.font, accountText, this.width - startX - 100, startY, 0xFFFFFF);
 
                 // 增加 y 坐标，确保下一行文本显示在下方
                 startY += this.font.lineHeight + 2;  // 增加行高和一些间距
@@ -150,7 +159,6 @@ public class Screen_Home extends Screen {
         }
 
         if (index != -1) {
-            // 渲染“富豪榜”文本，在账户列表之后
             String leaderboardText = "[" + index + "] 你 拥有 " + balance + " 枚梦鱼币";
             int leaderboardTextWidth = this.font.width(leaderboardText);
             int leaderboardX = 20;  // 居中显示
@@ -158,7 +166,7 @@ public class Screen_Home extends Screen {
             int leaderboardY = startY + 10;  // 在最后一行账户文本之后加一点间隔
 
             // 渲染“富豪榜”文本
-            guiGraphics.drawString(this.font, leaderboardText, startX, leaderboardY, 0xFFFFFF);
+            guiGraphics.drawString(this.font, leaderboardText, this.width - startX - 100, leaderboardY, 0xFFFFFF);
         }
     }
 
@@ -171,16 +179,6 @@ public class Screen_Home extends Screen {
     public void updateBalance(int balance, List<Map.Entry<String, Integer>> accounts) {
         this.balance = balance;
         this.accounts = accounts;
-    }
-
-    /**
-     * 判断是否暂停游戏，返回 false 表示游戏不会暂停。
-     *
-     * @return 是否暂停游戏
-     */
-    @Override
-    public boolean isPauseScreen() {
-        return false;
     }
 
     /**
@@ -198,5 +196,14 @@ public class Screen_Home extends Screen {
             }
         }
         return -1;  // 如果没有找到，返回 -1
+    }
+
+    @Override
+    protected void initPosition(){
+        TOP_MARGIN = this.height - 100;
+        thingsPerPage = Math.max(1, TOP_MARGIN / THING_SPACING);
+
+        startX = Math.max((this.width / 2) - 300, 60);
+        startY = Math.max((this.height - 300) / 4, 40);
     }
 }

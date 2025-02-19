@@ -1,5 +1,6 @@
 package com.mo.economy_system.network.packets.economy_system.sales_order;
 
+import com.mo.economy_system.core.economy_system.EconomySavedData;
 import com.mo.economy_system.core.economy_system.market.MarketItem;
 import com.mo.economy_system.core.economy_system.market.MarketManager;
 import com.mo.economy_system.utils.Util_MessageKeys;
@@ -31,31 +32,41 @@ public class Packet_CreateSalesOrder {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender(); // 获取发送上架请求的玩家
+
             if (player == null) return;
+
+            EconomySavedData economySavedData = EconomySavedData.getInstance(player.serverLevel());
 
             // 获取玩家手中的物品
             var heldItem = player.getMainHandItem();
 
-            // 检查是否与上架的物品匹配
-            if (!heldItem.isEmpty() && ItemStack.isSameItemSameTags(heldItem, msg.marketItem.getItemStack())) {
-                int requiredAmount = msg.marketItem.getItemStack().getCount();
+            int tax = (int) (msg.marketItem.getBasePrice() * 0.1);
 
-                if (heldItem.getCount() >= requiredAmount) {
-                    // 减少背包中的物品
-                    heldItem.shrink(requiredAmount);
+            if (economySavedData.minBalance(player.getUUID(), tax)) {
+                // 检查是否与上架的物品匹配
+                if (!heldItem.isEmpty() && ItemStack.isSameItemSameTags(heldItem, msg.marketItem.getItemStack())) {
+                    int requiredAmount = msg.marketItem.getItemStack().getCount();
 
-                    // 将商品加入市场管理器
-                    MarketManager.addMarketItem(msg.marketItem);
+                    if (heldItem.getCount() >= requiredAmount) {
+                        // 减少背包中的物品
+                        heldItem.shrink(requiredAmount);
 
-                    // 发送成功消息给玩家
-                    player.sendSystemMessage(Component.translatable(Util_MessageKeys.LIST_SUCCESSFULLY_MESSAGE_KEY));
+                        // 将商品加入市场管理器
+                        MarketManager.addMarketItem(msg.marketItem);
+
+                        // 发送成功消息给玩家
+                        player.sendSystemMessage(Component.translatable(Util_MessageKeys.LIST_SUCCESSFULLY_MESSAGE_KEY));
+                    } else {
+                        // 如果物品数量不足，通知玩家
+                        player.sendSystemMessage(Component.translatable(Util_MessageKeys.LIST_INSUFFICIENT_ITEM_MESSAGE_KEY));
+                    }
                 } else {
-                    // 如果物品数量不足，通知玩家
-                    player.sendSystemMessage(Component.translatable(Util_MessageKeys.LIST_INSUFFICIENT_ITEM_MESSAGE_KEY));
+                    // 如果手中的物品与上架物品不匹配，通知玩家
+                    player.sendSystemMessage(Component.translatable(Util_MessageKeys.LIST_UNMATCHED_ITEM_MESSAGE_KEY));
                 }
             } else {
-                // 如果手中的物品与上架物品不匹配，通知玩家
-                player.sendSystemMessage(Component.translatable(Util_MessageKeys.LIST_UNMATCHED_ITEM_MESSAGE_KEY));
+                // 如果玩家不能支付商品税，通知玩家
+                player.sendSystemMessage(Component.translatable(Util_MessageKeys.LIST_ITEM_TAX_PAYMENT_FAILED_MESSAGE_KEY, tax));
             }
         });
         context.setPacketHandled(true);

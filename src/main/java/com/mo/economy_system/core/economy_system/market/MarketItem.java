@@ -12,6 +12,13 @@ public abstract class MarketItem {
     protected final String sellerName;
     protected final UUID sellerID;
     protected final long listingTime;
+    protected final long expirationTime; // 商品过期时间（以毫秒为单位）
+
+    // 假设过期时间为上架后 3天
+    private static final long EXPIRATION_DURATION = 3 * 24 * 60 * 60 * 1000L; // 3天
+    // 假设过期时间为上架后 1 分钟
+    // private static final long EXPIRATION_DURATION = 1 * 60 * 1000L; // 1分钟
+
 
     public MarketItem(UUID tradeID, String itemID, ItemStack itemStack, int basePrice, String sellerName, UUID sellerID, long listingTime) {
         this.tradeID = tradeID;
@@ -21,6 +28,7 @@ public abstract class MarketItem {
         this.sellerName = sellerName;
         this.sellerID = sellerID;
         this.listingTime = listingTime;
+        this.expirationTime = listingTime + EXPIRATION_DURATION; // 设置过期时间
     }
 
     // 公共方法（Getters）...
@@ -37,6 +45,7 @@ public abstract class MarketItem {
         tag.putString("sellerName", sellerName);
         tag.putUUID("sellerID", sellerID);
         tag.putLong("listingTime", listingTime);
+        tag.putLong("expirationTime", expirationTime); // 保存过期时间
         return tag;
     }
 
@@ -53,6 +62,11 @@ public abstract class MarketItem {
         }
     }
 
+    // 判断商品是否过期
+    public boolean isExpired() {
+        return System.currentTimeMillis() > expirationTime;
+    }
+
     // Getters...
     public UUID getTradeID() { return tradeID; }
     public String getItemID() { return itemID; }
@@ -61,4 +75,5 @@ public abstract class MarketItem {
     public String getSellerName() { return sellerName; }
     public UUID getSellerID() { return sellerID; }
     public long getListingTime() { return listingTime; }
+    public long getExpirationTime() { return expirationTime; }
 }

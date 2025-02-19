@@ -34,6 +34,7 @@
   "text.home.balance": "§b余额: §6%s",
   "button.home.shop": "系统商店",
   "button.home.market": "玩家市场",
+  "button.home.delivery_box": "物资箱",
   "button.home.territory": "我的领地",
   "button.home.about": "关于本模组",
 
@@ -122,6 +123,7 @@
   "message.list.list_successfully": "上架成功!",
   "message.list.list_insufficient_item": "你没有足够的物品去上架",
   "message.list.list_unmatched_item": "你手中的物品与上架的物品不匹配",
+  "message.list.list_item_tax_payment_failed": "你没有足够的梦鱼币来交付商品税: %s 枚梦鱼币",
   "text.list.hint": "输入价格(整数且大于0)",
 
   "message.red_packet.insufficient_balance": "§c你没有足够的梦鱼币创建红包",
