@@ -46,7 +46,7 @@ public class Packet_RemoveTerritory {
 
             // 从管理器中移除领地
             TerritoryManager.removeTerritory(msg.territoryID);
-            player.sendSystemMessage(Component.translatable(Util_MessageKeys.TERRITORY_REMOVE_SUCCESS));
+            player.sendSystemMessage(Component.translatable(Util_MessageKeys.TERRITORY_REMOVE_SUCCESS, territory.getName()));
         });
         context.setPacketHandled(true);
     }

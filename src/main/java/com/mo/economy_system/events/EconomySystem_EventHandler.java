@@ -140,6 +140,7 @@ public class EconomySystem_EventHandler {
         if (event.getEntity() instanceof ServerPlayer serverPlayer) {
             UpdateChecker.checkForUpdates(serverPlayer);
 
+
             ServerLevel serverLevel = serverPlayer.serverLevel();
             EconomySavedData savedData = EconomySavedData.getInstance(serverLevel);
 

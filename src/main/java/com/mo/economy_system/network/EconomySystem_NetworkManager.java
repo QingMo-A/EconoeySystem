@@ -1,6 +1,8 @@
 package com.mo.economy_system.network;
 
 import com.mo.economy_system.EconomySystem;
+import com.mo.economy_system.network.packets.Packet_ServerPlayerListRequest;
+import com.mo.economy_system.network.packets.Packet_ServerPlayerListResponse;
 import com.mo.economy_system.network.packets.check_system.*;
 import com.mo.economy_system.network.packets.economy_system.*;
 import com.mo.economy_system.network.packets.economy_system.demand_order.Packet_ConfirmDemandOrder;
@@ -60,5 +62,8 @@ public class EconomySystem_NetworkManager {
         INSTANCE.registerMessage(packetId++, Packet_DeliveryBoxDataRequest.class, Packet_DeliveryBoxDataRequest::encode, Packet_DeliveryBoxDataRequest::decode, Packet_DeliveryBoxDataRequest::handle);
         INSTANCE.registerMessage(packetId++, Packet_DeliveryBoxDataResponse.class, Packet_DeliveryBoxDataResponse::encode, Packet_DeliveryBoxDataResponse::decode, Packet_DeliveryBoxDataResponse::handle);
         INSTANCE.registerMessage(packetId++, Packet_DeliveryBoxClaimItem.class, Packet_DeliveryBoxClaimItem::encode, Packet_DeliveryBoxClaimItem::decode, Packet_DeliveryBoxClaimItem::handle);
+        INSTANCE.registerMessage(packetId++, Packet_ServerPlayerListRequest.class, Packet_ServerPlayerListRequest::encode, Packet_ServerPlayerListRequest::decode, Packet_ServerPlayerListRequest::handle);
+        INSTANCE.registerMessage(packetId++, Packet_ServerPlayerListResponse.class, Packet_ServerPlayerListResponse::encode, Packet_ServerPlayerListResponse::decode, Packet_ServerPlayerListResponse::handle);
+        INSTANCE.registerMessage(packetId++, Packet_ModifyMode.class, Packet_ModifyMode::encode, Packet_ModifyMode::decode, Packet_ModifyMode::handle);
     }
 }

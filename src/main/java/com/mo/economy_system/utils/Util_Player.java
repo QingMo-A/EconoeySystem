@@ -1,12 +1,13 @@
 package com.mo.economy_system.utils;
 
+import com.mo.economy_system.core.economy_system.EconomySavedData;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.player.Player;
 
-import java.util.UUID;
+import java.util.*;
 
 public class Util_Player {
 
@@ -53,5 +54,22 @@ public class Util_Player {
 
         // 如果没有找到玩家信息，返回 "Unknown"
         return "Unknown";
+    }
+
+    public static List<Map.Entry<UUID, String>> getAllPlayerName(EconomySavedData data, MinecraftServer server) {
+        List<Map.Entry<UUID, String>> player = new ArrayList<>();
+
+        // 遍历 list
+        for (Map.Entry<UUID, Integer> entry : data.getAllPlayers()) {
+            UUID uuid = entry.getKey();  // 获取玩家 UUID
+
+            // 获取玩家的 GameProfile
+            GameProfile profile = server.getProfileCache().get(uuid).orElse(null);
+            if (profile != null) {
+                // 创建 Map.Entry 并添加到列表
+                player.add(new AbstractMap.SimpleEntry<>(uuid, profile.getName()));
+            }
+        }
+        return player;
     }
 }

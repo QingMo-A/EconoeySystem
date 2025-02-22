@@ -1,6 +1,7 @@
 package com.mo.economy_system.screen.territory_system;
 
 import com.mo.economy_system.network.EconomySystem_NetworkManager;
+import com.mo.economy_system.network.packets.territory_system.Packet_ModifyMode;
 import com.mo.economy_system.network.packets.territory_system.Packet_RemoveTerritory;
 import com.mo.economy_system.network.packets.territory_system.Packet_RemovePlayer;
 import com.mo.economy_system.network.packets.territory_system.Packet_TerritoryDataRequest;
@@ -84,21 +85,57 @@ public class Screen_ManageTerritory extends Screen {
                         .build()
         );
 
-        // 邀请玩家按钮
+        // 更改领地范围
         this.addRenderableWidget(
-                Button.builder(Component.translatable(Util_MessageKeys.TERRITORY_MANAGEMENT_INVITE_PLAYER), button -> {
-                            Minecraft.getInstance().setScreen(new Screen_InvitePlayer(territory));
-                        }).pos(this.width - (this.width / 4) - 60, startY + 55)
+                Button.builder(Component.translatable(Util_MessageKeys.TERRITORY_MANAGEMENT_RESIZE_TERRITORY), button -> {
+                            EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_ModifyMode(territory.getTerritoryID()));
+                            this.minecraft.setScreen(null);
+                        }).pos(this.width - (this.width / 4) - 60, startY + 30)
                         .size(120, 20)
                         .build()
         );
 
-        // 删除领地按钮
+        // 邀请玩家
+        this.addRenderableWidget(
+                Button.builder(Component.translatable(Util_MessageKeys.TERRITORY_MANAGEMENT_INVITE_PLAYER), button -> {
+                            Minecraft.getInstance().setScreen(new Screen_InvitePlayer(territory));
+                        }).pos(this.width - (this.width / 4) - 60, startY + 60)
+                        .size(120, 20)
+                        .build()
+        );
+
+        // 领地内Buff
+        this.addRenderableWidget(
+                Button.builder(Component.translatable(Util_MessageKeys.TERRITORY_MANAGEMENT_BUFF), button -> {
+
+                        }).pos(this.width - (this.width / 4) - 60, startY + 90)
+                        .size(120, 20)
+                        .build()
+        );
+
+        // 领地权限
+        this.addRenderableWidget(
+                Button.builder(Component.translatable(Util_MessageKeys.TERRITORY_MANAGEMENT_PERMISSIONS), button -> {
+
+                        }).pos(this.width - (this.width / 4) - 60, startY + 120)
+                        .size(120, 20)
+                        .build()
+        );
+        // 领地转让
+        this.addRenderableWidget(
+                Button.builder(Component.translatable(Util_MessageKeys.TERRITORY_MANAGEMENT_TRANSFER_OWNERSHIP), button -> {
+
+                        }).pos(this.width - (this.width / 4) - 60, startY + 150)
+                        .size(120, 20)
+                        .build()
+        );
+
+        // 删除领地
         this.addRenderableWidget(
                 Button.builder(Component.translatable(Util_MessageKeys.TERRITORY_MANAGEMENT_DELETE_TERRITORY), button -> {
                             EconomySystem_NetworkManager.INSTANCE.sendToServer(new Packet_RemoveTerritory(territory.getTerritoryID()));
                             this.minecraft.setScreen(null); // 关闭界面
-                        }).pos(this.width - (this.width / 4) - 60, startY + 110)
+                        }).pos(this.width - (this.width / 4) - 60, startY + 180)
                         .size(120, 20)
                         .build()
         );
@@ -160,11 +197,11 @@ public class Screen_ManageTerritory extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int p_96552_, int p_96553_, int p_96554_) {
-        if (p_96552_ == 256 && this.shouldCloseOnEsc()) {
-            Minecraft.getInstance().setScreen(new Screen_ManageTerritory(territory));
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256 && this.shouldCloseOnEsc()) {
+            Minecraft.getInstance().setScreen(new Screen_Territory());
             return true;
         }
-        return  false;
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 }

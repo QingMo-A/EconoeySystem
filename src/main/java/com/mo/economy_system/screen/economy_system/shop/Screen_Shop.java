@@ -1,20 +1,20 @@
 package com.mo.economy_system.screen.economy_system.shop;
 
-import com.mo.economy_system.core.economy_system.market.DemandOrder;
-import com.mo.economy_system.core.economy_system.market.MarketItem;
-import com.mo.economy_system.core.economy_system.market.SalesOrder;
 import com.mo.economy_system.screen.EconomySystem_Screen;
 import com.mo.economy_system.screen.Screen_Home;
 import com.mo.economy_system.core.economy_system.shop.ShopItem;
 import com.mo.economy_system.network.EconomySystem_NetworkManager;
 import com.mo.economy_system.network.packets.economy_system.Packet_ShopDataRequest;
-import com.mo.economy_system.network.packets.economy_system.Packet_ShopBuyItem;
+import com.mo.economy_system.screen.components.AnimatedButton;
+import com.mo.economy_system.screen.components.AnimatedHighLevelTextField;
+import com.mo.economy_system.screen.components.ItemIconAnimation;
+import com.mo.economy_system.screen.components.TextAnimation;
+import com.mo.economy_system.screen.economy_system.market.Screen_Market;
 import com.mo.economy_system.utils.Util_MessageKeys;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
@@ -28,7 +28,10 @@ public class Screen_Shop extends EconomySystem_Screen {
     private List<ShopItem> items = new ArrayList<>(); // 商品列表
     private List<ShopItem> itemsSnapshot = new ArrayList<>();
 
-    private EditBox searchBox; // 搜索框
+    private TextAnimation pageAnimation;
+
+    private AnimatedHighLevelTextField searchBox; // 搜索框
+    private int flag = 0;
 
     public Screen_Shop() {
         super(Component.translatable(Util_MessageKeys.SHOP_TITLE_KEY));
@@ -45,28 +48,83 @@ public class Screen_Shop extends EconomySystem_Screen {
     protected void init() {
         super.init();
 
+        this.currentPage = 0;
+
+        initPart();
+    }
+
+    @Override
+    protected void initPart() {
         initPosition();
 
         // 清除现有按钮
-        this.clearWidgets();
+        clearWidgets();
+        // clearItemButtons();
 
-        // 添加搜索框
-        this.searchBox = new EditBox(this.font, Math.max((this.width / 2) - 300, 60), 20, 200, 20, Component.translatable("search.market"));
-        this.addRenderableWidget(searchBox);
+        if (flag == 1) {
 
-        // 设置搜索框的键盘监听器
-        this.searchBox.setFocused(false); // 默认不聚焦
-        this.searchBox.setMaxLength(50); // 限制输入长度
-        this.searchBox.setHint(Component.translatable(Util_MessageKeys.SHOP_HINT_TEXT_KEY)); // 提示文本
+            // 添加搜索框
+            this.searchBox = new AnimatedHighLevelTextField(
+                    this.font,
+                    Math.max((this.width / 2) - 300, 60),
+                    -20,
+                    200,
+                    20,
+                    1000,
+                    Component.translatable("search.market")
+            );
+            this.addRenderableWidget(searchBox);
+
+            // 设置搜索框的键盘监听器
+            this.searchBox.setFocused(false); // 默认不聚焦
+            this.searchBox.setMaxLength(50); // 限制输入长度
+            this.searchBox.setHint(Component.translatable(Util_MessageKeys.SHOP_HINT_TEXT_KEY)); // 提示文本
+            this.searchBox.setResponder(text -> applySearch());
+            this.searchBox.startMoveAnimation(Math.max((this.width / 2) - 300, 60), 20);
+        } else if (flag >= 2) {
+
+            // 添加搜索框
+            this.searchBox = new AnimatedHighLevelTextField(
+                    this.font,
+                    Math.max((this.width / 2) - 300, 60),
+                    20,
+                    200,
+                    20,
+                    1000,
+                    Component.translatable("search.market")
+            );
+            this.addRenderableWidget(searchBox);
+
+            // 设置搜索框的键盘监听器
+            this.searchBox.setFocused(false); // 默认不聚焦
+            this.searchBox.setMaxLength(50); // 限制输入长度
+            this.searchBox.setHint(Component.translatable(Util_MessageKeys.SHOP_HINT_TEXT_KEY)); // 提示文本
+            this.searchBox.setResponder(text -> applySearch());
+            this.searchBox.startMoveAnimation(Math.max((this.width / 2) - 300, 60), 20);
+        }
 
         // 动态添加商品购买按钮
         addItemButtons();
 
-        // 添加翻页按钮
-        addPageButtons();
+        if (flag == 1) {
+            // 添加翻页按钮
+            addPageAnimatedButtons();
+
+        } else if (flag >= 2) {
+            addPageButtons();
+        }
+        flag ++;
 
         // 初始化渲染缓存（在所有按钮添加后调用）
         initializeRenderCache();
+    }
+
+    @Override
+    public void resize(Minecraft p_96575_, int p_96576_, int p_96577_) {
+
+        this.flag = 1;
+
+        super.resize(p_96575_, p_96576_, p_96577_);
     }
 
     @Override
@@ -83,16 +141,31 @@ public class Screen_Shop extends EconomySystem_Screen {
             detectMouseHoverAndRenderTooltip(guiGraphics, mouseX, mouseY);
         }
 
-        // 显示当前页数
-        guiGraphics.drawCenteredString(this.font, (currentPage + 1) + " / " + getTotalPages(),
-                this.width / 2, this.height - 33, 0xFFFFFF);
-
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
     }
 
     @Override
     protected void initializeRenderCache() {
         renderCache.clear(); // 清空旧的缓存
+
+        pageAnimation = new TextAnimation(
+                this.width / 2 - this.font.width((currentPage + 1) + " / " + getTotalPages()) / 2,
+                this.height + 33,
+                this.width / 2 - this.font.width((currentPage + 1) + " / " + getTotalPages()) / 2,
+                this.height - 33,
+                0f,
+                1f,
+                1000
+        );
+
+        renderCache.add((guiGraphics) -> {
+            // 渲染标题（带渐入和左滑效果）
+            renderAnimatedText(
+                    guiGraphics,
+                    Component.literal((currentPage + 1) + " / " + getTotalPages()),
+                    pageAnimation
+            );
+        });
 
         if (items.isEmpty()) {
             // 如果没有商品，添加无商品提示的渲染任务
@@ -113,23 +186,64 @@ public class Screen_Shop extends EconomySystem_Screen {
 
             final int currentY = y; // 使用最终变量供 Lambda 表达式使用
 
+            ItemIconAnimation icon;
+            TextAnimation price;
+            TextAnimation description;
+
+            icon = new ItemIconAnimation(
+                    startX,
+                    currentY,
+                    startX,
+                    currentY,
+                    0f,
+                    1f,
+                    0.8f,
+                    1f,
+                    1000
+            );
+
+            price = new TextAnimation(
+                    startX + 20,
+                    currentY + 5,
+                    startX + 20,
+                    currentY + 5,
+                    0f,
+                    1f,
+                    1000
+            );
+
+            description = new TextAnimation(
+                    startX,
+                    currentY + 18,
+                    startX,
+                    currentY + 18,
+                    0f,
+                    1f,
+                    1000
+            );
+
             // 渲染物品图标
-            renderCache.add((guiGraphics) -> guiGraphics.renderItem(itemStack, startX, currentY));
+            // renderCache.add((guiGraphics) -> guiGraphics.renderItem(itemStack, startX, currentY));
 
-            int priceDifference = item.getCurrentPrice() - item.getLastPrice();
-            String priceChangeText;
-
-            if (priceDifference > 0) {
-                priceChangeText = "+" + priceDifference; // 正数显示 "+ xxx"
-            } else {
-                priceChangeText = String.valueOf(priceDifference); // 负数直接显示 "- xxx"
-            }
-
-            // 渲染物品价格
-            renderCache.add((guiGraphics -> guiGraphics.drawString(this.font, Component.translatable(Util_MessageKeys.SHOP_ITEM_PRICE_KEY, item.getCurrentPrice()), startX + 20, currentY + 5, 0xFFFFFF)));
-
-            // 渲染物品描述
-            renderCache.add((guiGraphics -> guiGraphics.drawString(this.font, item.getDescription(), startX, currentY + 18, 0xAAAAAA)));
+            renderCache.add((guiGraphics) -> {
+                renderAnimatedItem(
+                        guiGraphics,
+                        itemStack,
+                        icon
+                );
+                renderAnimatedText(
+                        guiGraphics,
+                        Component.translatable(Util_MessageKeys.SHOP_ITEM_PRICE_KEY, item.getCurrentPrice()),
+                        price,
+                        0xFFFFFF
+                );
+                renderAnimatedText(
+                        guiGraphics,
+                        Component.literal(item.getDescription()),
+                        description,
+                        0xAAAAAA
+                );
+            });
 
             y += THING_SPACING;
         }
@@ -178,16 +292,64 @@ public class Screen_Shop extends EconomySystem_Screen {
 
             // 添加 购买 按钮
             this.addRenderableWidget(
-                    Button.builder(Component.translatable(Util_MessageKeys.SHOP_BUY_BUTTON_KEY), button -> {
+                    new AnimatedButton(
+                            this.width + 60,
+                            y,
+                            this.width - startX - 60,
+                            y,
+                            60, 20,
+                            Component.translatable(Util_MessageKeys.SHOP_BUY_BUTTON_KEY),
+                            1000,
+                            button -> {
                                 this.minecraft.setScreen(new Screen_BuyItem(item));
                             })
-                            .pos( this.width - startX - 60, y)
-                            .size(60, 20)
-                            .build()
             );
 
             y += THING_SPACING;
         }
+    }
+
+    // 添加分页按钮
+    private void addPageAnimatedButtons() {
+        int buttonY = this.height - 40;
+
+        this.addRenderableWidget(
+                new AnimatedButton(
+                        startX,
+                        this.height,
+                        startX,
+                        buttonY,
+                        PAGE_BUTTON_WIDTH,
+                        PAGE_BUTTON_HEIGHT,
+                        Component.literal("<"),
+                        1000,
+                        button -> {
+                            if (currentPage > 0) {
+                                currentPage--;
+                                this.initPart(); // 刷新页面
+                            }
+                        }
+                )
+        );
+
+        this.addRenderableWidget(
+                new AnimatedButton(
+                        this.width - startX - PAGE_BUTTON_WIDTH,
+                        this.height,
+                        this.width - startX - PAGE_BUTTON_WIDTH,
+                        buttonY,
+                        PAGE_BUTTON_WIDTH,
+                        PAGE_BUTTON_HEIGHT,
+                        Component.literal(">"),
+                        1000,
+                        button -> {
+                            if (currentPage < getTotalPages() - 1) {
+                                currentPage++;
+                                this.initPart(); // 刷新页面
+                            }
+                        }
+                )
+        );
     }
 
     // 添加分页按钮
@@ -199,7 +361,7 @@ public class Screen_Shop extends EconomySystem_Screen {
                 Button.builder(Component.literal("<"), button -> {
                             if (currentPage > 0) {
                                 currentPage--;
-                                this.init(); // 刷新页面
+                                this.initPart(); // 刷新页面
                             }
                         })
                         .pos(startX, buttonY)
@@ -212,7 +374,7 @@ public class Screen_Shop extends EconomySystem_Screen {
                 Button.builder(Component.literal(">"), button -> {
                             if (currentPage < getTotalPages() - 1) {
                                 currentPage++;
-                                this.init(); // 刷新页面
+                                this.initPart(); // 刷新页面
                             }
                         })
                         .pos(this.width - startX - PAGE_BUTTON_WIDTH, buttonY)
@@ -281,6 +443,8 @@ public class Screen_Shop extends EconomySystem_Screen {
         // 遍历所有已渲染的控件并移除与商品相关的按钮
         this.renderables.removeIf(widget -> widget instanceof Button && isItemButton((Button) widget));
         this.children().removeIf(widget -> widget instanceof Button && isItemButton((Button) widget));
+        // this.renderables.removeIf(widget -> widget instanceof EditBox);
+        this.children().removeIf(widget -> widget instanceof EditBox);
     }
 
     // 判断是否为购买按钮
@@ -298,6 +462,6 @@ public class Screen_Shop extends EconomySystem_Screen {
         endIndex = Math.min(startIndex + thingsPerPage, items.size());
 
         startX = Math.max((this.width / 2) - 300, 60);
-        startY = Math.max((this.height - 400) / 4, 40);
+        startY = Math.max((this.height - 450) / 4, 55);
     }
 }

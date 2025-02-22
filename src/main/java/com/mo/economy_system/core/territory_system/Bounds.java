@@ -1,5 +1,7 @@
 package com.mo.economy_system.core.territory_system;
 
+import net.minecraft.core.BlockPos;
+
 public class Bounds {
     public int x, z, width, height;
 
@@ -29,6 +31,15 @@ public class Bounds {
                 x + width > other.x &&
                 z < other.z + other.height &&
                 z + height > other.z;
+    }
+
+    public static Bounds calculateBounds(BlockPos pos1, BlockPos pos2) {
+        return new Bounds(
+                Math.min(pos1.getX(), pos2.getX()),
+                Math.min(pos1.getZ(), pos2.getZ()),
+                Math.abs(pos1.getX() - pos2.getX()),
+                Math.abs(pos1.getZ() - pos2.getZ())
+        );
     }
 }
 

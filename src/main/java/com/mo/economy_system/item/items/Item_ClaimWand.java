@@ -23,8 +23,13 @@ public class Item_ClaimWand extends Item {
 
     private static final Map<UUID, BlockPos> firstPositions = new HashMap<>();
     private static final Map<UUID, BlockPos> secondPositions = new HashMap<>();
+    private static final Map<UUID, BlockPos> firstModifyPositions = new HashMap<>();
+    private static final Map<UUID, BlockPos> secondModifyPositions = new HashMap<>();
+    private static final Map<UUID, Integer> modifyVolume = new HashMap<>();
     private static final Map<UUID, ScheduledExecutorService> particleTasks = new HashMap<>(); // 记录每个玩家的粒子任务
     private static final Map<UUID, ScheduledExecutorService> timeoutTasks = new HashMap<>(); // 记录每个玩家的超时任务
+
+    private static final Map<UUID, UUID> playerModify = new HashMap<>(); // 玩家UUID -> 领地ID
 
     public Item_ClaimWand(Properties properties) {
         super(properties);
@@ -39,66 +44,161 @@ public class Item_ClaimWand extends Item {
         UUID playerUUID = player.getUUID();
         BlockPos clickedPos = context.getClickedPos();
 
-        if (!firstPositions.containsKey(playerUUID)) {
-            // 玩家未选定第一个点
-            firstPositions.put(playerUUID, clickedPos);
-            player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_FIRST_POSITION_SET, clickedPos.getX(), clickedPos.getY(), clickedPos.getZ()));
-            startTimeoutTask(player); // 开始倒计时任务
-        } else if (!secondPositions.containsKey(playerUUID)) {
-            // 玩家未选定第二个点
-            secondPositions.put(playerUUID, clickedPos);
+        if (!playerModify.containsKey(playerUUID)) {
+            if (!firstPositions.containsKey(playerUUID)) {
+                // 玩家未选定第一个点
+                firstPositions.put(playerUUID, clickedPos);
+                player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_FIRST_POSITION_SET, clickedPos.getX(), clickedPos.getY(), clickedPos.getZ()));
+                startTimeoutTask(player); // 开始倒计时任务
+            } else if (!secondPositions.containsKey(playerUUID)) {
+                // 玩家未选定第二个点
+                secondPositions.put(playerUUID, clickedPos);
 
-            // 检查新圈地是否包含已有领地
-            BlockPos firstPos = firstPositions.get(playerUUID);
-            if (isOverlappingExistingTerritory(player, firstPos, clickedPos)) {
-                player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_OVERLAP_ERROR));
+                // 检查新圈地是否包含已有领地
+                BlockPos firstPos = firstPositions.get(playerUUID);
+                if (isOverlappingExistingTerritory(player, firstPos, clickedPos)) {
+                    player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_OVERLAP_ERROR));
+                    firstPositions.remove(playerUUID);
+                    secondPositions.remove(playerUUID);
+                    return InteractionResult.FAIL;
+                }
+
+                BlockPos secondPos = secondPositions.get(playerUUID);
+                // 检查两点是否水平
+                if (!(firstPos.getY() == secondPos.getY())) {
+                    player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_Y_MISMATCH_ERROR));
+                    firstPositions.remove(playerUUID);
+                    secondPositions.remove(playerUUID);
+                    return InteractionResult.FAIL;
+                }
+
+                player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_SECOND_POSITION_SET, clickedPos.getX(), clickedPos.getY(), clickedPos.getZ()));
+
+                // 计算范围和价格
+                int volume = calculateVolume(firstPos, clickedPos);
+                int price = volume * 20;
+
+                player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_VOLUME, volume));
+                player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_PRICE, price));
+                player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_INSTRUCTION));
+
+                // 显示粒子效果（仅显示边缘）
+                showParticleEffect((ServerLevel) player.level(), firstPos, clickedPos, player);
+
+            } else {
+                // 第三次右键，取消圈地
                 firstPositions.remove(playerUUID);
                 secondPositions.remove(playerUUID);
-                return InteractionResult.FAIL;
-            }
 
-            BlockPos secondPos = secondPositions.get(playerUUID);
-            // 检查两点是否水平
-            if (!(firstPos.getY() == secondPos.getY())) {
-                player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_Y_MISMATCH_ERROR));
+                // 停止粒子效果
+                stopParticleEffect(playerUUID);
+                stopTimeoutTask(playerUUID);
+
+                player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_CANCEL));
+            }
+        } else if (playerModify.containsKey(playerUUID)) {
+
+            if (!firstPositions.containsKey(playerUUID)) {
+                // 玩家未选定第一个点
+                firstPositions.put(playerUUID, clickedPos);
+                player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_FIRST_POSITION_SET, clickedPos.getX(), clickedPos.getY(), clickedPos.getZ()));
+                startTimeoutTask(player); // 开始倒计时任务
+            }  else if (!secondPositions.containsKey(playerUUID)) {
+                // 玩家未选定第二个点
+                secondPositions.put(playerUUID, clickedPos);
+
+                // 检查新圈地是否包含已有领地
+                BlockPos firstPos = firstPositions.get(playerUUID);
+                if (isOverlappingExistingTerritory(player, firstPos, clickedPos)) {
+                    player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_OVERLAP_ERROR));
+                    firstPositions.remove(playerUUID);
+                    secondPositions.remove(playerUUID);
+                    return InteractionResult.FAIL;
+                }
+
+                BlockPos secondPos = secondPositions.get(playerUUID);
+                // 检查两点是否水平
+                if (!(firstPos.getY() == secondPos.getY())) {
+                    player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_Y_MISMATCH_ERROR));
+                    firstPositions.remove(playerUUID);
+                    secondPositions.remove(playerUUID);
+                    return InteractionResult.FAIL;
+                }
+
+                player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_SECOND_POSITION_SET, clickedPos.getX(), clickedPos.getY(), clickedPos.getZ()));
+
+                Territory territory = TerritoryManager.getTerritoryByID(playerModify.get(playerUUID));
+
+                // 计算范围和价格
+                int volume = calculateVolume(firstPos, clickedPos);
+                int oldVolume = calculateVolume(territory.getPos1(), territory.getPos2());
+                // 计算新旧面积差值
+                int areaDiff = volume - oldVolume;
+
+                firstModifyPositions.put(playerUUID, firstPos);
+                secondModifyPositions.put(playerUUID, secondPos);
+                modifyVolume.put(playerUUID, areaDiff);
+
+                if (areaDiff > 0){
+                    player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_CONFIRM_EXPAND));
+                    int newPrice = areaDiff * 20;
+                    player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_RESIZE_COST_DETAILS, oldVolume, volume, newPrice));
+                } else if (areaDiff < 0) {
+                    player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_CONFIRM_SHRINK));
+                    player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_VOLUME_CHANGE, oldVolume, volume));
+                }
+
+                // 显示粒子效果（仅显示边缘）
+                showParticleEffect((ServerLevel) player.level(), firstPos, clickedPos, player);
+
+            } else {
+                // 第三次右键，取消圈地
                 firstPositions.remove(playerUUID);
                 secondPositions.remove(playerUUID);
-                return InteractionResult.FAIL;
+                firstModifyPositions.remove(playerUUID);
+                secondModifyPositions.remove(playerUUID);
+                modifyVolume.remove(playerUUID);
+
+                // 停止粒子效果
+                stopParticleEffect(playerUUID);
+                stopTimeoutTask(playerUUID);
+                cancelResizing(player);
+
+                player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_CANCEL));
             }
-
-            player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_SECOND_POSITION_SET, clickedPos.getX(), clickedPos.getY(), clickedPos.getZ()));
-
-            // 计算范围和价格
-            int volume = calculateVolume(firstPos, clickedPos);
-            int price = volume * 20;
-
-            player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_VOLUME, volume));
-            player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_PRICE, price));
-            player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_INSTRUCTION));
-
-            // 显示粒子效果（仅显示边缘）
-            showParticleEffect((ServerLevel) player.level(), firstPos, clickedPos, player);
-        } else {
-            // 第三次右键，取消圈地
-            firstPositions.remove(playerUUID);
-            secondPositions.remove(playerUUID);
-
-            // 停止粒子效果
-            stopParticleEffect(playerUUID);
-            stopTimeoutTask(playerUUID);
-
-            player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_CANCEL));
         }
 
         return InteractionResult.SUCCESS;
     }
 
+    public static void startResizing(ServerPlayer player, UUID territoryUUID) {
+        playerModify.put(player.getUUID(), territoryUUID);
+        stopTimeoutTask(player.getUUID());
+        player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_ENTER_RESIZE_MODE));
+    }
+
+    public static void cancelResizing(ServerPlayer player) {
+        playerModify.remove(player.getUUID());
+        player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_EXIT_RESIZE_MODE));
+    }
+
+    public static boolean isResizing(ServerPlayer player) {
+        return playerModify.containsKey(player.getUUID());
+    }
+
+    public static boolean isResizing(UUID playerUUID) {
+        return playerModify.containsKey(playerUUID);
+    }
+
+    public static UUID getResizingTerritoryID(ServerPlayer player) {
+        return playerModify.get(player.getUUID());
+    }
+
 
     private int calculateVolume(BlockPos pos1, BlockPos pos2) {
         int xSize = Math.abs(pos2.getX() - pos1.getX()) + 1;
-        int ySize = Math.abs(pos2.getY() - pos1.getY()) + 1;
         int zSize = Math.abs(pos2.getZ() - pos1.getZ()) + 1;
-        return xSize * ySize * zSize; // 计算体积
+        return xSize * zSize; // 计算体积
     }
 
     private void showParticleEffect(ServerLevel level, BlockPos pos1, BlockPos pos2, ServerPlayer player) {
@@ -138,14 +238,14 @@ public class Item_ClaimWand extends Item {
         particleTasks.put(playerUUID, executorService);
     }
 
-    private void stopParticleEffect(UUID playerUUID) {
+    private static void stopParticleEffect(UUID playerUUID) {
         ScheduledExecutorService executorService = particleTasks.remove(playerUUID);
         if (executorService != null) {
             executorService.shutdownNow();
         }
     }
 
-    private void startTimeoutTask(ServerPlayer player) {
+    private static void startTimeoutTask(ServerPlayer player) {
         UUID playerUUID = player.getUUID();
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
@@ -155,6 +255,11 @@ public class Item_ClaimWand extends Item {
                 firstPositions.remove(playerUUID);
                 secondPositions.remove(playerUUID);
                 stopParticleEffect(playerUUID);
+                firstModifyPositions.remove(playerUUID);
+                secondModifyPositions.remove(playerUUID);
+                modifyVolume.remove(playerUUID);
+                playerModify.remove(playerUUID);
+                cancelResizing(player);
                 player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_WAND_TIMEOUT));
             }
         }, 60, TimeUnit.SECONDS); // 60秒后执行
@@ -177,9 +282,25 @@ public class Item_ClaimWand extends Item {
         return secondPositions.get(playerUUID);
     }
 
+    public static BlockPos getFirstModifyPosition(UUID playerUUID) {
+        return firstModifyPositions.get(playerUUID);
+    }
+
+    public static BlockPos getSecondModifyPosition(UUID playerUUID) {
+        return secondModifyPositions.get(playerUUID);
+    }
+
+    public static int getModifyVolume(UUID playerUUID) {
+        return modifyVolume.get(playerUUID);
+    }
+
     public static void clearPositions(UUID playerUUID) {
         firstPositions.remove(playerUUID);
         secondPositions.remove(playerUUID);
+        firstModifyPositions.remove(playerUUID);
+        secondModifyPositions.remove(playerUUID);
+        modifyVolume.remove(playerUUID);
+        playerModify.remove(playerUUID);
 
         ScheduledExecutorService executorService = particleTasks.remove(playerUUID);
         if (executorService != null) {
@@ -197,12 +318,10 @@ public class Item_ClaimWand extends Item {
         int minZ = Math.min(pos1.getZ(), pos2.getZ());
         int maxZ = Math.max(pos1.getZ(), pos2.getZ());
 
+        boolean flag = false;
+
         // 遍历所有现有领地
         for (Territory territory : TerritoryManager.getAllTerritories()) {
-            // 如果玩家是领地所有者，不检测此领地
-            /*if (territory.isOwner(playerUUID)) {
-                continue;
-            }*/
 
             // 获取现有领地的 X-Z 范围
             int existingMinX = Math.min(territory.getPos1().getX(), territory.getPos2().getX());
@@ -212,11 +331,49 @@ public class Item_ClaimWand extends Item {
 
             // 检测范围是否重叠
             if (maxX >= existingMinX && minX <= existingMaxX && maxZ >= existingMinZ && minZ <= existingMaxZ && player.serverLevel().dimension().equals(territory.getDimension())) {
-                return true; // 存在重叠
+                // t.put(player.getUUID(), territory);
+                // 如果玩家处于修改模式
+                if (playerModify.containsKey(player.getUUID())) {
+                    if (!(playerModify.get(player.getUUID()).equals(territory.getTerritoryID()))) {
+                        flag = true;
+                        break;
+                    }
+                } else {
+                    return true;
+                }
+            }
+        }
+
+        return flag; // 没有重叠
+    }
+
+    private boolean isContainingTerritoryOwner(ServerPlayer player, BlockPos pos1, BlockPos pos2) {
+        // 计算新领地的范围
+        int minX = Math.min(pos1.getX(), pos2.getX());
+        int maxX = Math.max(pos1.getX(), pos2.getX());
+        int minZ = Math.min(pos1.getZ(), pos2.getZ());
+        int maxZ = Math.max(pos1.getZ(), pos2.getZ());
+
+        // 遍历所有现有领地
+        for (Territory territory : TerritoryManager.getAllTerritories()) {
+
+            // 获取现有领地的 X-Z 范围
+            int existingMinX = Math.min(territory.getPos1().getX(), territory.getPos2().getX());
+            int existingMaxX = Math.max(territory.getPos1().getX(), territory.getPos2().getX());
+            int existingMinZ = Math.min(territory.getPos1().getZ(), territory.getPos2().getZ());
+            int existingMaxZ = Math.max(territory.getPos1().getZ(), territory.getPos2().getZ());
+
+            // 检测范围是否重叠
+            if (maxX >= existingMinX && minX <= existingMaxX && maxZ >= existingMinZ && minZ <= existingMaxZ && player.serverLevel().dimension().equals(territory.getDimension())) {
+                if (territory.isOwner(player.getUUID())) {
+                    return true;
+                } else {
+                    return false;
+                }
+
             }
         }
 
         return false; // 没有重叠
     }
-
 }

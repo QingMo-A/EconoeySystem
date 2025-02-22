@@ -66,6 +66,12 @@ public class EconomySavedData extends SavedData {
         return allAccounts;
     }
 
+    // 返回一个只读的账户视图（防止外部修改原始数据）
+    public List<Map.Entry<UUID, Integer>> getAllPlayers() {
+        List<Map.Entry<UUID, Integer>> allPlayers = new ArrayList<>(accounts.entrySet());
+        return allPlayers;
+    }
+
     // 保存数据到 NBT
     @Override
     public CompoundTag save(CompoundTag tag) {

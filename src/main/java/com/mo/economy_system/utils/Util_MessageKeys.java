@@ -154,6 +154,10 @@ public class Util_MessageKeys {
     public static final String TERRITORY_MANAGEMENT_DELETE_TERRITORY = "message.territory_management.delete_territory";
     public static final String TERRITORY_MANAGEMENT_COPY_SUCCESS = "message.territory_management.copy_success";
     public static final String TERRITORY_MANAGEMENT_KICK_PLAYER = "message.territory_management.kick_player";
+    public static final String TERRITORY_MANAGEMENT_BUFF = "message.territory_management.buff";
+    public static final String TERRITORY_MANAGEMENT_PERMISSIONS = "message.territory_management.permissions";
+    public static final String TERRITORY_MANAGEMENT_TRANSFER_OWNERSHIP = "message.territory_management.transfer_ownership";
+    public static final String TERRITORY_MANAGEMENT_RESIZE_TERRITORY = "message.territory_management.resize_territory";
 
     public static final String TERRITORY_NOT_FOUND = "message.territory.not_found";
     public static final String TERRITORY_NO_OWNER_PERMISSION = "message.territory.no_owner_permission";
@@ -203,6 +207,15 @@ public class Util_MessageKeys {
     public static final String CLAIM_WAND_INSTRUCTION = "message.claim_wand.instruction";
     public static final String CLAIM_WAND_CANCEL = "message.claim_wand.cancel";
     public static final String CLAIM_WAND_TIMEOUT = "message.claim_wand.timeout";
+    public static final String CLAIM_RESIZE_FAILED = "message.claim.resize_failed";
+    public static final String CLAIM_RESIZE_SUCCESS = "message.claim.resize_success";
+    public static final String CLAIM_RESIZE_INSUFFICIENT_BALANCE = "message.claim.resize_insufficient_balance";
+    public static final String CLAIM_WAND_CONFIRM_EXPAND = "message.claim_wand.confirm_expand";
+    public static final String CLAIM_WAND_RESIZE_COST_DETAILS = "message.claim_wand.resize_cost_details";
+    public static final String CLAIM_WAND_CONFIRM_SHRINK = "message.claim_wand.confirm_shrink";
+    public static final String CLAIM_WAND_VOLUME_CHANGE = "message.claim_wand.volume_change";
+    public static final String CLAIM_WAND_ENTER_RESIZE_MODE = "message.claim_wand.enter_resize_mode";
+    public static final String CLAIM_WAND_EXIT_RESIZE_MODE = "message.claim_wand.exit_resize_mode";
 
     public static final String TELEPORT_TARGET_NOT_FOUND = "message.teleport.target_not_found";
     public static final String TELEPORT_NO_PERMISSION = "message.teleport.no_permission";

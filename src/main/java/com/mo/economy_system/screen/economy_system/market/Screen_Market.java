@@ -74,6 +74,7 @@ public class Screen_Market extends EconomySystem_Screen {
         this.searchBox.setFocused(false); // 默认不聚焦
         this.searchBox.setMaxLength(50); // 限制输入长度
         this.searchBox.setHint(Component.translatable(Util_MessageKeys.MARKET_HINT_TEXT_KEY)); // 提示文本
+        this.searchBox.setResponder(text -> applySearch());
 
         // 添加翻页按钮
         addPageButtons();

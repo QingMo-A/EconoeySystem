@@ -1,5 +1,7 @@
 package com.mo.economy_system.core.territory_system;
 
+import net.minecraft.core.BlockPos;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,6 +90,23 @@ public class QuadTree {
         }
 
         return result;
+    }
+
+    // 修改 query 方法，直接返回精确结果
+    public Territory queryExact(int x, int z) {
+        List<Territory> candidates = query(x, z);
+        return candidates.stream()
+                .filter(t -> t.isWithinBoundsIgnoreY(x, z))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Territory queryExact(BlockPos pos1, BlockPos pos2) {
+        List<Territory> candidates = query(pos1.getX(), pos2.getX());
+        return candidates.stream()
+                .filter(t -> t.isWithinBoundsIgnoreY(pos1.getX(), pos2.getX()))
+                .findFirst()
+                .orElse(null);
     }
 
     // 从四叉树中移除领地

@@ -15,7 +15,7 @@ public class TerritoryManager {
     private static final Map<UUID, List<Territory>> territoriesByOwner = new ConcurrentHashMap<>();
 
     // 初始化一个有限边界的四叉树
-    private static QuadTree quadTree = new QuadTree(0, new Bounds(-30000, -30000, 60000, 60000));
+    public static QuadTree quadTree = new QuadTree(0, new Bounds(-30000, -30000, 60000, 60000));
 
     // 自动保存间隔（60秒）
     private static final long AUTO_SAVE_INTERVAL = 60000L;

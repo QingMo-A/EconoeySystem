@@ -56,12 +56,63 @@ public class Command_TerritoryClaim {
                             Item_ClaimWand.clearPositions(playerUUID); // 清除点位记录
                             return 1;
                         })));
+        dispatcher.register(Commands.literal("confirm_modify")
+                .executes(context -> {
+                    ServerPlayer player = context.getSource().getPlayerOrException();
+                    UUID playerUUID = player.getUUID();
+
+                    // 检查玩家是否有两个选定点
+                    if (Item_ClaimWand.isResizing(playerUUID) == false || Item_ClaimWand.getFirstModifyPosition(playerUUID) == null || Item_ClaimWand.getSecondModifyPosition(playerUUID) == null || Item_ClaimWand.getModifyVolume(playerUUID) == 0) {
+                        player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_RESIZE_FAILED));
+                        return 0;
+                    }
+
+                    // 获取选定的点
+                    BlockPos firstPos = Item_ClaimWand.getFirstModifyPosition(playerUUID);
+                    BlockPos secondPos = Item_ClaimWand.getSecondModifyPosition(playerUUID);
+                    Territory t = TerritoryManager.getTerritoryByID(Item_ClaimWand.getResizingTerritoryID(player));
+
+                    // 检查余额
+                    EconomySavedData data = EconomySavedData.getInstance(player.serverLevel());
+
+                    int volume = Item_ClaimWand.getModifyVolume(playerUUID);
+                    if (volume > 0) {
+                        int price = Item_ClaimWand.getModifyVolume(playerUUID) * 20;
+
+                        if (data.minBalance(playerUUID, price)) {
+                            t.setBackpoint(firstPos);
+                            t.setX1(firstPos.getX());
+                            t.setY1(firstPos.getY());
+                            t.setZ1(firstPos.getZ());
+                            t.setX2(secondPos.getX());
+                            t.setY2(secondPos.getY());
+                            t.setZ2(secondPos.getZ());
+
+                            player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_RESIZE_SUCCESS));
+                            Item_ClaimWand.clearPositions(playerUUID);
+                        } else {
+                            player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_RESIZE_INSUFFICIENT_BALANCE));
+                        }
+                    } else {
+                        t.setBackpoint(firstPos);
+                        t.setX1(firstPos.getX());
+                        t.setY1(firstPos.getY());
+                        t.setZ1(firstPos.getZ());
+                        t.setX2(secondPos.getX());
+                        t.setY2(secondPos.getY());
+                        t.setZ2(secondPos.getZ());
+
+                        player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_RESIZE_SUCCESS));
+                        Item_ClaimWand.clearPositions(playerUUID);
+                    }
+                    return 1;
+                })
+        );
     }
 
     private static int calculateVolume(BlockPos pos1, BlockPos pos2) {
         int xSize = Math.abs(pos2.getX() - pos1.getX()) + 1;
-        int ySize = Math.abs(pos2.getY() - pos1.getY()) + 1;
         int zSize = Math.abs(pos2.getZ() - pos1.getZ()) + 1;
-        return xSize * ySize * zSize; // 计算体积
+        return xSize * zSize; // 计算体积
     }
 }
