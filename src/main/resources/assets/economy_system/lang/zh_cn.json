@@ -64,6 +64,7 @@
   "message.shop_buy.no_item": "未知物品",
   "message.shop_buy.invalid_count": "非法数量",
   "text.shop_buy.count": "数量: ",
+  "text_buy.price": "价格: %s",
 
   "screen.market.title": "市场",
   "text.market.hint": "输入商品任意信息",

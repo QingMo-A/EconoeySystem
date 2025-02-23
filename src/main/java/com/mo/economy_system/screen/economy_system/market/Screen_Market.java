@@ -12,6 +12,10 @@ import com.mo.economy_system.core.economy_system.market.DemandOrder;
 import com.mo.economy_system.core.economy_system.market.MarketItem;
 import com.mo.economy_system.network.EconomySystem_NetworkManager;
 import com.mo.economy_system.core.economy_system.market.SalesOrder;
+import com.mo.economy_system.screen.components.AnimatedButton;
+import com.mo.economy_system.screen.components.AnimatedHighLevelTextField;
+import com.mo.economy_system.screen.components.ItemIconAnimation;
+import com.mo.economy_system.screen.components.TextAnimation;
 import com.mo.economy_system.utils.Util_MessageKeys;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -19,6 +23,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import org.checkerframework.checker.units.qual.C;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +46,10 @@ public class Screen_Market extends EconomySystem_Screen {
             Util_MessageKeys.MARKET_SWITCH_DISPLAY_TYPE_4_BUTTON_KEY
     };
 
-    private EditBox searchBox; // 搜索框
+    private TextAnimation pageAnimation;
+    private TextAnimation noItem;
+
+    private AnimatedHighLevelTextField searchBox; // 搜索框
 
     private UUID playerUUID;
     private String playerName;
@@ -56,40 +64,103 @@ public class Screen_Market extends EconomySystem_Screen {
     @Override
     protected void init() {
         super.init();
-        initPosition();
+
+        this.currentPage = 0;
+
+        initPart();
+
 
         if (this.minecraft != null && this.minecraft.player != null) {
             this.playerUUID = this.minecraft.player.getUUID();
             this.playerName = this.minecraft.player.getName().getString();
         }
+    }
+
+    @Override
+    protected void initPart() {
+
+        initPosition();
 
         // 清除现有按钮
         this.clearWidgets();
 
-        // 添加搜索框
-        this.searchBox = new EditBox(this.font, Math.max((this.width / 2) - 300, 60), 20, 200, 20, Component.translatable("search.market"));
-        this.addRenderableWidget(searchBox);
+        if (flag == 1) {
 
-        // 设置搜索框的键盘监听器
-        this.searchBox.setFocused(false); // 默认不聚焦
-        this.searchBox.setMaxLength(50); // 限制输入长度
-        this.searchBox.setHint(Component.translatable(Util_MessageKeys.MARKET_HINT_TEXT_KEY)); // 提示文本
-        this.searchBox.setResponder(text -> applySearch());
+            // 添加搜索框
+            this.searchBox = new AnimatedHighLevelTextField(
+                    this.font,
+                    Math.max((this.width / 2) - 300, 60),
+                    -20,
+                    200,
+                    20,
+                    1000,
+                    Component.translatable("search.market")
+            );
+            this.addRenderableWidget(searchBox);
 
-        // 添加翻页按钮
-        addPageButtons();
+            // 设置搜索框的键盘监听器
+            this.searchBox.setFocused(false); // 默认不聚焦
+            this.searchBox.setMaxLength(50); // 限制输入长度
+            this.searchBox.setHint(Component.translatable(Util_MessageKeys.MARKET_HINT_TEXT_KEY)); // 提示文本
+            this.searchBox.setResponder(text -> applySearch());
+            this.searchBox.startMoveAnimation(Math.max((this.width / 2) - 300, 60), 20);
 
-        // 添加切换显示类型的按钮
-        addSwitchDisplayTypeButton();
+            // 添加动态翻页按钮
+            addPageAnimatedButtons();
 
-        // 添加上架按钮
-        addListItemButton();
+            addSwitchDisplayTypeAnimatedButton();
 
-        // 添加求购按钮
-        addRequestItemButton();
+            addListItemAnimatedButton();
 
-        // 初始化渲染缓存（在所有按钮添加后调用）
+            addRequestItemAnimatedButton();
+
+        } else if (flag >= 2) {
+
+            // 添加搜索框
+            this.searchBox = new AnimatedHighLevelTextField(
+                    this.font,
+                    Math.max((this.width / 2) - 300, 60),
+                    20,
+                    200,
+                    20,
+                    1000,
+                    Component.translatable("search.market")
+            );
+            this.addRenderableWidget(searchBox);
+
+            // 设置搜索框的键盘监听器
+            this.searchBox.setFocused(false); // 默认不聚焦
+            this.searchBox.setMaxLength(50); // 限制输入长度
+            this.searchBox.setHint(Component.translatable(Util_MessageKeys.MARKET_HINT_TEXT_KEY)); // 提示文本
+            this.searchBox.setResponder(text -> applySearch());
+            this.searchBox.startMoveAnimation(Math.max((this.width / 2) - 300, 60), 20);
+
+            // 添加静态翻页按钮
+            addPageButtons();
+
+            // 添加切换显示类型的按钮
+            addSwitchDisplayTypeButton();
+
+            // 添加上架按钮
+            addListItemButton();
+
+            // 添加求购按钮
+            addRequestItemButton();
+        }
+
+        flag ++;
+
         initializeRenderCache();
+
+        super.initPart();
+    }
+
+    @Override
+    public void resize(Minecraft minecraft, int width, int height) {
+
+        this.flag = 1;
+
+        super.resize(minecraft, width, height);
     }
 
     // 渲染(一帧一更新)
@@ -107,10 +178,6 @@ public class Screen_Market extends EconomySystem_Screen {
             detectMouseHoverAndRenderTooltip(guiGraphics, mouseX, mouseY);
         }
 
-        // 渲染当前页数
-        guiGraphics.drawCenteredString(this.font, (currentPage + 1) + " / " + getTotalPages(),
-                this.width / 2, this.height - 33, 0xFFFFFF);
-
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
     }
 
@@ -118,12 +185,47 @@ public class Screen_Market extends EconomySystem_Screen {
     protected void initializeRenderCache() {
         renderCache.clear(); // 清空旧的缓存
 
+        pageAnimation = new TextAnimation(
+                this.width / 2 - this.font.width((currentPage + 1) + " / " + getTotalPages()) / 2,
+                this.height + 33,
+                this.width / 2 - this.font.width((currentPage + 1) + " / " + getTotalPages()) / 2,
+                this.height - 33,
+                0f,
+                1f,
+                1000
+        );
+
+        renderCache.add((guiGraphics) -> {
+            renderAnimatedText(
+                    guiGraphics,
+                    Component.literal((currentPage + 1) + " / " + getTotalPages()),
+                    pageAnimation
+            );
+        });
+
         if (filteredItems.isEmpty()) {
+
+            int textWidth = this.font.width(Component.translatable(Util_MessageKeys.MARKET_NO_ITEMS_TEXT_KEY));
+            int xPosition = (this.width - textWidth) / 2;
+
+            noItem = new TextAnimation(
+                    xPosition,
+                    this.height / 2 - 10,
+                    xPosition,
+                    this.height / 2 - 10,
+                    0f,
+                    1f,
+                    2000
+            );
+
             // 如果没有商品，添加无商品提示的渲染任务
             renderCache.add((guiGraphics) -> {
-                int textWidth = this.font.width(Component.translatable(Util_MessageKeys.MARKET_NO_ITEMS_TEXT_KEY));
-                int xPosition = (this.width - textWidth) / 2;
-                guiGraphics.drawString(this.font, Component.translatable(Util_MessageKeys.MARKET_NO_ITEMS_TEXT_KEY), xPosition, this.height / 2 - 10, 0xFFFFFF, false);
+
+                renderAnimatedText(
+                        guiGraphics,
+                        Component.translatable(Util_MessageKeys.MARKET_NO_ITEMS_TEXT_KEY),
+                        noItem
+                );
             });
             return;
         }
@@ -136,18 +238,62 @@ public class Screen_Market extends EconomySystem_Screen {
 
             final int currentY = y; // 使用最终变量供 Lambda 表达式使用
 
-            // 添加图标渲染任务
-            renderCache.add((guiGraphics) -> guiGraphics.renderItem(itemStack, startX, currentY));
+            ItemIconAnimation icon;
+            TextAnimation name;
+            TextAnimation price;
 
-            // 添加物品名称渲染任务
-            renderCache.add((guiGraphics) -> guiGraphics.drawString(this.font,
-                    Component.translatable(Util_MessageKeys.MARKET_ITEM_NAME_AND_COUNT_KEY,
-                            itemStack.getHoverName().getString(),
-                            itemStack.getCount()), startX + 20, currentY + 5, 0xFFFFFF, false));
+            icon = new ItemIconAnimation(
+                    startX,
+                    currentY,
+                    startX,
+                    currentY,
+                    0f,
+                    1f,
+                    0.8f,
+                    1f,
+                    1000
+            );
 
-            // 添加价格渲染任务
-            renderCache.add((guiGraphics) -> guiGraphics.drawString(this.font,
-                    Component.translatable(Util_MessageKeys.MARKET_ITEM_PRICE_KEY, item.getBasePrice()), startX, currentY + 18, 0xAAAAAA, false));
+            name = new TextAnimation(
+                    startX + 20,
+                    currentY + 5,
+                    startX + 20,
+                    currentY + 5,
+                    0f,
+                    1f,
+                    1000
+            );
+
+            price = new TextAnimation(
+                    startX,
+                    currentY + 18,
+                    startX,
+                    currentY + 18,
+                    0f,
+                    1f,
+                    1000
+            );
+
+            // 渲染物品图标, 价格与描述
+            renderCache.add((guiGraphics) -> {
+                renderAnimatedItem(
+                        guiGraphics,
+                        itemStack,
+                        icon
+                );
+                renderAnimatedText(
+                        guiGraphics,
+                        Component.translatable(Util_MessageKeys.MARKET_ITEM_NAME_AND_COUNT_KEY, itemStack.getHoverName().getString(), itemStack.getCount()),
+                        name,
+                        0xFFFFFF
+                );
+                renderAnimatedText(
+                        guiGraphics,
+                        Component.translatable(Util_MessageKeys.MARKET_ITEM_PRICE_KEY, item.getBasePrice()),
+                        price,
+                        0xAAAAAA
+                );
+            });
 
             // 添加购买或下架按钮（确保在初始化时添加按钮）
             addActionButton(item, this.width - startX, currentY, playerUUID);
@@ -180,26 +326,54 @@ public class Screen_Market extends EconomySystem_Screen {
         }
     }
 
-    // 添加购买按钮
-    private void addItemButtons() {
+    // 添加初始化动态分页按钮
+    @Override
+    protected void addPageAnimatedButtons() {
         initPosition();
+        int buttonY = this.height - 40;
 
-        int y = startY;
-        UUID playerUUID = this.minecraft.player.getUUID();
+        this.addRenderableWidget(
+                new AnimatedButton(
+                        startX,
+                        this.height,
+                        startX,
+                        buttonY,
+                        PAGE_BUTTON_WIDTH,
+                        PAGE_BUTTON_HEIGHT,
+                        Component.literal("<"),
+                        1000,
+                        button -> {
+                            if (currentPage > 0) {
+                                currentPage--;
+                                this.initPart(); // 刷新页面
+                            }
+                        }
+                )
+        );
 
-        for (int i = startIndex; i < endIndex; i++) {
-            System.out.println(i);
-            MarketItem item = filteredItems.get(i);
-
-            // 添加购买或下架按钮
-            this.addActionButton(item, this.width - startX, y, playerUUID);
-
-            y += THING_SPACING;
-        }
+        this.addRenderableWidget(
+                new AnimatedButton(
+                        this.width - startX - PAGE_BUTTON_WIDTH,
+                        this.height,
+                        this.width - startX - PAGE_BUTTON_WIDTH,
+                        buttonY,
+                        PAGE_BUTTON_WIDTH,
+                        PAGE_BUTTON_HEIGHT,
+                        Component.literal(">"),
+                        1000,
+                        button -> {
+                            if (currentPage < getTotalPages() - 1) {
+                                currentPage++;
+                                this.initPart(); // 刷新页面
+                            }
+                        }
+                )
+        );
     }
 
-    // 添加翻页按钮
-    private void addPageButtons() {
+    // 添加后续静态分页按钮
+    @Override
+    protected void addPageButtons() {
         initPosition();
         int buttonY = this.height - 40;
 
@@ -208,7 +382,7 @@ public class Screen_Market extends EconomySystem_Screen {
                 Button.builder(Component.literal("<"), button -> {
                             if (currentPage > 0) {
                                 currentPage--;
-                                this.init(); // 刷新页面
+                                this.initPart(); // 刷新页面
                             }
                         })
                         .pos(startX, buttonY)
@@ -221,7 +395,7 @@ public class Screen_Market extends EconomySystem_Screen {
                 Button.builder(Component.literal(">"), button -> {
                             if (currentPage < getTotalPages() - 1) {
                                 currentPage++;
-                                this.init(); // 刷新页面
+                                this.initPart(); // 刷新页面
                             }
                         })
                         .pos(this.width - startX - PAGE_BUTTON_WIDTH, buttonY)
@@ -231,6 +405,28 @@ public class Screen_Market extends EconomySystem_Screen {
     }
 
     // 添加求购按钮
+    private void addRequestItemAnimatedButton() {
+        int buttonWidth = 70;
+        int buttonHeight = 20;
+
+        this.addRenderableWidget(
+                new AnimatedButton(
+                        this.width - Math.max((this.width / 2) - 300, 60) - buttonWidth,
+                        -20,
+                        this.width - Math.max((this.width / 2) - 300, 60) - buttonWidth,
+                        20,
+                        buttonWidth,
+                        buttonHeight,
+                        Component.translatable(Util_MessageKeys.MARKET_REQUEST_BUTTON_KEY),
+                        1000,
+                        button -> {
+                            // 打开上架界面
+                            this.minecraft.setScreen(new Screen_CreateDemandOrder(minecraft.player));
+                        }
+                )
+        );
+    }
+
     private void addRequestItemButton() {
         int buttonWidth = 70;
         int buttonHeight = 20;
@@ -247,6 +443,28 @@ public class Screen_Market extends EconomySystem_Screen {
     }
 
     // 添加上架按钮
+    private void addListItemAnimatedButton() {
+        int buttonWidth = 70;
+        int buttonHeight = 20;
+
+        this.addRenderableWidget(
+                new AnimatedButton(
+                        this.width - Math.max((this.width / 2) - 300, 60) - (2 * buttonWidth + 10),
+                        -20,
+                        this.width - Math.max((this.width / 2) - 300, 60) - (2 * buttonWidth + 10),
+                        20,
+                        buttonWidth,
+                        buttonHeight,
+                        Component.translatable(Util_MessageKeys.MARKET_LIST_BUTTON_KEY),
+                        1000,
+                        button -> {
+                            // 打开上架界面
+                            this.minecraft.setScreen(new Screen_CreateSalesOrder(minecraft.player));
+                        }
+                )
+        );
+    }
+
     private void addListItemButton() {
         int buttonWidth = 70;
         int buttonHeight = 20;
@@ -263,6 +481,32 @@ public class Screen_Market extends EconomySystem_Screen {
     }
 
     // 添加切换显示类型按钮
+    private void addSwitchDisplayTypeAnimatedButton() {
+        int buttonWidth = 100;
+        int buttonHeight = 20;
+
+        // 添加到界面
+        this.addRenderableWidget(
+                new AnimatedButton(
+                        this.width - Math.max((this.width / 2) - 300, 60) - (2 * 70 + 20) - buttonWidth,
+                        -20,
+                        this.width - Math.max((this.width / 2) - 300, 60) - (2 * 70 + 20) - buttonWidth,
+                        20,
+                        buttonWidth,
+                        buttonHeight,
+                        Component.translatable(DISPLAY_TYPE_KEYS[displayTypeIndex]),
+                        1000,
+                        button -> {
+                            // 执行切换逻辑
+                            displayTypeIndex = (displayTypeIndex + 1) % DISPLAY_TYPE_KEYS.length; // 循环切换文本索引
+                            button.setMessage(Component.translatable(DISPLAY_TYPE_KEYS[displayTypeIndex])); // 更新按钮显示文本
+
+                            // 执行与当前显示类型相关的操作
+                            handleDisplayTypeAction(displayTypeIndex);
+                        })
+        );
+    }
+
     private void addSwitchDisplayTypeButton() {
         int buttonWidth = 100;
         int buttonHeight = 20;
@@ -287,29 +531,28 @@ public class Screen_Market extends EconomySystem_Screen {
         this.addRenderableWidget(switchDisplayButton);
     }
 
-    // 辅助方法：创建并添加一个按钮
-    private void addButton(String translationKey, int posX, int posY, int width, int height, Runnable onClick) {
-        Button button = Button.builder(Component.translatable(translationKey), btn -> onClick.run())
-                .pos(posX, posY)
-                .size(width, height)
-                .build();
-        this.addRenderableWidget(button);
-    }
-
-    // 辅助方法：创建一个按钮并将其设为不可用（disabled）
-    private void addDisabledButton(String translationKey, int posX, int posY, int width, int height, Runnable onClick) {
-        Button button = Button.builder(Component.translatable(translationKey), btn -> onClick.run())
-                .pos(posX, posY)
-                .size(width, height)
-                .build();
-        button.active = false;
-        this.addRenderableWidget(button);
-    }
-
     // 处理与显示类型相关的操作
     private void handleDisplayTypeAction(int displayTypeIndex) {
         this.displayTypeIndex = displayTypeIndex; // 保存过滤条件
         applyFilters(); // 调用联合过滤逻辑
+    }
+
+    // 添加购买按钮
+    private void addItemButtons() {
+        initPosition();
+
+        int y = startY;
+        UUID playerUUID = this.minecraft.player.getUUID();
+
+        for (int i = startIndex; i < endIndex; i++) {
+            System.out.println(i);
+            MarketItem item = filteredItems.get(i);
+
+            // 添加购买或下架按钮
+            this.addActionButton(item, this.width - startX, y, playerUUID);
+
+            y += THING_SPACING;
+        }
     }
 
     // 重构后的主方法，根据订单类型与玩家权限添加相应按钮
@@ -404,6 +647,40 @@ public class Screen_Market extends EconomySystem_Screen {
             }
         }
         // 其它类型暂不处理
+    }
+
+    // 辅助方法：创建并添加一个按钮
+    private void addButton(String translationKey, int posX, int posY, int width, int height, Runnable onClick) {
+        this.addRenderableWidget(
+                new AnimatedButton(
+                        this.width + width,
+                        posY,
+                        posX,
+                        posY,
+                        width,
+                        height,
+                        Component.translatable(translationKey),
+                        1000,
+                        button -> onClick.run()
+                )
+        );
+    }
+
+    // 辅助方法：创建一个按钮并将其设为不可用（disabled）
+    private void addDisabledButton(String translationKey, int posX, int posY, int width, int height, Runnable onClick) {
+        AnimatedButton button = new AnimatedButton(
+                this.width + width,
+                posY,
+                posX,
+                posY,
+                width,
+                height,
+                Component.translatable(translationKey),
+                1000,
+                btn -> onClick.run()
+        );
+        button.active = false;
+        this.addRenderableWidget(button);
     }
 
     // 辅助方法：发送刷新界面
@@ -531,6 +808,6 @@ public class Screen_Market extends EconomySystem_Screen {
         endIndex = Math.min(startIndex + thingsPerPage, filteredItems.size());
 
         startX = Math.max((this.width / 2) - 300, 60);
-        startY = Math.max((this.height - 400) / 4, 40);
+        startY = Math.max((this.height - 450) / 4, 55);
     }
 }

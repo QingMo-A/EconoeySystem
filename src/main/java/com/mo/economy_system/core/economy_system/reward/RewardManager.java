@@ -1,6 +1,7 @@
 package com.mo.economy_system.core.economy_system.reward;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -16,7 +17,10 @@ import java.util.Optional;
 
 public class RewardManager {
     public static final File CONFIG_FILE = new File(FMLPaths.CONFIGDIR.get().toFile(), "economy_rewards.json");
-    private static final Gson GSON = new Gson();
+    private static final Gson GSON = new GsonBuilder()
+            .setPrettyPrinting()  // 启用格式化
+            .disableHtmlEscaping() // 可选：禁用 HTML 转义（如保留 &、< 等符号）
+            .create();
 
     private static final List<RewardEntry> rewards = new ArrayList<>();
 

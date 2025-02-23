@@ -4,6 +4,10 @@ import com.mo.economy_system.network.EconomySystem_NetworkManager;
 import com.mo.economy_system.network.packets.economy_system.sales_order.Packet_CreateSalesOrder;
 import com.mo.economy_system.core.economy_system.market.SalesOrder;
 import com.mo.economy_system.screen.EconomySystem_Screen;
+import com.mo.economy_system.screen.components.AnimatedButton;
+import com.mo.economy_system.screen.components.AnimatedHighLevelTextField;
+import com.mo.economy_system.screen.components.ItemIconAnimation;
+import com.mo.economy_system.screen.components.TextAnimation;
 import com.mo.economy_system.utils.Util_MessageKeys;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -20,7 +24,13 @@ import java.util.UUID;
 public class Screen_CreateSalesOrder extends EconomySystem_Screen {
 
     private final Player player;
-    private EditBox priceInput; // 输入框用于设置价格
+    private AnimatedHighLevelTextField priceInput; // 输入框用于设置价格
+
+    private TextAnimation noItem;
+    private ItemIconAnimation icon;
+    private TextAnimation name;
+    private TextAnimation count;
+    private TextAnimation price;
 
     public Screen_CreateSalesOrder(Player player) {
         super(Component.translatable(Util_MessageKeys.LIST_TITLE_KEY));
@@ -31,26 +41,110 @@ public class Screen_CreateSalesOrder extends EconomySystem_Screen {
     protected void init() {
         super.init();
 
+        initPart();
+
+    }
+
+    @Override
+    protected void initPart() {
+
         // 清除所有组件
         this.clearWidgets();
 
-        // 添加价格输入框
-        priceInput = new EditBox(this.font, this.width / 2 - 75, this.height / 2 - 20, 150, 20, Component.literal("Enter Price"));
-        this.addRenderableWidget(priceInput);
-        this.priceInput.setHint(Component.translatable(Util_MessageKeys.LIST_HINT_TEXT_KEY)); // 提示文本
+        if (flag == 0) {
 
-        // 添加上架按钮
-        this.addRenderableWidget(
-                Button.builder(Component.translatable(Util_MessageKeys.LIST_LIST_BUTTON_KEY), button -> listItem())
-                        .pos(this.width / 2 - 50, this.height / 2 + 10)
-                        .size(100, 20)
-                        .build()
-        );
+            // 添加价格输入框
+            priceInput = new AnimatedHighLevelTextField(
+                    this.font,
+                    this.width / 2 - 75,
+                    this.height + 2,
+                    150,
+                    20,
+                    1000,
+                    Component.literal("Enter Price"));
+            this.addRenderableWidget(priceInput);
+
+            // 设置搜索框的键盘监听器
+            this.priceInput.setFocused(false); // 默认不聚焦
+            this.priceInput.setHint(Component.translatable(Util_MessageKeys.LIST_HINT_TEXT_KEY)); // 提示文本
+            // this.priceInput.setResponder(text -> pricePrediction());
+            this.priceInput.startMoveAnimation(this.width / 2 - 75, this.height / 2 - 20);
+
+            this.addRenderableWidget(
+                    new AnimatedButton(
+                            this.width / 2 - 50,
+                            this.height + 20,
+                            this.width / 2 - 50,
+                            this.height / 2 + 10,
+                            100,
+                            20,
+                            Component.translatable(Util_MessageKeys.LIST_LIST_BUTTON_KEY),
+                            1000,
+                            button -> {
+                                listItem();
+                            }
+                    )
+            );
+
+        } else if (flag >= 1) {
+
+            // 添加价格输入框
+            priceInput = new AnimatedHighLevelTextField(
+                    this.font,
+                    this.width / 2 - 75,
+                    this.height / 2 - 20,
+                    150,
+                    20,
+                    1000,
+                    Component.literal("Enter Price"));
+            this.addRenderableWidget(priceInput);
+
+            // 设置搜索框的键盘监听器
+            this.priceInput.setFocused(false); // 默认不聚焦
+            this.priceInput.setHint(Component.translatable(Util_MessageKeys.LIST_HINT_TEXT_KEY)); // 提示文本
+            // this.priceInput.setResponder(text -> pricePrediction());
+            this.priceInput.startMoveAnimation(this.width / 2 - 75, this.height / 2 - 20);
+
+            // 添加上架按钮
+            this.addRenderableWidget(
+                    Button.builder(Component.translatable(Util_MessageKeys.LIST_LIST_BUTTON_KEY), button -> listItem())
+                            .pos(this.width / 2 - 50, this.height / 2 + 10)
+                            .size(100, 20)
+                            .build()
+            );
+
+        }
+
+        flag ++;
+
+        initializeRenderCache();
+
+        super.initPart();
+    }
+
+    @Override
+    public void resize(Minecraft minecraft, int width, int height) {
+
+        this.flag = 0;
+
+        super.resize(minecraft, width, height);
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         this.renderBackground(guiGraphics);
+
+        // 执行渲染缓存中的任务
+        for (RunnableWithGraphics task : renderCache) {
+            task.run(guiGraphics);
+        }
+
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
+    }
+
+    @Override
+    protected void initializeRenderCache() {
+        renderCache.clear();
 
         // 获取玩家手中的物品
         ItemStack heldItem = player.getMainHandItem();
@@ -65,27 +159,96 @@ public class Screen_CreateSalesOrder extends EconomySystem_Screen {
             // 计算整体的居中位置
             int xPosition = (this.width - totalWidth) / 2;
 
-            // 渲染物品图标
-            guiGraphics.renderItem(heldItem, xPosition, this.height / 2 - 40);
+            icon = new ItemIconAnimation(
+                    xPosition,
+                    this.height / 2 - 40,
+                    xPosition,
+                    this.height / 2 - 40,
+                    0f,
+                    1f,
+                    0.8f,
+                    1f,
+                    1000
+            );
 
-            // 渲染物品名称（图标右边，间距2）
-            guiGraphics.drawString(this.font, heldItem.getHoverName().getString(), xPosition + 16 + 2, this.height / 2 - 36, 0xFFFFFF);
+            name = new TextAnimation(
+                    xPosition + 16 + 2,
+                    this.height / 2 - 36,
+                    xPosition + 16 + 2,
+                    this.height / 2 - 36,
+                    0f,
+                    1f,
+                    1000
+            );
+
+            renderCache.add((guiGraphics) -> {
+
+                renderAnimatedItem(
+                        guiGraphics,
+                        heldItem,
+                        icon
+                );
+
+                renderAnimatedText(
+                        guiGraphics,
+                        Component.literal(heldItem.getHoverName().getString()),
+                        name,
+                        0xFFFFFF
+                );
+
+            });
 
         } else {
             // 动态计算文字居中的位置
             int textWidth = this.font.width(Component.translatable(Util_MessageKeys.LIST_NO_ITEM_IN_HAND_TEXT_KEY));
             int xPosition = (this.width - textWidth) / 2;
 
-            guiGraphics.drawString(this.font, Component.translatable(Util_MessageKeys.LIST_NO_ITEM_IN_HAND_TEXT_KEY), xPosition, this.height / 2 - 40, 0xAAAAAA);
+            noItem = new TextAnimation(
+                    xPosition,
+                    this.height / 2 - 40,
+                    xPosition,
+                    this.height / 2 - 40,
+                    0f,
+                    1f,
+                    2000
+            );
+
+            renderCache.add((guiGraphics) -> {
+
+                renderAnimatedText(
+                        guiGraphics,
+                        Component.translatable(Util_MessageKeys.LIST_NO_ITEM_IN_HAND_TEXT_KEY),
+                        noItem,
+                        0xAAAAAA
+                );
+
+            });
         }
 
         int textWidth = this.font.width(Component.translatable(Util_MessageKeys.LIST_PRICE_TEXT_KEY));
-        // 计算整体的居中位置
-        int xPosition = (this.width - textWidth) / 2;
-        // 渲染价格输入框
-        guiGraphics.drawString(this.font, Component.translatable(Util_MessageKeys.LIST_PRICE_TEXT_KEY), this.width / 2 - 78 - textWidth, this.height / 2 - 15, 0xFFFFFF);
 
-        super.render(guiGraphics, mouseX, mouseY, partialTicks);
+        price = new TextAnimation(
+                -textWidth,
+                this.height / 2 - 15,
+                this.width / 2 - 78 - textWidth,
+                this.height / 2 - 15,
+                0f,
+                1f,
+                1000
+        );
+
+        renderCache.add((guiGraphics) -> {
+
+            renderAnimatedText(
+                    guiGraphics,
+                    Component.translatable(Util_MessageKeys.LIST_PRICE_TEXT_KEY),
+                    price,
+                    0xFFFFFF
+            );
+
+        });
+
+        super.initializeRenderCache();
     }
 
     private void listItem() {

@@ -175,7 +175,8 @@ public class Screen_DeliveryBox extends EconomySystem_Screen {
     }
 
     // 添加翻页按钮
-    private void addPageButtons() {
+    @Override
+    protected void addPageButtons() {
         initPosition();
         int buttonY = this.height - 40;
 

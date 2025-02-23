@@ -28,41 +28,38 @@ public class EconomySystem_Screen extends Screen {
     protected int startX;
     protected int startY;
 
+    protected int flag = 0;
+
     protected EconomySystem_Screen(Component title) {
         super(title);
     }
 
-    protected void initializeRenderCache() {
+    // 初始化渲染缓存
+    protected void initializeRenderCache() {}
 
-    }
-
+    // 初始化坐标
     protected void initPosition() {}
 
-    protected void initStaticComponents() {
-
-    }
-
-    protected void initDynamicComponents() {
-
-    }
-
+    // 初始化部分
     protected void initPart() {}
 
+    // 根据鼠标位置渲染描述
     protected void detectMouseHoverAndRenderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {}
+
+    protected void addPageAnimatedButtons() {
+
+    }
+
+    protected void addPageButtons() {
+
+    }
 
     @Override
     public boolean isPauseScreen() {
         return false; // 界面打开时不暂停游戏
     }
 
-    protected void clearFocus() {
-        ComponentPath componentpath = this.getCurrentFocusPath();
-        if (componentpath != null) {
-            componentpath.applyFocus(false);
-        }
-
-    }
-
+    // 检测鼠标位置
     protected boolean isMouseOver(int mouseX, int mouseY, int x, int y, int width, int height) {
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
     }
@@ -72,6 +69,7 @@ public class EconomySystem_Screen extends Screen {
         void run(GuiGraphics guiGraphics);
     }
 
+    // 渲染动画文本
     protected void renderAnimatedText(GuiGraphics guiGraphics, Component text, TextAnimation animation) {
         // 计算当前属性
         int x = animation.getCurrentX();
@@ -92,6 +90,7 @@ public class EconomySystem_Screen extends Screen {
         );
     }
 
+    // 渲染自定义颜色的动画文本
     protected void renderAnimatedText(GuiGraphics guiGraphics, Component text, TextAnimation animation, int customHexColor) {
         // 计算当前属性
         int x = animation.getCurrentX();
@@ -114,6 +113,7 @@ public class EconomySystem_Screen extends Screen {
         );
     }
 
+    // 渲染动画图标
     protected void renderAnimatedItem(GuiGraphics guiGraphics, ItemStack itemStack, ItemIconAnimation animation) {
         if (animation == null) return;
 

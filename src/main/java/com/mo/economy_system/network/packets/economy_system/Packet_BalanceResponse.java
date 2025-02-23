@@ -53,8 +53,6 @@ public class Packet_BalanceResponse {
             Screen screen = minecraft.screen;
             if (screen instanceof Screen_Home screenHome) {
                 screenHome.updateBalance(msg.balance, msg.accounts); // 更新界面余额
-            } else {
-                minecraft.player.sendSystemMessage(Component.literal("Your Balance: " + msg.balance + " coins"));
             }
         });
         context.setPacketHandled(true);

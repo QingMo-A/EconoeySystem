@@ -71,6 +71,7 @@ public class Command_TerritoryClaim {
                     BlockPos firstPos = Item_ClaimWand.getFirstModifyPosition(playerUUID);
                     BlockPos secondPos = Item_ClaimWand.getSecondModifyPosition(playerUUID);
                     Territory t = TerritoryManager.getTerritoryByID(Item_ClaimWand.getResizingTerritoryID(player));
+                    TerritoryManager.removeTerritory(t.getTerritoryID());
 
                     // 检查余额
                     EconomySavedData data = EconomySavedData.getInstance(player.serverLevel());
@@ -105,6 +106,7 @@ public class Command_TerritoryClaim {
                         player.sendSystemMessage(Component.translatable(Util_MessageKeys.CLAIM_RESIZE_SUCCESS));
                         Item_ClaimWand.clearPositions(playerUUID);
                     }
+                    TerritoryManager.addTerritory(t);
                     return 1;
                 })
         );
