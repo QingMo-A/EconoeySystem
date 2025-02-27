@@ -2,7 +2,7 @@
 
 > 一个简单的经济系统
 
-![Version](https://img.shields.io/badge/version-v1.1.6-blue)
+![Version](https://img.shields.io/badge/version-v1.2.00-blue)
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 
 ### 作者 (Author): [QingMo](https://github.com/QingMo)
@@ -31,7 +31,6 @@
 
 - 玩家出售的杂物，可以查看卖家的信息。
 - 将鼠标移动至物品图标上，显示物品的详细信息（如卖家等）。
-- 若发现哄抬物价的情况，系统会及时更新商品税。
 
 ---
 
