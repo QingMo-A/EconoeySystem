@@ -97,6 +97,7 @@ public class Util_MessageKeys {
     public static final String ORDER_DELIVERED_BY_PLAYER_KEY = "message.order.delivered_by_player";
 
     public static final String MARKET_TITLE_KEY = "screen.market.title";
+    public static final String MARKET_HINT_TEXT_KEY = "text.market.hint";
     public static final String MARKET_SELLER_NAME_KEY = "screen.market.item.seller_name";
     public static final String MARKET_SELLER_UUID_KEY = "screen.market.item.seller_uuid";
     public static final String MARKET_TRADE_ID_KEY = "screen.market.item.trade_id";
@@ -113,7 +114,6 @@ public class Util_MessageKeys {
     public static final String MARKET_SWITCH_DISPLAY_TYPE_4_BUTTON_KEY = "button.market.switch_display_type_4";
     public static final String MARKET_BUY_BUTTON_KEY = "button.market.buy";
     public static final String MARKET_REMOVE_BUTTON_KEY = "button.market.remove";
-    public static final String MARKET_HINT_TEXT_KEY = "text.market.hint";
     public static final String MARKET_ITEM_DOES_NOT_EXIST_MESSAGE_KEY = "message.market.item_does_not_exist";
     public static final String MARKET_PURCHASE_FAILED_MESSAGE_KEY = "message.market.purchase_failed";
     public static final String MARKET_PURCHASE_SUCCESSFULLY_MESSAGE_KEY = "message.market.purchase_successfully";
@@ -159,11 +159,9 @@ public class Util_MessageKeys {
     public static final String TERRITORY_MANAGEMENT_PERMISSIONS = "message.territory_management.permissions";
     public static final String TERRITORY_MANAGEMENT_TRANSFER_OWNERSHIP = "message.territory_management.transfer_ownership";
     public static final String TERRITORY_MANAGEMENT_RESIZE_TERRITORY = "message.territory_management.resize_territory";
-
     public static final String TERRITORY_NOT_FOUND = "message.territory.not_found";
     public static final String TERRITORY_NO_OWNER_PERMISSION = "message.territory.no_owner_permission";
     public static final String TERRITORY_REMOVE_SUCCESS = "message.territory.remove_success";
-
     public static final String TERRITORY_NOT_EXIST = "message.territory.not_exist";
     public static final String TERRITORY_NO_PERMISSION = "message.territory.no_permission";
     public static final String TERRITORY_PLAYER_KICKED = "message.territory.player_kicked";
@@ -180,7 +178,6 @@ public class Util_MessageKeys {
     public static final String INVITE_RECEIVED = "message.invite.received"; // 玩家 {inviterName} 邀请你加入领地: {territoryName}
     public static final String INVITE_INSTRUCTIONS = "message.invite.instructions"; // 输入 /accept_invite 接受 或 /decline_invite 拒绝
     public static final String INVITE_SELF_ERROR = "message.invite.self_error"; // 你不能向自己发出邀请!
-
     public static final String INVITE_NOT_IN_TERRITORY = "message.invite.not_in_territory";
     public static final String INVITE_SENT_TO_PLAYER = "message.invite.sent_to_player";
     public static final String INVITE_RECEIVED_PLAYER = "message.invite.received_player";
@@ -194,7 +191,6 @@ public class Util_MessageKeys {
     public static final String INVITE_DECLINE_NO_PENDING = "message.invite.decline_no_pending";
     public static final String INVITE_DECLINED = "message.invite.declined";
     public static final String INVITE_DECLINE_BUTTON = "button.invite.decline";
-
 
     public static final String CLAIM_WAND_SELECT_POINTS = "message.claim_wand.select_points";
     public static final String CLAIM_INSUFFICIENT_BALANCE = "message.claim.insufficient_balance";

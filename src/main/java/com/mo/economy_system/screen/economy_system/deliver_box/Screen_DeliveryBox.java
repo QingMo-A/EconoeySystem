@@ -4,7 +4,6 @@ import com.mo.economy_system.core.economy_system.delivery_box.DeliveryItem;
 import com.mo.economy_system.network.EconomySystem_NetworkManager;
 import com.mo.economy_system.network.packets.economy_system.Packet_DeliveryBoxClaimItem;
 import com.mo.economy_system.network.packets.economy_system.Packet_DeliveryBoxDataRequest;
-import com.mo.economy_system.network.packets.economy_system.sales_order.Packet_RemoveSalesOrder;
 import com.mo.economy_system.screen.EconomySystem_Screen;
 import com.mo.economy_system.screen.Screen_Home;
 import com.mo.economy_system.utils.Util_MessageKeys;

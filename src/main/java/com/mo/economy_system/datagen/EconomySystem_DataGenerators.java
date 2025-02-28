@@ -1,6 +1,7 @@
 package com.mo.economy_system.datagen;
 
 import com.mo.economy_system.EconomySystem;
+import com.mo.economy_system.datagen.lang.ZhCnLanguageProvider;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
@@ -21,5 +22,6 @@ public class EconomySystem_DataGenerators {
         CompletableFuture<HolderLookup.Provider> providerCompletableFuture = event.getLookupProvider();
 
         dataGenerator.addProvider(event.includeServer(), new ModItemModelProvider(packOutput, existingFileHelper));
+        dataGenerator.addProvider(event.includeServer(), new ZhCnLanguageProvider(dataGenerator, EconomySystem.MODID));
     }
 }

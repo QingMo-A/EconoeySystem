@@ -5,13 +5,11 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import net.minecraftforge.fml.loading.FMLPaths;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -35,8 +33,9 @@ public class ShopManager {
     }
 
     public void saveToConfig() {
-        try (FileWriter writer = new FileWriter(CONFIG_FILE)) {
-            GSON.toJson(items, writer);
+        try (FileOutputStream fos = new FileOutputStream(CONFIG_FILE); // 使用字节流
+             OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8)) { // 指定 UTF-8
+            GSON.toJson(items, osw);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -47,9 +46,10 @@ public class ShopManager {
             saveDefaultConfig();
         }
 
-        try (FileReader reader = new FileReader(CONFIG_FILE)) {
+        try (FileInputStream fis = new FileInputStream(CONFIG_FILE); // 使用字节流
+             InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8)) { // 指定 UTF-8
             Type listType = new TypeToken<List<ShopItem>>() {}.getType();
-            List<ShopItem> loadedItems = GSON.fromJson(reader, listType);
+            List<ShopItem> loadedItems = GSON.fromJson(isr, listType);
             items.clear();
             if (loadedItems != null) {
                 items.addAll(loadedItems);
